@@ -65,13 +65,7 @@ namespace BachelorTherasoftDotnetApi.Controllers
             return Ok(new WorkspaceDto{
                 Id = workspace.Id,
                 Name = workspace.Name,
-                Users = [
-                    new UserDto{
-                        Id = user.Id,
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                    },
-                ]
+                
             });
         }
     }
