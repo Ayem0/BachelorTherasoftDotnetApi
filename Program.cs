@@ -1,6 +1,10 @@
 using BachelorTherasoftDotnetApi.Databases;
 using BachelorTherasoftDotnetApi.Dtos;
+using BachelorTherasoftDotnetApi.Interfaces;
 using BachelorTherasoftDotnetApi.Models;
+using BachelorTherasoftDotnetApi.Repositories;
+using BachelorTherasoftDotnetApi.Services;
+
 //using BachelorTherasoftDotnetApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -67,6 +71,8 @@ builder.Services.AddIdentityApiEndpoints<User>(options => {
 //builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
+builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
+builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
 
 var app = builder.Build();
 

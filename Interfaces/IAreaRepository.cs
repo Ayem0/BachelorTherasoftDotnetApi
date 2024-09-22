@@ -1,12 +1,9 @@
+using BachelorTherasoftDotnetApi.Base;
 using BachelorTherasoftDotnetApi.Models;
 
 namespace BachelorTherasoftDotnetApi.Interfaces;
 
-public interface IAreaRepository
+public interface IAreaRepository : IBaseRepository<Area>
 {
-    Task<Area?> GetAreaAsync(string areaId);
-    Task<List<Area>?> GetAreasAsync(string[] areasId);
-    Task CreateAsync(string name, string locationId);
-    Task DeleteAsync(string areaId);
-    Task UpdateAsync(string areaId, string name);
+    
 }

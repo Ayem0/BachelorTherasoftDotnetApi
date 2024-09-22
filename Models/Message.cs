@@ -1,10 +1,9 @@
-﻿using BachelorTherasoftDotnetApi.Classes;
+﻿using BachelorTherasoftDotnetApi.Base;
 
 namespace BachelorTherasoftDotnetApi.Models;
 
-internal class Message : DefaultFields
+public class Message : BaseModel
 {
-    public string Id = Guid.NewGuid().ToString();
     public required string MemberId { get; set; }
     public required string ConversationId { get; set; }
     public string ?ReplyToMessageId { get; set; }

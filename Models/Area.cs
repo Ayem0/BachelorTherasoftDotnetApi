@@ -1,10 +1,9 @@
-﻿using BachelorTherasoftDotnetApi.Classes;
+﻿using BachelorTherasoftDotnetApi.Base;
 
 namespace BachelorTherasoftDotnetApi.Models;
 
-public class Area : DefaultFields
+public class Area : BaseModel
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
     public required string LocationId { get; set; }
     public required Location Location { get; set; }
     public required string Name { get; set; }

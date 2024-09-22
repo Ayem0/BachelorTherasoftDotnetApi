@@ -1,15 +1,14 @@
 using System;
-using BachelorTherasoftDotnetApi.Classes;
+using BachelorTherasoftDotnetApi.Base;
 
 namespace BachelorTherasoftDotnetApi.Models;
 
-public class Workspace : DefaultFields
+public class Workspace : BaseModel
 {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
         public required string Name { get; set; }
-        public List<User> Users { get; set; } = [];
-        public List<WorkspaceRight> WorkspaceRights { get; set; } = [];
-        public List<WorkspaceRole> WorkspaceRoles { get; set; } = [];
-        public List<Location> Locations { get; set; } = [];
+        public virtual List<User> Users { get; set; } = [];
+        public virtual List<WorkspaceRight> WorkspaceRights { get; set; } = [];
+        public virtual List<WorkspaceRole> WorkspaceRoles { get; set; } = [];
+        public virtual List<Location> Locations { get; set; } = [];
 
 }

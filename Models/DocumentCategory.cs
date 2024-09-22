@@ -1,11 +1,10 @@
 using System;
-using BachelorTherasoftDotnetApi.Classes;
+using BachelorTherasoftDotnetApi.Base;
 
 namespace BachelorTherasoftDotnetApi.Models;
 
-public class DocumentCategory : DefaultFields
+public class DocumentCategory : BaseModel
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
     public required string Name { get; set; }
     public required string WorkspaceId { get; set; }
     public required Workspace Workspace { get; set; }

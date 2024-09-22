@@ -1,10 +1,9 @@
-﻿using BachelorTherasoftDotnetApi.Classes;
+﻿using BachelorTherasoftDotnetApi.Base;
 
 namespace BachelorTherasoftDotnetApi.Models;
 
-public class Event : DefaultFields
+public class Event : BaseModel
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
     public required TimeOnly StartTime { get; set; }
     public required TimeOnly EndTime { get; set; }
     public required DateTime StartDate { get; set; }

@@ -1,10 +1,9 @@
-using BachelorTherasoftDotnetApi.Classes;
+using BachelorTherasoftDotnetApi.Base;
 
 namespace BachelorTherasoftDotnetApi.Models;
 
-public class Document : DefaultFields
+public class Document : BaseModel
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
     public required string EventId { get; set; }
     public required Event Event { get; set; }
     public required string DocumentCategoryId { get; set; }

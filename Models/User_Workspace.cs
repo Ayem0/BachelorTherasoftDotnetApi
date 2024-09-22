@@ -1,8 +1,8 @@
-using BachelorTherasoftDotnetApi.Classes;
+using BachelorTherasoftDotnetApi.Base;
 
 namespace BachelorTherasoftDotnetApi.Models;
 
-public class User_Workspace : DefaultFields
+public class User_Workspace : BaseModel
 {
     public required string UserId { get; set; }
     public required User User { get; set; }

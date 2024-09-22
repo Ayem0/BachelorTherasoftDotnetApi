@@ -1,11 +1,10 @@
-using BachelorTherasoftDotnetApi.Classes;
+using BachelorTherasoftDotnetApi.Base;
 using BachelorTherasoftDotnetApi.Enums;
 
 namespace BachelorTherasoftDotnetApi.Models;
 
-public class Slot : DefaultFields
+public class Slot : BaseModel
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
     public required string RoomId { get; set; }
     public required Room Room { get; set; }
     public required TimeOnly StartTime { get; set; }
