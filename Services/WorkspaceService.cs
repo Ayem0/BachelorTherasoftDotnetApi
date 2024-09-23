@@ -19,4 +19,14 @@ public class WorkspaceService : IWorkspaceService
     {
         await _workspaceRepository.CreateAsync(workspace);
     }
+
+    public async Task UpdateWorkspaceAsync(Workspace workspace)
+    {
+        await _workspaceRepository.UpdateAsync(workspace);
+    }
+
+    public async Task DeleteWorkspaceAsync(string id)
+    {
+        await _workspaceRepository.DeleteAsync(id);
+    }
 }
