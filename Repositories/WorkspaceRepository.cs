@@ -11,12 +11,13 @@ public class WorkspaceRepository : BaseRepository<Workspace>, IWorkspaceReposito
     public WorkspaceRepository(MySqlDbContext context) : base(context)
     {
     }
+    
     public async new Task<Workspace?> GetByIdAsync(string id)
-{
-    return await _context.Workspace
-        .Include(w => w.Users)
-        .Include(w => w.WorkspaceRoles)
-        .Where(w => w.Id == id && w.DeletedAt == null)
-        .FirstOrDefaultAsync();
-}
+    {
+        return await _context.Workspace
+            .Include(w => w.Users)
+            .Include(w => w.WorkspaceRoles)
+            .Where(w => w.Id == id && w.DeletedAt == null)
+            .FirstOrDefaultAsync();
+    }
 }

@@ -37,7 +37,8 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel
     public async Task DeleteAsync(string id)
     {
         var entity = await _dbSet.FindAsync(id);
-        if (entity != null)
+        
+        if (entity != null && entity.DeletedAt == null)
         {
             entity.DeletedAt = DateTime.Now;
             _dbSet.Update(entity);

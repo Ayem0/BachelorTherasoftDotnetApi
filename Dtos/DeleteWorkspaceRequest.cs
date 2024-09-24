@@ -1,8 +1,10 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace BachelorTherasoftDotnetApi.Dtos;
 
-public class DeleteWorkspaceRequestDto
+public class DeleteWorkspaceRequest
 {
+    [Required]
     public required string Id { get; set;}
 }

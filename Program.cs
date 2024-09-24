@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MySqlConnector;
+using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -48,6 +49,26 @@ builder.Services.AddSwaggerGen(o =>
             new string[] {}
         }
     });
+    o.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "Bachelor Therasoft",
+        Description = "An ASP.NET Core Web API for collaborativ agenda",
+        TermsOfService = new Uri("https://example.com/terms"),
+        Contact = new OpenApiContact
+        {
+            Name = "Example Contact",
+            Url = new Uri("https://example.com/contact")
+        },
+        License = new OpenApiLicense
+        {
+            Name = "Example License",
+            Url = new Uri("https://example.com/license")
+        }
+    });
+    // Ajoute les commentaire du code dans le swagger 
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    o.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 builder.Services.AddDbContext<MySqlDbContext>( 
     options => options.UseMySql(
@@ -73,6 +94,8 @@ builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
 builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
+builder.Services.AddScoped<IWorkspaceRoleRepository, WorkspaceRoleRepository>();
+builder.Services.AddScoped<IWorkspaceRoleService, WorkspaceRoleService>();
 
 var app = builder.Build();
 
@@ -92,8 +115,7 @@ app.UseAuthorization();
 app.MapIdentityApi<User>();
 app.MapPost("/register2", async (
     RegisterRequestDto request,
-    UserManager<User> userManager,
-    IPasswordHasher<User> passwordHasher) =>
+    UserManager<User> userManager) =>
 {
     var user = new User
     {
