@@ -18,7 +18,17 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel
 
     public async Task<T?> GetByIdAsync(string id)
     {
-        return await _dbSet.Where(x => x.Id == id && x.DeletedAt == null).FirstAsync();
+        IQueryable<T> query = _dbSet;
+
+        // Charger toutes les relations (propriétés de navigation)
+        var navigations = _context.Model.FindEntityType(typeof(T))!.GetNavigations();
+
+        foreach (var navigation in navigations)
+        {
+            query = query.Include(navigation.Name);
+        }
+
+        return await query.Where(x => x.Id == id && x.DeletedAt == null).FirstOrDefaultAsync();
     }
 
     public async Task CreateAsync(T entity)
@@ -34,16 +44,11 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(string id)
+    public async Task DeleteAsync(T entity)
     {
-        var entity = await _dbSet.FindAsync(id);
-        
-        if (entity != null && entity.DeletedAt == null)
-        {
-            entity.DeletedAt = DateTime.Now;
-            _dbSet.Update(entity);
-            await _context.SaveChangesAsync();
-        }
+        entity.DeletedAt = DateTime.Now;
+        _dbSet.Update(entity);
+        await _context.SaveChangesAsync();
     }
 }
 

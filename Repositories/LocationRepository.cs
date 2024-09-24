@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.Repositories;
 
-public class LocationRepository : BaseRepository<Location>, ILocationRepository
+public class LocationRepository : BaseRepository<Location>
 {
     public LocationRepository(MySqlDbContext context) : base(context)
     {

@@ -5,7 +5,7 @@ using BachelorTherasoftDotnetApi.Base;
 
 namespace BachelorTherasoftDotnetApi.Repositories;
 
-public class AreaRepository : BaseRepository<Area>, IAreaRepository
+public class AreaRepository : BaseRepository<Area>
 {
     public AreaRepository(MySqlDbContext context) : base(context)
     {

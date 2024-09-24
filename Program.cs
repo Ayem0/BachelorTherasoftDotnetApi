@@ -1,3 +1,4 @@
+using BachelorTherasoftDotnetApi.Base;
 using BachelorTherasoftDotnetApi.Databases;
 using BachelorTherasoftDotnetApi.Dtos;
 using BachelorTherasoftDotnetApi.Interfaces;
@@ -92,9 +93,9 @@ builder.Services.AddIdentityApiEndpoints<User>(options => {
 //builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
-builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
+builder.Services.AddScoped<IBaseRepository<Workspace>, BaseRepository<Workspace>>();
+builder.Services.AddScoped<IBaseRepository<WorkspaceRole>, BaseRepository<WorkspaceRole>>();
 builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
-builder.Services.AddScoped<IWorkspaceRoleRepository, WorkspaceRoleRepository>();
 builder.Services.AddScoped<IWorkspaceRoleService, WorkspaceRoleService>();
 
 var app = builder.Build();

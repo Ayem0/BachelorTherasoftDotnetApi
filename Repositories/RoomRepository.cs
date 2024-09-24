@@ -6,7 +6,7 @@ using BachelorTherasoftDotnetApi.Base;
 
 namespace BachelorTherasoftDotnetApi.Repositories;
 
-public class RoomRepository : BaseRepository<Location>, ILocationRepository
+public class RoomRepository : BaseRepository<Location>
 {
      public RoomRepository(MySqlDbContext context) : base(context)
     {

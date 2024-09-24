@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.Repositories;
 
-public class WorkspaceRoleRepository : BaseRepository<WorkspaceRole>, IWorkspaceRoleRepository
+public class WorkspaceRoleRepository : BaseRepository<WorkspaceRole>
 
 {
     public WorkspaceRoleRepository(MySqlDbContext context) : base(context)

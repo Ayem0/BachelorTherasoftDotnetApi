@@ -6,7 +6,7 @@ using BachelorTherasoftDotnetApi.Base;
 
 namespace BachelorTherasoftDotnetApi.Repositories;
 
-public class WorkspaceRepository : BaseRepository<Workspace>, IWorkspaceRepository
+public class WorkspaceRepository : BaseRepository<Workspace>
 {
     public WorkspaceRepository(MySqlDbContext context) : base(context)
     {
