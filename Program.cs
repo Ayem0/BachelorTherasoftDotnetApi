@@ -1,23 +1,16 @@
-using BachelorTherasoftDotnetApi.Base;
-using BachelorTherasoftDotnetApi.Databases;
-using BachelorTherasoftDotnetApi.Dtos;
-using BachelorTherasoftDotnetApi.Interfaces;
-using BachelorTherasoftDotnetApi.Models;
-using BachelorTherasoftDotnetApi.Repositories;
-using BachelorTherasoftDotnetApi.Services;
 
-//using BachelorTherasoftDotnetApi.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using BachelorTherasoftDotnetApi.src.Databases;
+using BachelorTherasoftDotnetApi.src.Dtos;
+using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Models;
+using BachelorTherasoftDotnetApi.src.Repositories;
+using BachelorTherasoftDotnetApi.src.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MySqlConnector;
 using System.Reflection;
-using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -89,10 +82,15 @@ builder.Services.AddIdentityApiEndpoints<User>(options => {
     options.Lockout.MaxFailedAccessAttempts = 5;
 }).AddEntityFrameworkStores<MySqlDbContext>();
 
+// Email service
 //builder.Services.AddTransient<IEmailSender, EmailSender>();
 //builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
+
+// Authentication service
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
+
+// Custom Services
 builder.Services.AddScoped<WorkspaceRepository>();
 builder.Services.AddScoped<WorkspaceRoleRepository>();
 builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
@@ -114,6 +112,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapIdentityApi<User>();
+// TODO a delete lors de l'auth controller et auth service
 app.MapPost("/register2", async (
     RegisterRequestDto request,
     UserManager<User> userManager) =>
