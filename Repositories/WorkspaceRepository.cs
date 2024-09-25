@@ -1,5 +1,4 @@
 using BachelorTherasoftDotnetApi.Models;
-using BachelorTherasoftDotnetApi.Interfaces;
 using BachelorTherasoftDotnetApi.Databases;
 using Microsoft.EntityFrameworkCore;
 using BachelorTherasoftDotnetApi.Base;
@@ -11,7 +10,7 @@ public class WorkspaceRepository : BaseRepository<Workspace>
     public WorkspaceRepository(MySqlDbContext context) : base(context)
     {
     }
-    
+
     public async new Task<Workspace?> GetByIdAsync(string id)
     {
         return await _context.Workspace

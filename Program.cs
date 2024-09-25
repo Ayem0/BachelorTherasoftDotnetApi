@@ -93,8 +93,8 @@ builder.Services.AddIdentityApiEndpoints<User>(options => {
 //builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
-builder.Services.AddScoped<IBaseRepository<Workspace>, BaseRepository<Workspace>>();
-builder.Services.AddScoped<IBaseRepository<WorkspaceRole>, BaseRepository<WorkspaceRole>>();
+builder.Services.AddScoped<WorkspaceRepository>();
+builder.Services.AddScoped<WorkspaceRoleRepository>();
 builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
 builder.Services.AddScoped<IWorkspaceRoleService, WorkspaceRoleService>();
 

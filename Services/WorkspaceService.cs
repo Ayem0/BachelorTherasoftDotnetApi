@@ -2,15 +2,16 @@ using BachelorTherasoftDotnetApi.Base;
 using BachelorTherasoftDotnetApi.Dtos;
 using BachelorTherasoftDotnetApi.Interfaces;
 using BachelorTherasoftDotnetApi.Models;
+using BachelorTherasoftDotnetApi.Repositories;
 using Microsoft.AspNetCore.Identity;
 
 namespace BachelorTherasoftDotnetApi.Services;
 
 public class WorkspaceService : IWorkspaceService
 {
-    private readonly IBaseRepository<Workspace> _workspaceRepository;
+    private readonly WorkspaceRepository _workspaceRepository;
     private readonly UserManager<User> _userManager;
-    public WorkspaceService(IBaseRepository<Workspace> workspaceRepository, UserManager<User> userManager)
+    public WorkspaceService(WorkspaceRepository workspaceRepository, UserManager<User> userManager)
     {
         _workspaceRepository = workspaceRepository;
         _userManager = userManager;

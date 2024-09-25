@@ -25,7 +25,7 @@ namespace BachelorTherasoftDotnetApi.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<WorkspaceDto>> GetWorkspaceById(string id)
+        public async Task<ActionResult<WorkspaceDto>> GetById(string id)
         {
             var workspace = await _workspaceService.GetByIdAsync(id);
 
@@ -111,7 +111,7 @@ namespace BachelorTherasoftDotnetApi.Controllers
         /// <summary>
         /// Updates a workspace.
         /// </summary>
-        [HttpPatch("{id}")]
+        [HttpPut("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

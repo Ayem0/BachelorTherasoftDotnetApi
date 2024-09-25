@@ -1,80 +1,99 @@
-// using BachelorTherasoftDotnetApi.Dtos;
-// using BachelorTherasoftDotnetApi.Interfaces;
-// using BachelorTherasoftDotnetApi.Models;
-// using Microsoft.AspNetCore.Authorization;
-// using Microsoft.AspNetCore.Http;
-// using Microsoft.AspNetCore.Mvc;
+using BachelorTherasoftDotnetApi.Dtos;
+using BachelorTherasoftDotnetApi.Interfaces;
+using BachelorTherasoftDotnetApi.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
-// namespace BachelorTherasoftDotnetApi.Controllers
-// {
-//     [Route("api/[controller]")]
-//     [ApiController]
-//     public class WorkspaceRoleController : ControllerBase
-//     {
-//         private readonly IWorkspaceRoleService _workspaceRoleService;
-//         private readonly IWorkspaceService _workspaceService;
+namespace BachelorTherasoftDotnetApi.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class WorkspaceRoleController : ControllerBase
+    {
+        private readonly IWorkspaceRoleService _workspaceRoleService;
         
-//         public WorkspaceRoleController(IWorkspaceRoleService workspaceRoleService, IWorkspaceService workspaceService)
-//         {
-//             _workspaceRoleService = workspaceRoleService;
-//             _workspaceService = workspaceService;
-//         }
+        public WorkspaceRoleController(IWorkspaceRoleService workspaceRoleService)
+        {
+            _workspaceRoleService = workspaceRoleService;
+        }
 
-//         /// <summary>
-//         /// Creates a role for a workspace.
-//         /// </summary>
-//         [HttpPost("")]
-//         [Authorize]
-//         public async Task<ActionResult> Create([FromBody] CreateWorkspaceRoleRequest request)
-//         {
-//             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
+        /// <summary>
+        /// Creates a role for a workspace.
+        /// </summary>
+        [HttpPost("")]
+        [Authorize]
+        public async Task<ActionResult> Create([FromBody] CreateWorkspaceRoleRequest request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-//             var workspace = await _workspaceService.GetWorkspaceByIdAsync(request.WorkspaceId);
+            var workspaceRole = await _workspaceRoleService.CreateAsync(request.Name, request.WorkspaceId);
 
-//             if ( workspace == null) return NotFound();
-
-//             var workspaceRole = new WorkspaceRole{
-//                 Name = request.Name,
-//                 Workspace = workspace,
-//                 WorkspaceId = workspace.Id,
-//             };
-
-//             await _workspaceRoleService.CreateWorkspaceRoleAsync(workspaceRole);
-
-//             var workspaceRoleDto = new WorkspaceRoleDto{
-//                 Id = workspaceRole.Id,
-//                 Name = workspaceRole.Name
-//             };
+            if ( workspaceRole == null) return BadRequest();
             
-//             return CreatedAtAction(nameof(Create), new { id = workspaceRoleDto.Id }, workspaceRoleDto);
-//         }
+            return CreatedAtAction(nameof(Create), new { id = workspaceRole.Id }, workspaceRole);
+        }
 
-//         /// <summary>
-//         /// Creates a role for a workspace.
-//         /// </summary>
-//         [HttpPost("")]
-//         [Authorize]
-//         public async Task<ActionResult> Delete([FromBody] DeleteWorkspaceRoleRequest request)
-//         {
-//             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
+        /// <summary>
+        /// Deletes a role from a workspace.
+        /// </summary>
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<ActionResult> Delete(string id)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-//             var role = await _workspaceRoleService.GetWorkspaceRoleByIdAsync(request.Id);
+            var workspaceRole = await _workspaceRoleService.DeleteAsync(id);
 
-//             if ( role == null) return NotFound();
+            if (workspaceRole) return Ok();
 
-//             await _workspaceRoleService.DeleteWorkspaceRoleAsync(role.Id);
+            return BadRequest();
+        }
 
-//             await _workspaceRoleService.CreateWorkspaceRoleAsync(workspaceRole);
+        [HttpPost("{id}/AddRoleToMember/{userId}")]
+        [Authorize]
+        public async Task<ActionResult> AddRoleToMember(string id, string userId)
+        {
+            var res = await _workspaceRoleService.AddRoleToMemberAsync(id, userId);
 
-//             var workspaceRoleDto = new WorkspaceRoleDto{
-//                 Id = workspaceRole.Id,
-//                 Name = workspaceRole.Name
-//             };
+            if (res) return Ok();
+
+            return BadRequest();
+        }
+
+        [HttpDelete("{id}/RemoveRoleFromMember/{userId}")]
+        [Authorize]
+        public async Task<ActionResult> RemoveRoleFromMember(string id, string userId)
+        {
+            var res = await _workspaceRoleService.AddRoleToMemberAsync(id, userId);
             
-//             return CreatedAtAction(nameof(CreateWorkspaceRole), new { id = workspaceRoleDto.Id }, workspaceRoleDto);
-//         }
+            if (res) return Ok();
 
+            return BadRequest();
+        }
 
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<ActionResult> Update(string id, [FromBody] UpdateWorkspaceRoleRequest request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
+            
+            var res = await _workspaceRoleService.UpdateAsync(id, request.NewName);
 
-//     }
-// }
+            if (res) return Ok();
+
+            return BadRequest();
+        }
+
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<ActionResult<WorkspaceRoleDto?>> GetById(string id)
+        {
+            var role = await _workspaceRoleService.GetByIdAsync(id);
+
+            if (role == null) return BadRequest();
+            
+            return Ok(role);
+        }
+    }
+}
