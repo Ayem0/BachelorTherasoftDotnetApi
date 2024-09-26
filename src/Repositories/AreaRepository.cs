@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
 
-public class AreaRepository : BaseRepository<Area>
+public class AreaRepository : BaseRepository<Area>, IAreaRepository
 {
     public AreaRepository(MySqlDbContext context) : base(context)
     {

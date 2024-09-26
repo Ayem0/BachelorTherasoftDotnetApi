@@ -1,12 +1,13 @@
 using System;
 using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Databases;
+using BachelorTherasoftDotnetApi.src.Interfaces;
 using BachelorTherasoftDotnetApi.src.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
 
-public class WorkspaceRoleRepository : BaseRepository<WorkspaceRole>
+public class WorkspaceRoleRepository : BaseRepository<WorkspaceRole>, IWorkspaceRoleRepository
 
 {
     public WorkspaceRoleRepository(MySqlDbContext context) : base(context)

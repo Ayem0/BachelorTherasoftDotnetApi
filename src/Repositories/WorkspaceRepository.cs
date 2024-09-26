@@ -2,10 +2,11 @@ using BachelorTherasoftDotnetApi.src.Models;
 using BachelorTherasoftDotnetApi.src.Databases;
 using Microsoft.EntityFrameworkCore;
 using BachelorTherasoftDotnetApi.src.Base;
+using BachelorTherasoftDotnetApi.src.Interfaces;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
 
-public class WorkspaceRepository : BaseRepository<Workspace>
+public class WorkspaceRepository : BaseRepository<Workspace>, IWorkspaceRepository
 {
     public WorkspaceRepository(MySqlDbContext context) : base(context)
     {

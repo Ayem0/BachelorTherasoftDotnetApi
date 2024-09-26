@@ -91,13 +91,13 @@ builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
 // Custom Repositories
-builder.Services.AddScoped<WorkspaceRepository>();
-builder.Services.AddScoped<WorkspaceRoleRepository>();
-builder.Services.AddScoped<LocationRepository>();
-builder.Services.AddScoped<AreaRepository>();
-builder.Services.AddScoped<RoomRepository>();
-builder.Services.AddScoped<EventRepository>();
-builder.Services.AddScoped<EventCategoryRepository>();
+builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
+builder.Services.AddScoped<IWorkspaceRoleRepository, WorkspaceRoleRepository>();
+builder.Services.AddScoped<ILocationRepository, LocationRepository>();
+builder.Services.AddScoped<IAreaRepository, AreaRepository>();
+builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+builder.Services.AddScoped<IEventRepository, EventRepository>();
+builder.Services.AddScoped<IEventCategoryRepository, EventCategoryRepository>();
 // Custom Services
 builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
 builder.Services.AddScoped<IWorkspaceRoleService, WorkspaceRoleService>();

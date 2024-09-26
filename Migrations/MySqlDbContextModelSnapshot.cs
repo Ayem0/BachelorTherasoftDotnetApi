@@ -132,6 +132,9 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time(6)");
+
                     b.Property<string>("EventCategoryId")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
@@ -142,6 +145,9 @@ namespace BachelorTherasoftDotnetApi.Migrations
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time(6)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");
