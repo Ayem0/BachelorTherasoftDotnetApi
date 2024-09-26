@@ -90,11 +90,19 @@ builder.Services.AddIdentityApiEndpoints<User>(options => {
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
-// Custom Services
+// Custom Repositories
 builder.Services.AddScoped<WorkspaceRepository>();
 builder.Services.AddScoped<WorkspaceRoleRepository>();
+builder.Services.AddScoped<LocationRepository>();
+builder.Services.AddScoped<AreaRepository>();
+builder.Services.AddScoped<RoomRepository>();
+// Custom Services
 builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
 builder.Services.AddScoped<IWorkspaceRoleService, WorkspaceRoleService>();
+builder.Services.AddScoped<ILocationService, LocationService>();
+builder.Services.AddScoped<IAreaService, AreaService>();
+builder.Services.AddScoped<IRoomService, RoomService>();
+
 
 var app = builder.Build();
 

@@ -50,6 +50,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             return BadRequest();
         }
 
+        /// <summary>
+        /// Adds a workspace role to a member.
+        /// </summary>
         [HttpPost("{id}/AddRoleToMember/{userId}")]
         [Authorize]
         public async Task<ActionResult> AddRoleToMember(string id, string userId)
@@ -61,6 +64,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             return BadRequest();
         }
 
+        /// <summary>
+        /// Reomves a workspace role from a member.
+        /// </summary>
         [HttpDelete("{id}/RemoveRoleFromMember/{userId}")]
         [Authorize]
         public async Task<ActionResult> RemoveRoleFromMember(string id, string userId)
@@ -72,6 +78,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             return BadRequest();
         }
 
+        /// <summary>
+        /// Updates a workspace role.
+        /// </summary>
         [HttpPut("{id}")]
         [Authorize]
         public async Task<ActionResult> Update(string id, [FromBody] UpdateWorkspaceRoleRequest request)
@@ -85,6 +94,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             return BadRequest();
         }
 
+        /// <summary>
+        /// Gets a workspace role by id.
+        /// </summary>
         [HttpGet("{id}")]
         [Authorize]
         public async Task<ActionResult<WorkspaceRoleDto?>> GetById(string id)
