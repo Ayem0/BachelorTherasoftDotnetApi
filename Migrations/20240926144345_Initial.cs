@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace BachelorTherasoftDotnetApi.src.Migrations
+namespace BachelorTherasoftDotnetApi.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -604,8 +604,6 @@ namespace BachelorTherasoftDotnetApi.src.Migrations
                 {
                     Id = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    StartTime = table.Column<TimeOnly>(type: "time(6)", nullable: false),
-                    EndTime = table.Column<TimeOnly>(type: "time(6)", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: true)

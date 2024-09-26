@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BachelorTherasoftDotnetApi.src.Migrations
+namespace BachelorTherasoftDotnetApi.Migrations
 {
     [DbContext(typeof(MySqlDbContext))]
     partial class MySqlDbContextModelSnapshot : ModelSnapshot
@@ -132,9 +132,6 @@ namespace BachelorTherasoftDotnetApi.src.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<TimeOnly>("EndTime")
-                        .HasColumnType("time(6)");
-
                     b.Property<string>("EventCategoryId")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
@@ -145,9 +142,6 @@ namespace BachelorTherasoftDotnetApi.src.Migrations
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<TimeOnly>("StartTime")
-                        .HasColumnType("time(6)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");

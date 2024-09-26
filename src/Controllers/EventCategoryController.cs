@@ -1,58 +1,57 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LocationController : ControllerBase
+    public class EventCategoryController : ControllerBase
     {
-        private readonly ILocationService _locationService;
-        private readonly IWorkspaceService _workspaceService;
-        public LocationController(ILocationService locationService, IWorkspaceService workspaceService)
+        private readonly IEventCategoryService _eventCategoryService;
+        public EventCategoryController(IEventCategoryService eventCategoryService)
         {
-            _locationService = locationService;   
-            _workspaceService = workspaceService;
+            _eventCategoryService = eventCategoryService;
         }
 
-        /// <summary>
-        /// Get a location by id.
+         /// <summary>
+        /// Get a EventCategory by id.
         /// </summary>
         [HttpGet("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<LocationDto?>> GetById(string id)
+        public async Task<ActionResult<EventCategoryDto?>> GetById(string id)
         {
-            var location = await _locationService.GetByIdAsync(id);
+            var EventCategory = await _eventCategoryService.GetByIdAsync(id);
 
-            if (location == null) return NotFound();
+            if (EventCategory == null) return NotFound();
   
-            return Ok(location);
+            return Ok(EventCategory);
         }
 
         /// <summary>
-        /// Creates a location.
+        /// Creates a EventCategory.
         /// </summary>
         [HttpPost("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<LocationDto>> Create([FromBody] CreateLocationRequest request)
+        public async Task<ActionResult<EventCategoryDto>> Create([FromBody] CreateEventCategoryRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var location = await _locationService.CreateAsync(request.Name, request.WorkspaceId);
+            var EventCategory = await _eventCategoryService.CreateAsync(request.WorkspaceId, request.Name, request.Icon);
 
-            if (location == null) return BadRequest();
+            if (EventCategory == null) return BadRequest();
 
-            return CreatedAtAction(nameof(Create), new { id = location.Id }, location);
+            return CreatedAtAction(nameof(Create), new { id = EventCategory.Id }, EventCategory);
         }
 
         /// <summary>
-        /// Deletes a location.
+        /// Deletes a EventCategory.
         /// </summary>
         [HttpDelete("{id}")]
         [Authorize]
@@ -62,27 +61,27 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var res = await _locationService.DeleteAsync(id);
+            var res = await _eventCategoryService.DeleteAsync(id);
 
-            if ( res ) return Ok();
+            if (res) return Ok();
 
             return BadRequest();
         }
         
         /// <summary>
-        /// Updates a location.
+        /// Updates a EventCategory.
         /// </summary>
         [HttpPut("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update(string id, [FromBody] UpdateLocationRequest request)
+        public async Task<IActionResult> Update(string id, [FromBody] UpdateEventCategoryRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var res = await _locationService.UpdateAsync(id, request.NewName);
+            var res = await _eventCategoryService.UpdateAsync(id, request.NewName, request.NewIcon);
 
-            if ( res ) return Ok();
+            if (res) return Ok();
 
             return BadRequest();
         }

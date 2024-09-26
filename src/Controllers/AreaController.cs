@@ -1,58 +1,61 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+
+// TODO Ajouter la fonctionnalité d'update la location
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LocationController : ControllerBase
+    public class AreaController : ControllerBase
     {
-        private readonly ILocationService _locationService;
+        private readonly IAreaService _areaService;
         private readonly IWorkspaceService _workspaceService;
-        public LocationController(ILocationService locationService, IWorkspaceService workspaceService)
+        public AreaController(IAreaService areaService, IWorkspaceService workspaceService)
         {
-            _locationService = locationService;   
+            _areaService = areaService;   
             _workspaceService = workspaceService;
         }
 
         /// <summary>
-        /// Get a location by id.
+        /// Get a Area by id.
         /// </summary>
         [HttpGet("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<LocationDto?>> GetById(string id)
+        public async Task<ActionResult<AreaDto?>> GetById(string id)
         {
-            var location = await _locationService.GetByIdAsync(id);
+            var Area = await _areaService.GetByIdAsync(id);
 
-            if (location == null) return NotFound();
+            if (Area == null) return NotFound();
   
-            return Ok(location);
+            return Ok(Area);
         }
 
         /// <summary>
-        /// Creates a location.
+        /// Creates a Area.
         /// </summary>
         [HttpPost("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<LocationDto>> Create([FromBody] CreateLocationRequest request)
+        public async Task<ActionResult<AreaDto>> Create([FromBody] CreateAreaRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var location = await _locationService.CreateAsync(request.Name, request.WorkspaceId);
+            var Area = await _areaService.CreateAsync(request.Name, request.LocationId);
 
-            if (location == null) return BadRequest();
+            if (Area == null) return BadRequest();
 
-            return CreatedAtAction(nameof(Create), new { id = location.Id }, location);
+            return CreatedAtAction(nameof(Create), new { id = Area.Id }, Area);
         }
 
         /// <summary>
-        /// Deletes a location.
+        /// Deletes a Area.
         /// </summary>
         [HttpDelete("{id}")]
         [Authorize]
@@ -62,27 +65,27 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var res = await _locationService.DeleteAsync(id);
+            var res = await _areaService.DeleteAsync(id);
 
-            if ( res ) return Ok();
+            if (res) return Ok();
 
             return BadRequest();
         }
         
         /// <summary>
-        /// Updates a location.
+        /// Updates a Area.
         /// </summary>
         [HttpPut("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update(string id, [FromBody] UpdateLocationRequest request)
+        public async Task<IActionResult> Update(string id, [FromBody] UpdateAreaRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var res = await _locationService.UpdateAsync(id, request.NewName);
+            var res = await _areaService.UpdateAsync(id, request.NewName);
 
-            if ( res ) return Ok();
+            if (res) return Ok();
 
             return BadRequest();
         }

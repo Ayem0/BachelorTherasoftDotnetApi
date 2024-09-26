@@ -6,5 +6,6 @@ internal class Conversation : BaseModel
 {
     public string ?Name { get; set; }
     public required List<string> MembersId { get; set; }
+    public required List<Message> Messages { get; set; } = [];
 }
 

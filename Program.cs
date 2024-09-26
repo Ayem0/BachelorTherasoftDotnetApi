@@ -8,7 +8,7 @@ using BachelorTherasoftDotnetApi.src.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using MySqlConnector;
+using MySqlConnector;       
 using System.Reflection;
 
 
@@ -96,13 +96,16 @@ builder.Services.AddScoped<WorkspaceRoleRepository>();
 builder.Services.AddScoped<LocationRepository>();
 builder.Services.AddScoped<AreaRepository>();
 builder.Services.AddScoped<RoomRepository>();
+builder.Services.AddScoped<EventRepository>();
+builder.Services.AddScoped<EventCategoryRepository>();
 // Custom Services
 builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
 builder.Services.AddScoped<IWorkspaceRoleService, WorkspaceRoleService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<IAreaService, AreaService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
-
+builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<IEventCategoryService, EventCategoryService>();
 
 var app = builder.Build();
 

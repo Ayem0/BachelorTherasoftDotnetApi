@@ -9,8 +9,8 @@ public class Event : BaseModel
     public string? Description { get; set; }
     public required string RoomId { get; set; }
     public required Room Room { get; set; }
-    public string? EventCategoryId { get; set; }
-    public EventCategory? EventCategory { get; set; }
+    public required string EventCategoryId { get; set; }
+    public required EventCategory EventCategory { get; set; }
     public List<Participant> Participants { get; set; } = [];
     public List<User> Users { get; set; } = [];
     public List<Tag> Tags { get; set; } = [];
