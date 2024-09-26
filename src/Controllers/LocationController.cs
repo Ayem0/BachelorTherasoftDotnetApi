@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("Api/[controller]")]
     [ApiController]
     public class LocationController : ControllerBase
     {
@@ -44,7 +44,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var location = await _locationService.CreateAsync(request.Name, request.WorkspaceId);
+            var location = await _locationService.CreateAsync(request.Name, request.WorkspaceId, request.Description, request.Address, request.City, request.Country);
 
             if (location == null) return BadRequest();
 
@@ -80,7 +80,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var res = await _locationService.UpdateAsync(id, request.NewName);
+            var res = await _locationService.UpdateAsync(id, request.NewName, request.NewDescription, request.NewAddress, request.NewCity, request.NewCountry);
 
             if ( res ) return Ok();
 

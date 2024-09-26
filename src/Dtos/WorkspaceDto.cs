@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -10,6 +9,8 @@ public class WorkspaceDto
     public required string Id { get; set; }
     [Required]
     public required string Name { get; set; }
+
+    public string? Description { get; set; }
     
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<UserDto>? Users { get; set; }

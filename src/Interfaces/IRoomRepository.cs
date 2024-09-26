@@ -1,4 +1,3 @@
-using System;
 using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Models;
 

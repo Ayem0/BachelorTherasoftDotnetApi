@@ -47,18 +47,7 @@ builder.Services.AddSwaggerGen(o =>
     {
         Version = "v1",
         Title = "Bachelor Therasoft",
-        Description = "An ASP.NET Core Web API for collaborativ agenda",
-        TermsOfService = new Uri("https://example.com/terms"),
-        Contact = new OpenApiContact
-        {
-            Name = "Example Contact",
-            Url = new Uri("https://example.com/contact")
-        },
-        License = new OpenApiLicense
-        {
-            Name = "Example License",
-            Url = new Uri("https://example.com/license")
-        }
+        Description = "An ASP.NET Core Web API for collaborative agenda"
     });
     // Ajoute les commentaire du code dans le swagger 
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -98,6 +87,7 @@ builder.Services.AddScoped<IAreaRepository, AreaRepository>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IEventCategoryRepository, EventCategoryRepository>();
+builder.Services.AddScoped<ITagRepository, TagRepository>();
 // Custom Services
 builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
 builder.Services.AddScoped<IWorkspaceRoleService, WorkspaceRoleService>();
@@ -106,6 +96,7 @@ builder.Services.AddScoped<IAreaService, AreaService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IEventCategoryService, EventCategoryService>();
+builder.Services.AddScoped<ITagService, TagService>();
 
 var app = builder.Build();
 

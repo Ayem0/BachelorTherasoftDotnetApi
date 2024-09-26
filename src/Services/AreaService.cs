@@ -1,28 +1,27 @@
-using System;
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces;
 using BachelorTherasoftDotnetApi.src.Models;
-using BachelorTherasoftDotnetApi.src.Repositories;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
 public class AreaService : IAreaService
 {
-    private readonly AreaRepository _areaRepository;
-    private readonly LocationRepository _locationRepository;
-    public AreaService(AreaRepository areaRepository, LocationRepository locationRepository)
+    private readonly IAreaRepository _areaRepository;
+    private readonly ILocationRepository _locationRepository;
+    public AreaService(IAreaRepository areaRepository, ILocationRepository locationRepository)
     {
         _areaRepository = areaRepository;
         _locationRepository = locationRepository;
     }
 
-    public async Task<AreaDto?> CreateAsync(string name, string locationId)
+    public async Task<AreaDto?> CreateAsync(string locationId, string name, string? description)
     {
         var location = await _locationRepository.GetByIdAsync(locationId);
         if (location == null) return null;
 
         var area = new Area {
             Name = name,
+            Description = description,
             Location = location,
             LocationId = location.Id
         };
@@ -60,12 +59,13 @@ public class AreaService : IAreaService
         return areaDto;
     }
 
-    public async Task<bool> UpdateAsync(string id, string newName)
+    public async Task<bool> UpdateAsync(string id, string? newName, string? newDescription)
     {
         var area = await _areaRepository.GetByIdAsync(id);
-        if (area == null) return false;
+        if (area == null || (newName == null && newDescription == null)) return false;
 
-        area.Name = newName;
+        area.Name = newName ?? area.Name;
+        area.Description = newDescription ?? area.Description;
 
         await _areaRepository.UpdateAsync(area);
 

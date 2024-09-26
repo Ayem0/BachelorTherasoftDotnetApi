@@ -1,20 +1,19 @@
-using System;
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces;
 using BachelorTherasoftDotnetApi.src.Models;
-using BachelorTherasoftDotnetApi.src.Repositories;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
 public class EventCategoryService : IEventCategoryService
 {
-    private readonly EventCategoryRepository _eventCategoryRepository;
-    private readonly WorkspaceRepository _workspaceRepository;
-    public EventCategoryService(EventCategoryRepository eventCategoryRepository, WorkspaceRepository workspaceRepository)
+    private readonly IEventCategoryRepository _eventCategoryRepository;
+    private readonly IWorkspaceRepository _workspaceRepository;
+    public EventCategoryService(IEventCategoryRepository eventCategoryRepository, IWorkspaceRepository workspaceRepository)
     {
         _eventCategoryRepository = eventCategoryRepository;
         _workspaceRepository = workspaceRepository;
     }
+
     public async Task<EventCategoryDto?> CreateAsync(string workspaceId, string name, string icon)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
@@ -22,7 +21,7 @@ public class EventCategoryService : IEventCategoryService
 
         var eventCategory = new EventCategory {
             Name = name,
-            WorkspaceId =workspace.Id,
+            WorkspaceId = workspace.Id,
             Workspace = workspace,
             Icon = icon
         };
@@ -44,6 +43,7 @@ public class EventCategoryService : IEventCategoryService
         if (eventCategory == null) return false;
 
         await _eventCategoryRepository.DeleteAsync(eventCategory);
+
         return true;
     }
 
@@ -57,17 +57,20 @@ public class EventCategoryService : IEventCategoryService
             Icon = eventCategory.Icon,
             Name = eventCategory.Name
         };
+
         return eventCategoryDto;
     }
 
     public async Task<bool> UpdateAsync(string id, string? newName, string? newIcon)
     {
         var eventCategory = await _eventCategoryRepository.GetByIdAsync(id);
-        if (eventCategory == null) return false;
+        if (eventCategory == null || (newName == null && newIcon == null)) return false;
 
         eventCategory.Name = newName ?? eventCategory.Name;
         eventCategory.Icon = newIcon ?? eventCategory.Icon;
+
         await _eventCategoryRepository.UpdateAsync(eventCategory);
+
         return true;
     }
 }

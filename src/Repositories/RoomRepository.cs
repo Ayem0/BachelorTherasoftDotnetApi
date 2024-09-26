@@ -15,10 +15,10 @@ public class RoomRepository : BaseRepository<Room>, IRoomRepository
     public async new Task<Room?> GetByIdAsync(string id)
     {
         return await _context.Room
-            .Include(w => w.Area)
-            .Include(w => w.Slots)
-            .Include(w => w.Events)
-            .Where(w => w.Id == id && w.DeletedAt == null)
+            .Include(r => r.Area)
+            .Include(r => r.Slots)
+            .Include(r => r.Events)
+            .Where(r => r.Id == id && r.DeletedAt == null && r.Area.DeletedAt == null && r.Slots.All(s => s.DeletedAt == null) && r.Events.All(e => e.DeletedAt == null))
             .FirstOrDefaultAsync();
     }
 }

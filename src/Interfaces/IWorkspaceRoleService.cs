@@ -5,9 +5,9 @@ namespace BachelorTherasoftDotnetApi.src.Interfaces;
 public interface IWorkspaceRoleService
 {
     Task<WorkspaceRoleDto?> GetByIdAsync(string id);
-    Task<WorkspaceRoleDto?> CreateAsync(string name, string workspaceId);
+    Task<WorkspaceRoleDto?> CreateAsync(string workspaceId, string name, string? description);
     Task<bool> AddRoleToMemberAsync(string id, string userID);
     Task<bool> RemoveRoleFromMemberAsync(string id, string userID);
     Task<bool> DeleteAsync(string id);
-    Task<bool> UpdateAsync(string id, string newName);
+    Task<bool> UpdateAsync(string id, string? newName, string? newDescription);
 }

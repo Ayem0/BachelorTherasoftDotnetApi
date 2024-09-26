@@ -1,9 +1,7 @@
-using System;
-
 namespace BachelorTherasoftDotnetApi.src.Dtos;
 
 public class UpdateEventCategoryRequest
 {
-    public required string NewName { get; set; }
-    public required string NewIcon { get; set; }
+    public string? NewName { get; set; }
+    public string? NewIcon { get; set; }
 }

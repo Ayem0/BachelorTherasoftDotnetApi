@@ -1,4 +1,3 @@
-using System;
 using BachelorTherasoftDotnetApi.src.Dtos;
 
 namespace BachelorTherasoftDotnetApi.src.Interfaces;

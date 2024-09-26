@@ -3,7 +3,8 @@ using BachelorTherasoftDotnetApi.src.Models;
 
 namespace BachelorTherasoftDotnetApi.src.Interfaces;
 
-public interface ILocationRepository : IBaseRepository<Location>
+public interface ITagRepository : IBaseRepository<Tag>
 {
+
 
 }

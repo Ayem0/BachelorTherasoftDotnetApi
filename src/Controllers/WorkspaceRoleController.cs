@@ -1,13 +1,11 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces;
-using BachelorTherasoftDotnetApi.src.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("Api/[controller]")]
     [ApiController]
     public class WorkspaceRoleController : ControllerBase
     {
@@ -27,7 +25,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var workspaceRole = await _workspaceRoleService.CreateAsync(request.Name, request.WorkspaceId);
+            var workspaceRole = await _workspaceRoleService.CreateAsync(request.WorkspaceId, request.Name, request.Description);
 
             if ( workspaceRole == null) return BadRequest();
             
@@ -87,7 +85,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var res = await _workspaceRoleService.UpdateAsync(id, request.NewName);
+            var res = await _workspaceRoleService.UpdateAsync(id, request.NewName, request.Description);
 
             if (res) return Ok();
 

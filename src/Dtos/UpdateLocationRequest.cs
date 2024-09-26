@@ -1,9 +1,10 @@
-using System;
-
 namespace BachelorTherasoftDotnetApi.src.Dtos;
 
 public class UpdateLocationRequest
 {
-    public required string LocationId { get; set; }
-    public required string NewName { get; set; }
+    public string? NewName { get; set; }
+    public string? NewDescription { get; set; }
+    public string? NewAddress { get; set; }
+    public string? NewCity { get; set; }
+    public string? NewCountry { get; set; }
 }

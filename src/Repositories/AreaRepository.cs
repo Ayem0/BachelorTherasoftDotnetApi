@@ -17,7 +17,7 @@ public class AreaRepository : BaseRepository<Area>, IAreaRepository
         return await _context.Area
             .Include(w => w.Rooms)
             .Include(w => w.Location)
-            .Where(w => w.Id == id && w.DeletedAt == null)
+            .Where(w => w.Id == id && w.DeletedAt == null &&  w.Location.DeletedAt == null && w.Rooms.All(r => r.DeletedAt == null))
             .FirstOrDefaultAsync();
     }
 }

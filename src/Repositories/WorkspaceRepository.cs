@@ -17,7 +17,7 @@ public class WorkspaceRepository : BaseRepository<Workspace>, IWorkspaceReposito
         return await _context.Workspace
             .Include(w => w.Users)
             .Include(w => w.WorkspaceRoles)
-            .Where(w => w.Id == id && w.DeletedAt == null)
+            .Where(w => w.Id == id && w.DeletedAt == null && w.Users.All(u => u.DeletedAt == null) && w.WorkspaceRoles.All(wr => wr.DeletedAt == null))
             .FirstOrDefaultAsync();
     }
 }

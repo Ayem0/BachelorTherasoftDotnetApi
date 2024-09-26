@@ -1,14 +1,13 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 // TODO permettre de modifier l'area d'une room
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("Api/[controller]")]
     [ApiController]
     public class RoomController : ControllerBase
     {
@@ -47,7 +46,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var Room = await _RoomService.CreateAsync(request.Name, request.AreaId);
+            var Room = await _RoomService.CreateAsync(request.Name, request.AreaId, request.Description);
 
             if (Room == null) return BadRequest();
 
@@ -83,7 +82,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var res = await _RoomService.UpdateAsync(id, request.NewName);
+            var res = await _RoomService.UpdateAsync(id, request.NewName, request.NewDescription);
 
             if (res) return Ok();
 

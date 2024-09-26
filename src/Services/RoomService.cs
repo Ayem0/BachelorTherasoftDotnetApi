@@ -1,22 +1,20 @@
-using System;
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces;
 using BachelorTherasoftDotnetApi.src.Models;
-using BachelorTherasoftDotnetApi.src.Repositories;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
 public class RoomService : IRoomService
 {
-    private readonly AreaRepository _areaRepository;
-    private readonly RoomRepository _roomRepository;
-    public RoomService(AreaRepository areaRepository, RoomRepository roomRepository)
+    private readonly IAreaRepository _areaRepository;
+    private readonly IRoomRepository _roomRepository;
+    public RoomService(IAreaRepository areaRepository, IRoomRepository roomRepository)
     {
         _areaRepository = areaRepository;
         _roomRepository = roomRepository;
     }
 
-    public async Task<RoomDto?> CreateAsync(string name, string areaId)
+    public async Task<RoomDto?> CreateAsync(string name, string areaId, string? description)
     {
         var area = await _areaRepository.GetByIdAsync(areaId);
         if (area == null) return null;
@@ -24,7 +22,8 @@ public class RoomService : IRoomService
         var room = new Room {
             Name = name,
             AreaId = area.Id,
-            Area = area
+            Area = area,
+            Description = description
         };
 
         await _roomRepository.CreateAsync(room);
@@ -32,6 +31,7 @@ public class RoomService : IRoomService
         var roomDto = new RoomDto {
             Id = room.Id,
             Name = room.Name,
+            Description = room.Description
         };
 
         return roomDto;
@@ -41,7 +41,9 @@ public class RoomService : IRoomService
     {
         var room = await _roomRepository.GetByIdAsync(id);
         if (room == null) return false;
+
         await _roomRepository.DeleteAsync(room);
+
         return true;
     }
 
@@ -52,19 +54,23 @@ public class RoomService : IRoomService
 
         var roomDto = new RoomDto {
             Id = room.Id,
-            Name = room.Name
+            Name = room.Name,
+            Description = room.Description
         };
 
         return roomDto;
     }
 
-    public async Task<bool> UpdateAsync(string id, string newName)
+    public async Task<bool> UpdateAsync(string id, string? newName, string? newDescription)
     {
         var room = await _roomRepository.GetByIdAsync(id);
-        if (room == null) return false;
+        if (room == null || (newName == null && newDescription == null)) return false;
 
-        room.Name = newName;
+        room.Name = newName ?? room.Name;
+        room.Description = newDescription ?? room.Description;
+
         await _roomRepository.UpdateAsync(room);
+
         return true;
     }
 }

@@ -1,5 +1,3 @@
-using System;
-
 namespace BachelorTherasoftDotnetApi.src.Base;
 
 public interface IBaseRepository<T> where T : BaseModel

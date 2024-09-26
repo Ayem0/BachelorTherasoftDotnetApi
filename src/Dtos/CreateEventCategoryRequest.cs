@@ -1,5 +1,3 @@
-using System;
-
 namespace BachelorTherasoftDotnetApi.src.Dtos;
 
 public class CreateEventCategoryRequest

@@ -1,11 +1,10 @@
-using System;
 using System.Text.Json.Serialization;
 
 namespace BachelorTherasoftDotnetApi.src.Dtos;
 
 public class UserDto
 {
-    public string? Id { get; set; }
+    public required string Id { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
 

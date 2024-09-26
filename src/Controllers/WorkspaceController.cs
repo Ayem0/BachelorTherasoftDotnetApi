@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("Api/[controller]")]
     [ApiController]
     public class WorkspaceController : ControllerBase
     {
@@ -45,7 +45,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var workspace = await _workspaceService.CreateAsync(request.Name, userId);
+            var workspace = await _workspaceService.CreateAsync(userId, request.Name, request.Description);
 
             if (workspace == null) return BadRequest();
 
@@ -117,7 +117,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var res = await _workspaceService.UpdateAsync(id, request.NewName);
+            var res = await _workspaceService.UpdateAsync(id, request.NewName, request.Description);
 
             if ( res ) return Ok();
 

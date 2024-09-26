@@ -1,14 +1,13 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 // TODO Ajouter la fonctionnalité d'update la location
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("Api/[controller]")]
     [ApiController]
     public class AreaController : ControllerBase
     {
@@ -47,7 +46,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var Area = await _areaService.CreateAsync(request.Name, request.LocationId);
+            var Area = await _areaService.CreateAsync(request.LocationId, request.Name, request.Description);
 
             if (Area == null) return BadRequest();
 
@@ -83,7 +82,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var res = await _areaService.UpdateAsync(id, request.NewName);
+            var res = await _areaService.UpdateAsync(id, request.NewName, request.NewDescription);
 
             if (res) return Ok();
 
