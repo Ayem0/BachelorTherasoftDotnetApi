@@ -87,6 +87,8 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
@@ -290,6 +292,8 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Address = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     City = table.Column<string>(type: "longtext", nullable: true)
@@ -431,6 +435,8 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
@@ -457,6 +463,8 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
@@ -481,6 +489,8 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     WorkspaceId = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    ParticipantCategoryId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     FirstName = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     LastName = table.Column<string>(type: "longtext", nullable: false)
@@ -489,13 +499,13 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Address = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    City = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Country = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Description = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     DateOfBirth = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    ParticipantCategoryId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
@@ -581,6 +591,8 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     AreaId = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),

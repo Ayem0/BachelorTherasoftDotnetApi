@@ -33,6 +33,9 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("LocationId")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
@@ -132,9 +135,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<TimeOnly>("EndTime")
-                        .HasColumnType("time(6)");
-
                     b.Property<string>("EventCategoryId")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
@@ -145,9 +145,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<TimeOnly>("StartTime")
-                        .HasColumnType("time(6)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");
@@ -214,6 +211,9 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -238,6 +238,9 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("Address")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("City")
                         .HasColumnType("longtext");
 
                     b.Property<string>("Country")
@@ -365,6 +368,9 @@ namespace BachelorTherasoftDotnetApi.Migrations
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -552,6 +558,9 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -603,6 +612,9 @@ namespace BachelorTherasoftDotnetApi.Migrations
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .IsRequired()

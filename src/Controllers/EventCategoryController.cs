@@ -15,7 +15,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             _eventCategoryService = eventCategoryService;
         }
 
-         /// <summary>
+        /// <summary>
         /// Get a EventCategory by id.
         /// </summary>
         [HttpGet("{id}")]

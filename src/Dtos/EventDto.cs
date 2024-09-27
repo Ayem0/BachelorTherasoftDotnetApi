@@ -8,4 +8,5 @@ public class EventDto
     public string? Description { get; set; }
     public required RoomDto Room { get; set; }
     public required EventCategoryDto EventCategory { get; set; }
+    public List<ParticipantDto>? Participants { get; set; }
 }

@@ -88,6 +88,8 @@ builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IEventCategoryRepository, EventCategoryRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
+builder.Services.AddScoped<IParticipantRepository, ParticipantRepository>();
+builder.Services.AddScoped<IParticipantCategoryRepository, ParticipantCategoryRepository>();
 // Custom Services
 builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
 builder.Services.AddScoped<IWorkspaceRoleService, WorkspaceRoleService>();
@@ -97,6 +99,8 @@ builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IEventCategoryService, EventCategoryService>();
 builder.Services.AddScoped<ITagService, TagService>();
+builder.Services.AddScoped<IParticipantService, ParticipantService>();
+builder.Services.AddScoped<IParticipantCategoryService, ParticipantCategoryService>();
 
 var app = builder.Build();
 

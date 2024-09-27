@@ -44,7 +44,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var location = await _locationService.CreateAsync(request.Name, request.WorkspaceId, request.Description, request.Address, request.City, request.Country);
+            var location = await _locationService.CreateAsync(request.WorkspaceId, request.Name, request.Description, request.Address, request.City, request.Country);
 
             if (location == null) return BadRequest();
 

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BachelorTherasoftDotnetApi.Migrations
 {
     [DbContext(typeof(MySqlDbContext))]
-    [Migration("20240926144345_Initial")]
+    [Migration("20240927074220_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -35,6 +35,9 @@ namespace BachelorTherasoftDotnetApi.Migrations
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("LocationId")
                         .IsRequired()
@@ -211,6 +214,9 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -235,6 +241,9 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("Address")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("City")
                         .HasColumnType("longtext");
 
                     b.Property<string>("Country")
@@ -362,6 +371,9 @@ namespace BachelorTherasoftDotnetApi.Migrations
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -549,6 +561,9 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -600,6 +615,9 @@ namespace BachelorTherasoftDotnetApi.Migrations
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .IsRequired()

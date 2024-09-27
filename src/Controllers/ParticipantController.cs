@@ -5,51 +5,53 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
-    [Route("Api/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class EventController : ControllerBase
+    public class ParticipantController : ControllerBase
     {
-        private readonly IEventService _eventService;
-        public EventController(IEventService eventService)
+        private readonly IParticipantService _participantService;
+        public ParticipantController(IParticipantService participantService)
         {
-            _eventService = eventService;
+            _participantService = participantService;
         }
-        /// <summary>
-        /// Get a Event by id.
+
+         /// <summary>
+        /// Get a Participant by id.
         /// </summary>
         [HttpGet("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<EventDto?>> GetById(string id)
+        public async Task<ActionResult<ParticipantDto?>> GetById(string id)
         {
-            var Event = await _eventService.GetByIdAsync(id);
+            var participant = await _participantService.GetByIdAsync(id);
 
-            if (Event == null) return NotFound();
+            if (participant == null) return NotFound();
   
-            return Ok(Event);
+            return Ok(participant);
         }
 
         /// <summary>
-        /// Creates a Event.
+        /// Creates a Participant.
         /// </summary>
         [HttpPost("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<EventDto>> Create([FromBody] CreateEventRequest request)
+        public async Task<ActionResult<ParticipantDto>> Create([FromBody] CreateParticipantRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var Event = await _eventService.CreateAsync(request.Description, request.RoomId, request.EventCategoryId, request.StartDate, request.EndDate, request.ParticipantIds);
+            var participant = await _participantService.CreateAsync(request.WorkspaceId, request.ParticipantCategoryId, request.FirstName, 
+                request.LastName, request.Email, request.Description, request.Address, request.City, request.Country, request.DateOfBirth);
 
-            if (Event == null) return BadRequest();
+            if (participant == null) return BadRequest();
 
-            return CreatedAtAction(nameof(Create), new { id = Event.Id }, Event);
+            return CreatedAtAction(nameof(Create), new { id = participant.Id }, participant);
         }
 
         /// <summary>
-        /// Deletes a Event.
+        /// Deletes a Participant.
         /// </summary>
         [HttpDelete("{id}")]
         [Authorize]
@@ -59,7 +61,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var res = await _eventService.DeleteAsync(id);
+            var res = await _participantService.DeleteAsync(id);
 
             if (res) return Ok();
 
@@ -67,17 +69,18 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         }
         
         /// <summary>
-        /// Updates a Event.
+        /// Updates a Participant.
         /// </summary>
         [HttpPut("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update(string id, [FromBody] UpdateEventRequest request)
+        public async Task<IActionResult> Update(string id, [FromBody] UpdateParticipantRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var res = await _eventService.UpdateAsync(id, request.NewStartDate, request.NewEndDate, request.NewRoomId, request.NewDescription, request.NewEventCategoryId, request.NewParticipantIds);
+            var res = await _participantService.UpdateAsync(id, request.NewParticipantCategoryId, request.NewFirstName, request.NewLastName, 
+                request.NewEmail, request.NewDescription, request.NewAddress, request.NewCity, request.NewCountry, request.NewDateOfBirth);
 
             if (res) return Ok();
 

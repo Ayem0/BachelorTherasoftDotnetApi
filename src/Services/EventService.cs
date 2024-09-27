@@ -9,14 +9,16 @@ public class EventService : IEventService
     private readonly IEventRepository _eventRepository;
     private readonly IRoomRepository _roomRepository;
     private readonly IEventCategoryRepository _eventCategoryRepository;
-    public EventService(IEventRepository eventRepository, IEventCategoryRepository eventCategoryRepository, IRoomRepository roomRepository)
+    private readonly IParticipantRepository _participantRepository;
+    public EventService(IEventRepository eventRepository, IEventCategoryRepository eventCategoryRepository, IRoomRepository roomRepository, IParticipantRepository participantRepository)
     {
         _eventRepository = eventRepository;
         _roomRepository = roomRepository;
         _eventCategoryRepository = eventCategoryRepository;
+        _participantRepository = participantRepository;
     }
 
-    public async Task<EventDto?> CreateAsync(string? description, string roomId, string eventCategoryId, DateTime startDate, DateTime endDate)
+    public async Task<EventDto?> CreateAsync(string? description, string roomId, string eventCategoryId, DateTime startDate, DateTime endDate, List<string>? participantIds)
     {
         var room = await _roomRepository.GetByIdAsync(roomId);
         if (room == null) return null;
@@ -24,6 +26,28 @@ public class EventService : IEventService
         var eventCategory = await _eventCategoryRepository.GetByIdAsync(eventCategoryId);
         if (eventCategory == null) return null;
 
+        List<Participant> participants = [];
+        List<ParticipantDto> participantDtos = [];
+        
+        for (int i = 0; i < participantIds?.Count; i++) {
+            var participant = await _participantRepository.GetByIdAsync(participantIds[i]);
+            if (participant == null) return null;
+            if (!participants.Contains(participant)) {
+                participants.Add(participant);
+                participantDtos.Add( new ParticipantDto {
+                    Id = participant.Id,
+                    FirstName = participant.FirstName,
+                    LastName = participant.LastName,
+                    Email = participant.Email,
+                    Description = participant.Description,
+                    Address = participant.Address,
+                    City = participant.City,
+                    Country = participant.Country,
+                    DateOfBirth = participant.DateOfBirth
+                });
+            }
+        }
+        
         var eventToAdd = new Event {
             Description = description,
             StartDate = startDate,
@@ -31,7 +55,8 @@ public class EventService : IEventService
             Room = room,
             RoomId = room.Id,
             EventCategory = eventCategory,
-            EventCategoryId = eventCategory.Id
+            EventCategoryId = eventCategory.Id,
+            Participants = participants
         };
         
         await _eventRepository.CreateAsync(eventToAdd);
@@ -41,6 +66,7 @@ public class EventService : IEventService
             Description = description,
             StartDate = eventToAdd.StartDate,
             EndDate = eventToAdd.EndDate,
+            Participants = participantDtos,
             Room = new RoomDto {
                 Id = eventToAdd.Room.Id,
                 Name = eventToAdd.Room.Name
@@ -88,10 +114,11 @@ public class EventService : IEventService
         return eventDto;
     }
 
-    public async Task<bool> UpdateAsync(string id, DateTime? newStartDate, DateTime? newEndDate, string? newRoomId, string? newDescription, string? newEventCategoryId)
+    public async Task<bool> UpdateAsync(string id, DateTime? newStartDate, DateTime? newEndDate, string? newRoomId, string? newDescription, 
+        string? newEventCategoryId, List<string>? newParticipantIds)
     {
         var eventToUpdate = await _eventRepository.GetByIdAsync(id);
-        if (eventToUpdate == null || (newStartDate == null && newEndDate == null && newRoomId == null && newDescription == null && newEventCategoryId == null)) return false;
+        if (eventToUpdate == null || (newStartDate == null && newEndDate == null && newRoomId == null && newDescription == null && newEventCategoryId == null && newParticipantIds == null)) return false;
 
         if (newRoomId != null) {
             var room = await _roomRepository.GetByIdAsync(id);
@@ -109,9 +136,22 @@ public class EventService : IEventService
             eventToUpdate.EventCategoryId = eventCategory.Id;
         }
 
+        List<Participant> participants = [];
+        for (int i = 0; i < newParticipantIds?.Count; i++) {
+            var participantToAdd = eventToUpdate.Participants.Find(x => x.Id == newParticipantIds[i]);
+            if (participantToAdd == null) {
+                var participant = await _participantRepository.GetByIdAsync(newParticipantIds[i]);
+                if (participant == null) return false;
+                participants.Add(participant);
+            } else {
+                participants.Add(participantToAdd);
+            }
+        }
+
         eventToUpdate.StartDate = newStartDate ?? eventToUpdate.StartDate;
         eventToUpdate.EndDate = newEndDate ?? eventToUpdate.EndDate;
         eventToUpdate.Description = newDescription ?? eventToUpdate.Description;
+        eventToUpdate.Participants = participants.Count > 0 ? participants : eventToUpdate.Participants;
 
         await _eventRepository.UpdateAsync(eventToUpdate);
         

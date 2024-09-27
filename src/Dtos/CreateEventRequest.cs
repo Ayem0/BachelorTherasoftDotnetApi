@@ -7,4 +7,5 @@ public class CreateEventRequest
     public required string RoomId { get; set; }
     public string? Description { get; set; }
     public required string EventCategoryId { get; set; }
+    public List<string>? ParticipantIds { get; set; }
 }
