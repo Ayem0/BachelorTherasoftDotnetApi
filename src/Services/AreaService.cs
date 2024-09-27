@@ -31,6 +31,7 @@ public class AreaService : IAreaService
         var areaDto = new AreaDto {
             Id = area.Id,
             Name = area.Name,
+            Description = area.Description,
         };
 
         return areaDto;
@@ -54,6 +55,7 @@ public class AreaService : IAreaService
         var areaDto = new AreaDto {
             Id = area.Id,
             Name = area.Name,
+            Description = area.Description,
         };
 
         return areaDto;

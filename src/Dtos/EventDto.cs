@@ -9,4 +9,5 @@ public class EventDto
     public required RoomDto Room { get; set; }
     public required EventCategoryDto EventCategory { get; set; }
     public List<ParticipantDto>? Participants { get; set; }
+    public List<TagDto>? Tags { get; set; }
 }

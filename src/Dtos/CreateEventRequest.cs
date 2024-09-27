@@ -8,4 +8,5 @@ public class CreateEventRequest
     public string? Description { get; set; }
     public required string EventCategoryId { get; set; }
     public List<string>? ParticipantIds { get; set; }
+    public List<string>? TagIds { get; set; }
 }
