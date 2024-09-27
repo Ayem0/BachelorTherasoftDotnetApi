@@ -10,7 +10,6 @@ public class WorkspaceRoleService : IWorkspaceRoleService
     private readonly IWorkspaceRoleRepository _workspaceRoleRepository;
      private readonly IWorkspaceRepository _workspaceRepository;
     private readonly UserManager<User> _userManager;
-
     public WorkspaceRoleService(IWorkspaceRoleRepository workspaceRoleRepository, UserManager<User> userManager,IWorkspaceRepository workspaceRepository)
     {
         _workspaceRoleRepository = workspaceRoleRepository;
@@ -26,64 +25,40 @@ public class WorkspaceRoleService : IWorkspaceRoleService
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null) return false;
 
-        if (!workspaceRole.Users.Contains(user)) {
+        var isContained = workspaceRole.Users.Contains(user);
+        if (!isContained) {
             workspaceRole.Users.Add(user);
             await _workspaceRoleRepository.UpdateAsync(workspaceRole);
-            return true;
         }
-
-        return false;
+        return !isContained;
     }
 
     public async Task<WorkspaceRoleDto?> CreateAsync(string workspaceId, string name, string? description)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
-
         if (workspace == null) return null;
 
-        var workspaceRole = new WorkspaceRole {
-            Name = name,
-            WorkspaceId = workspace.Id,
-            Workspace = workspace,
-            Description = description
-        };
-
+        var workspaceRole = new WorkspaceRole(workspace, name, description){ Workspace = workspace };
         await _workspaceRoleRepository.CreateAsync(workspaceRole);
 
-        var workspaceRoleDto = new WorkspaceRoleDto {
-            Id = workspaceRole.Id,
-            Name = workspaceRole.Name,
-            Description = workspaceRole.Description
-        };
-
-        return workspaceRoleDto;
+        return new WorkspaceRoleDto(workspaceRole);
     }
 
     public async Task<bool> DeleteAsync(string id)
     {
         var workspaceRole = await _workspaceRoleRepository.GetByIdAsync(id);
-
         if (workspaceRole == null) return false;
 
         await _workspaceRoleRepository.DeleteAsync(workspaceRole);
-
         return true;
     }
 
     public async Task<WorkspaceRoleDto?> GetByIdAsync(string id)
     {
         var workspaceRole = await _workspaceRoleRepository.GetByIdAsync(id);
-
         if (workspaceRole == null) return null;
 
-        var workspaceRoleDto = new WorkspaceRoleDto {
-            Id = workspaceRole.Id,
-            Name = workspaceRole.Name,
-            Description = workspaceRole.Description,
-            Users = workspaceRole.Users.Select(user => new UserDto(user)).ToList()
-        };
-
-        return workspaceRoleDto;
+        return new WorkspaceRoleDto(workspaceRole);
     }
 
     public async Task<bool> RemoveRoleFromMemberAsync(string id, string userId)
@@ -93,26 +68,22 @@ public class WorkspaceRoleService : IWorkspaceRoleService
 
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null) return false;
-
-        if (workspaceRole.Users.Contains(user)) {
-            workspaceRole.Users.Remove(user);
-            await _workspaceRoleRepository.UpdateAsync(workspaceRole);
-            return true;
-        }
-
-        return false;
+        
+        var isContained =  workspaceRole.Users.Remove(user);
+        if (isContained) await _workspaceRoleRepository.UpdateAsync(workspaceRole);
+            
+        return isContained;
     }
 
-    public async Task<bool> UpdateAsync(string id, string? newName, string? newDescription)
+    public async Task<WorkspaceRoleDto?> UpdateAsync(string id, string? newName, string? newDescription)
     {
         var workspaceRole = await _workspaceRoleRepository.GetByIdAsync(id);
-        if (workspaceRole == null || (newName == null && newDescription == null)) return false;
+        if (workspaceRole == null || (newName == null && newDescription == null)) return null;
 
         workspaceRole.Name = newName ?? workspaceRole.Name;
         workspaceRole.Description = newDescription ?? workspaceRole.Description;
 
         await _workspaceRoleRepository.UpdateAsync(workspaceRole);
-
-        return true;
+        return new WorkspaceRoleDto(workspaceRole);
     }
 }

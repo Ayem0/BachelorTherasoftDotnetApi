@@ -21,20 +21,17 @@ public class ParticipantCategoryService : IParticipantCategoryService
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
         if(workspace == null) return null;
 
-        var participantCategory = new ParticipantCategory(workspace, name, icon) {
-            Workspace = workspace
-        };
-
+        var participantCategory = new ParticipantCategory(workspace, name, icon) { Workspace = workspace };
         await _participantCategoryRepository.CreateAsync(participantCategory);
 
-        var participantCategoryDto = new ParticipantCategoryDto(participantCategory);
-        return participantCategoryDto;
+        return new ParticipantCategoryDto(participantCategory);
     }
 
     public async Task<bool> DeleteAsync(string id)
     {
         var participantCategory = await _participantCategoryRepository.GetByIdAsync(id);
         if(participantCategory == null) return false;
+
         await _participantCategoryRepository.DeleteAsync(participantCategory);
         return true;
     }
@@ -44,21 +41,18 @@ public class ParticipantCategoryService : IParticipantCategoryService
         var participantCategory = await _participantCategoryRepository.GetByIdAsync(id);
         if(participantCategory == null) return null;
         
-        var participantCategoryDto = new ParticipantCategoryDto(participantCategory);
-
-        return participantCategoryDto;
+        return new ParticipantCategoryDto(participantCategory);
     }
 
-    public async Task<bool> UpdateAsync(string id, string? newName, string? newIcon)
+    public async Task<ParticipantCategoryDto?> UpdateAsync(string id, string? newName, string? newIcon)
     {
         var participantCategory = await _participantCategoryRepository.GetByIdAsync(id);
-        if(participantCategory == null || (newName == null && newIcon == null)) return false;
+        if(participantCategory == null || (newName == null && newIcon == null)) return null;
 
         participantCategory.Name = newName ?? participantCategory.Name;
         participantCategory.Icon = newIcon ?? participantCategory.Icon;
 
         await _participantCategoryRepository.UpdateAsync(participantCategory);
-
-        return true;
+        return new ParticipantCategoryDto(participantCategory);
     }
 }

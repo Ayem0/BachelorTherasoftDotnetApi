@@ -14,35 +14,24 @@ public class WorkspaceService : IWorkspaceService
         _workspaceRepository = workspaceRepository;
         _userManager = userManager;
     }
+
     public async Task<WorkspaceDto?> GetByIdAsync(string id)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(id);
         if (workspace == null) return null;
 
-        var workspaceDto = new WorkspaceDto(workspace) {
-            Id = workspace.Id,
-            Name = workspace.Name,
-            Description = workspace.Description
-        };
-
-        return workspaceDto;
+        return new WorkspaceDto(workspace);
     }
 
-    public async Task<WorkspaceDto?> CreateAsync( string? userId, string name, string? description) 
+    public async Task<WorkspaceDto?> CreateAsync(string userId, string name, string? description) 
     {
-        if (userId == null) return null;
-
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null) return null;
 
         var workspace = new Workspace(name, description, [user]);
-        // workspace.Users.Add(user);
-
         await _workspaceRepository.CreateAsync(workspace);
 
-        var workspaceDto = new WorkspaceDto(workspace);
-
-        return workspaceDto;
+        return new WorkspaceDto(workspace);
     }
 
     public async Task<bool> RemoveMemberAsync(string id, string userId)
@@ -54,7 +43,6 @@ public class WorkspaceService : IWorkspaceService
         if (user == null) return false;
 
         var isContained = workspace.Users.Remove(user);
-
         if (isContained) await _workspaceRepository.UpdateAsync(workspace);
 
         return isContained;
@@ -68,13 +56,12 @@ public class WorkspaceService : IWorkspaceService
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null) return false;
 
-        if (!workspace.Users.Contains(user)) {
+        var isContained = workspace.Users.Contains(user);
+        if (!isContained) {
             workspace.Users.Add(user);
             await _workspaceRepository.UpdateAsync(workspace);
-            return true;
         }
-
-        return false;
+        return !isContained;
     }
 
     public async Task<bool> DeleteAsync(string id)
@@ -83,20 +70,18 @@ public class WorkspaceService : IWorkspaceService
         if (workspace == null) return false;
 
         await _workspaceRepository.DeleteAsync(workspace);
-
         return true;
     }
 
-    public async Task<bool> UpdateAsync(string id, string? newName, string? newDescription) 
+    public async Task<WorkspaceDto?> UpdateAsync(string id, string? newName, string? newDescription) 
     {
         var workspace = await _workspaceRepository.GetByIdAsync(id);
-        if (workspace == null || (newDescription == null && newName == null)) return false;
+        if (workspace == null || (newDescription == null && newName == null)) return null;
 
         workspace.Name = newName ?? workspace.Name;
         workspace.Description = newDescription ?? workspace.Description;
 
         await _workspaceRepository.UpdateAsync(workspace);
-
-        return true;
+        return new WorkspaceDto(workspace);
     }
 }

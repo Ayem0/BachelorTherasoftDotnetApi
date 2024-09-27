@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using BachelorTherasoftDotnetApi.src.Models;
 
@@ -11,6 +12,7 @@ public class UserDto
         FirstName = user.FirstName;
         LastName = user.LastName;
     }
+    [Required]
     public string Id { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }

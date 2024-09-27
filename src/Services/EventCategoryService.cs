@@ -24,9 +24,7 @@ public class EventCategoryService : IEventCategoryService
         };
 
         await _eventCategoryRepository.CreateAsync(eventCategory);
-
-        var eventCategoryDto = new EventCategoryDto(eventCategory);
-        return eventCategoryDto;
+        return new EventCategoryDto(eventCategory);
     }
 
     public async Task<bool> DeleteAsync(string id)
@@ -35,7 +33,6 @@ public class EventCategoryService : IEventCategoryService
         if (eventCategory == null) return false;
 
         await _eventCategoryRepository.DeleteAsync(eventCategory);
-
         return true;
     }
 
@@ -44,21 +41,18 @@ public class EventCategoryService : IEventCategoryService
         var eventCategory = await _eventCategoryRepository.GetByIdAsync(id);
         if (eventCategory == null) return null;
 
-        var eventCategoryDto = new EventCategoryDto(eventCategory);
-
-        return eventCategoryDto;
+        return new EventCategoryDto(eventCategory);
     }
 
-    public async Task<bool> UpdateAsync(string id, string? newName, string? newIcon)
+    public async Task<EventCategoryDto?> UpdateAsync(string id, string? newName, string? newIcon)
     {
         var eventCategory = await _eventCategoryRepository.GetByIdAsync(id);
-        if (eventCategory == null || (newName == null && newIcon == null)) return false;
+        if (eventCategory == null || (newName == null && newIcon == null)) return null;
 
         eventCategory.Name = newName ?? eventCategory.Name;
         eventCategory.Icon = newIcon ?? eventCategory.Icon;
 
         await _eventCategoryRepository.UpdateAsync(eventCategory);
-
-        return true;
+        return new EventCategoryDto(eventCategory);
     }
 }

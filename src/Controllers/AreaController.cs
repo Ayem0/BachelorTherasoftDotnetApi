@@ -24,12 +24,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("{id}")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
         public async Task<ActionResult<AreaDto?>> GetById(string id)
         {
             var Area = await _areaService.GetByIdAsync(id);
-
             if (Area == null) return NotFound();
   
             return Ok(Area);
@@ -40,14 +38,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPost("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status201Created / StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<AreaDto>> Create([FromBody] CreateAreaRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
             var Area = await _areaService.CreateAsync(request.LocationId, request.Name, request.Description);
-
             if (Area == null) return BadRequest();
 
             return CreatedAtAction(nameof(Create), new { id = Area.Id }, Area);
@@ -58,17 +54,13 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpDelete("{id}")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Delete(string id)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
             var res = await _areaService.DeleteAsync(id);
+            if (!res) return BadRequest();
 
-            if (res) return Ok();
-
-            return BadRequest();
+            return Ok();
         }
         
         /// <summary>
@@ -76,17 +68,15 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPut("{id}")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update(string id, [FromBody] UpdateAreaRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
             var res = await _areaService.UpdateAsync(id, request.NewName, request.NewDescription);
+            if (res == null) return BadRequest();
 
-            if (res) return Ok();
-
-            return BadRequest();
+            return Ok(res);
         }
     }
 }

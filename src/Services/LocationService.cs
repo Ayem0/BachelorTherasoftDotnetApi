@@ -19,9 +19,7 @@ public class LocationService : ILocationService
         var location = await _locationRepository.GetByIdAsync(id);
         if (location == null) return null;
 
-        var locationDto = new LocationDto(location);
-
-        return locationDto;
+        return new LocationDto(location);
     }
 
     public async Task<bool> DeleteAsync(string id) 
@@ -30,7 +28,6 @@ public class LocationService : ILocationService
         if (location == null) return false;
 
         await _locationRepository.DeleteAsync(location);
-
         return true;
     }
 
@@ -39,21 +36,16 @@ public class LocationService : ILocationService
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
         if (workspace == null) return null;
 
-        var location = new Location(workspace, name, description, address, city, country) {
-            Workspace = workspace
-        };
-
+        var location = new Location(workspace, name, description, address, city, country) { Workspace = workspace };
         await _locationRepository.CreateAsync(location);
 
-        var locationDto = new LocationDto(location);
-
-        return locationDto;
+        return new LocationDto(location);
     }
 
-    public async Task<bool> UpdateAsync(string id, string? newName, string? newDescription, string? newAddress, string? newCity, string? newCountry) 
+    public async Task<LocationDto?> UpdateAsync(string id, string? newName, string? newDescription, string? newAddress, string? newCity, string? newCountry) 
     {
         var location = await _locationRepository.GetByIdAsync(id);
-        if (location == null || (newName == null && newDescription == null && newAddress == null && newCity == null && newCountry == null)) return false;
+        if (location == null || (newName == null && newDescription == null && newAddress == null && newCity == null && newCountry == null)) return null;
 
         location.Name = newName ?? location.Name;
         location.Description = newDescription ?? location.Description;
@@ -62,7 +54,6 @@ public class LocationService : ILocationService
         location.Country = newCountry ?? location.Country;
 
         await _locationRepository.UpdateAsync(location);
-        
-        return true;
+        return new LocationDto(location);
     }
 }

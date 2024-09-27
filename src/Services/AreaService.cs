@@ -22,12 +22,9 @@ public class AreaService : IAreaService
         var area = new Area(location, name, description) {
             Location = location,
         };
-
         await _areaRepository.CreateAsync(area);
 
-        var areaDto = new AreaDto(area);
-
-        return areaDto;
+        return new AreaDto(area);
     }
 
     public async Task<bool> DeleteAsync(string id)
@@ -36,7 +33,6 @@ public class AreaService : IAreaService
         if (area == null) return false;
 
         await _areaRepository.DeleteAsync(area);
-
         return true;
     }
 
@@ -45,21 +41,18 @@ public class AreaService : IAreaService
         var area = await _areaRepository.GetByIdAsync(id);
         if (area == null) return null;
 
-        var areaDto = new AreaDto(area);
-
-        return areaDto;
+        return new AreaDto(area);
     }
 
-    public async Task<bool> UpdateAsync(string id, string? newName, string? newDescription)
+    public async Task<AreaDto?> UpdateAsync(string id, string? newName, string? newDescription)
     {
         var area = await _areaRepository.GetByIdAsync(id);
-        if (area == null || (newName == null && newDescription == null)) return false;
+        if (area == null || (newName == null && newDescription == null)) return null;
 
         area.Name = newName ?? area.Name;
         area.Description = newDescription ?? area.Description;
 
         await _areaRepository.UpdateAsync(area);
-
-        return true;
+        return new AreaDto(area);
     }
 }

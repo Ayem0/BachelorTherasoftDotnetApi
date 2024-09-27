@@ -9,5 +9,5 @@ public interface IWorkspaceRoleService
     Task<bool> AddRoleToMemberAsync(string id, string userID);
     Task<bool> RemoveRoleFromMemberAsync(string id, string userID);
     Task<bool> DeleteAsync(string id);
-    Task<bool> UpdateAsync(string id, string? newName, string? newDescription);
+    Task<WorkspaceRoleDto?> UpdateAsync(string id, string? newName, string? newDescription);
 }

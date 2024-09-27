@@ -32,7 +32,6 @@ public class EventService : IEventService
 
         List<Participant> participants = [];
         List<ParticipantDto> participantDtos = [];
-        
         for (int i = 0; i < participantIds?.Count; i++) {
             var participant = await _participantRepository.GetByIdAsync(participantIds[i]);
             if (participant == null) return null;
@@ -44,7 +43,6 @@ public class EventService : IEventService
 
         List<Tag> tags = [];
         List<TagDto> tagDtos = [];
-
         for (int i = 0; i < tagIds?.Count; i++) {
             var tag = await _tagRepository.GetByIdAsync(tagIds[i]);
             if (tag == null) return null;
@@ -58,12 +56,9 @@ public class EventService : IEventService
             Room = room,
             EventCategory = eventCategory
         };
-        
         await _eventRepository.CreateAsync(eventToAdd);
 
-        var eventDto = GetEventDto(eventToAdd);
-
-        return eventDto;
+        return GetEventDto(eventToAdd);
     }
 
     public async Task<bool> DeleteAsync(string id)
@@ -72,7 +67,6 @@ public class EventService : IEventService
         if (eventToDelete == null) return false;
 
         await _eventRepository.DeleteAsync(eventToDelete);
-
         return true;
     }
 
@@ -81,9 +75,7 @@ public class EventService : IEventService
         var eventToGet = await _eventRepository.GetByIdAsync(id);
         if (eventToGet == null) return null;
         
-        var eventDto = GetEventDto(eventToGet);
-
-        return eventDto;
+        return GetEventDto(eventToGet);
     }
 
     public async Task<EventDto?> UpdateAsync(string id, DateTime? newStartDate, DateTime? newEndDate, string? newRoomId, string? newDescription, 
@@ -140,15 +132,12 @@ public class EventService : IEventService
         eventToUpdate.Tags = tags.Count > 0 ? tags : eventToUpdate.Tags;
 
         await _eventRepository.UpdateAsync(eventToUpdate);
-        
-        var eventDto = GetEventDto(eventToUpdate);
 
-        return eventDto;
+        return GetEventDto(eventToUpdate);
     }
 
-    public static EventDto GetEventDto(Event baseEvent) {
-        var eventDto = new EventDto(baseEvent,  new RoomDto(baseEvent.Room), new EventCategoryDto(baseEvent.EventCategory), 
+    private static EventDto GetEventDto(Event baseEvent) {
+        return new EventDto(baseEvent,  new RoomDto(baseEvent.Room), new EventCategoryDto(baseEvent.EventCategory), 
             baseEvent.Participants?.Select(participant => new ParticipantDto(participant)).ToList(), baseEvent.Tags?.Select(tag => new TagDto(tag)).ToList());
-        return eventDto;
     }
 }

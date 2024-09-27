@@ -19,12 +19,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("{id}")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
         public async Task<ActionResult<EventDto?>> GetById(string id)
         {
             var Event = await _eventService.GetByIdAsync(id);
-
             if (Event == null) return NotFound();
   
             return Ok(Event);
@@ -35,14 +33,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPost("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status201Created / StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<EventDto>> Create([FromBody] CreateEventRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
             var Event = await _eventService.CreateAsync(request.Description, request.RoomId, request.EventCategoryId, request.StartDate, request.EndDate, request.ParticipantIds, request.TagIds);
-
             if (Event == null) return BadRequest();
 
             return CreatedAtAction(nameof(Create), new { id = Event.Id }, Event);
@@ -53,17 +49,13 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpDelete("{id}")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Delete(string id)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
             var res = await _eventService.DeleteAsync(id);
+            if (!res) return BadRequest();
 
-            if (res) return Ok();
-
-            return BadRequest();
+            return Ok();
         }
         
         /// <summary>
@@ -71,17 +63,15 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPut("{id}")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update(string id, [FromBody] UpdateEventRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
             var res = await _eventService.UpdateAsync(id, request.NewStartDate, request.NewEndDate, request.NewRoomId, request.NewDescription, request.NewEventCategoryId, request.NewParticipantIds, request.NewTagIds);
+            if (res == null) return BadRequest();
 
-            if (res != null) return Ok(res);
-
-            return BadRequest();
+            return Ok(res);
         }
     }
 }

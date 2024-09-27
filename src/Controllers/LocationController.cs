@@ -22,12 +22,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("{id}")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
         public async Task<ActionResult<LocationDto?>> GetById(string id)
         {
             var location = await _locationService.GetByIdAsync(id);
-
             if (location == null) return NotFound();
   
             return Ok(location);
@@ -38,14 +36,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPost("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status201Created / StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<LocationDto>> Create([FromBody] CreateLocationRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
             var location = await _locationService.CreateAsync(request.WorkspaceId, request.Name, request.Description, request.Address, request.City, request.Country);
-
             if (location == null) return BadRequest();
 
             return CreatedAtAction(nameof(Create), new { id = location.Id }, location);
@@ -56,17 +52,13 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpDelete("{id}")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Delete(string id)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
             var res = await _locationService.DeleteAsync(id);
+            if (!res) return BadRequest();
 
-            if (res) return Ok();
-
-            return BadRequest();
+            return Ok();
         }
         
         /// <summary>
@@ -74,17 +66,15 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPut("{id}")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update(string id, [FromBody] UpdateLocationRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
             var res = await _locationService.UpdateAsync(id, request.NewName, request.NewDescription, request.NewAddress, request.NewCity, request.NewCountry);
+            if (res == null) return BadRequest();
 
-            if (res) return Ok();
-
-            return BadRequest();
+            return Ok();
         }
     }
 }

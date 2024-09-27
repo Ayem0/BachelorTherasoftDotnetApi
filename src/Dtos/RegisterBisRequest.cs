@@ -2,7 +2,7 @@
 
 namespace BachelorTherasoftDotnetApi.src.Dtos
 {
-    public class RegisterRequest
+    public class RegisterBisRequest
     {
         [Required]
         public required string Password { get; set; }

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using BachelorTherasoftDotnetApi.src.Models;
 
 namespace BachelorTherasoftDotnetApi.src.Dtos;
@@ -13,7 +14,9 @@ public class LocationDto
         City = location.City;
         Country = location.Country;
     }
+    [Required]
     public string Id { get; set; }
+    [Required]
     public string Name { get; set; }
     public string? Description { get; set; }
     public string? Address { get; set; }

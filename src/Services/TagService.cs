@@ -23,12 +23,9 @@ public class TagService : ITagService
         var tag = new Tag(workspace, name, icon, description) {
             Workspace = workspace
         };
-
         await _tagRepository.CreateAsync(tag);
 
-        var tagDto = new TagDto(tag);
-
-        return tagDto;
+        return new TagDto(tag);
     }
 
     public async Task<bool> DeleteAsync(string id)
@@ -37,7 +34,6 @@ public class TagService : ITagService
         if (Tag == null) return false;
 
         await _tagRepository.DeleteAsync(Tag);
-
         return true;
     }
 
@@ -46,22 +42,19 @@ public class TagService : ITagService
         var Tag = await _tagRepository.GetByIdAsync(id);
         if (Tag == null) return null;
 
-        var TagDto = new TagDto(Tag);
-
-        return TagDto;
+        return new TagDto(Tag);
     }
 
-    public async Task<bool> UpdateAsync(string id, string? newName, string? newIcon, string? newDescription)
+    public async Task<TagDto?> UpdateAsync(string id, string? newName, string? newIcon, string? newDescription)
     {
         var Tag = await _tagRepository.GetByIdAsync(id);
-        if (Tag == null || (newName == null && newIcon == null)) return false;
+        if (Tag == null || (newName == null && newIcon == null)) return null;
 
         Tag.Name = newName ?? Tag.Name;
         Tag.Icon = newIcon ?? Tag.Icon;
         Tag.Description = newDescription ?? Tag.Description;
         
         await _tagRepository.UpdateAsync(Tag);
-
-        return true;
+        return new TagDto(Tag);
     }
 }

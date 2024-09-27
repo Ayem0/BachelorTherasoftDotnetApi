@@ -29,12 +29,9 @@ public class ParticipantService : IParticipantService
             ParticipantCategory = participantCategory,
             Workspace = workspace
         };
-
         await _participantRepository.CreateAsync(participant);
 
-        var participantDto = new ParticipantDto(participant);
-
-        return participantDto;
+        return new ParticipantDto(participant);
     }
 
     public async Task<bool> DeleteAsync(string id)
@@ -51,21 +48,19 @@ public class ParticipantService : IParticipantService
         var participant  = await _participantRepository.GetByIdAsync(id);
         if(participant == null) return null;
 
-        var participantDto = new ParticipantDto(participant);
-
-        return participantDto;
+        return new ParticipantDto(participant);
     }
 
-    public async Task<bool> UpdateAsync(string id, string? newParticipantCategoryId, string? newFirstName, string? newLastName, string? newEmail, 
+    public async Task<ParticipantDto?> UpdateAsync(string id, string? newParticipantCategoryId, string? newFirstName, string? newLastName, string? newEmail, 
         string? newDescription, string? newAddress, string? newCity, string? newCountry, DateTime? newDateOfBirth)
     {
         var participant = await _participantRepository.GetByIdAsync(id);
         if(participant == null || (newParticipantCategoryId == null && newFirstName == null && newLastName == null && newEmail == null && 
-            newDescription == null && newAddress == null && newCity == null && newCountry == null && newDateOfBirth == null)) return false;
+            newDescription == null && newAddress == null && newCity == null && newCountry == null && newDateOfBirth == null)) return null;
 
         if (newParticipantCategoryId != null) {
             var participantCategory = await _participantCategoryRepository.GetByIdAsync(newParticipantCategoryId);
-            if (participantCategory == null) return false;
+            if (participantCategory == null) return null;
 
             participant.ParticipantCategory = participantCategory;
             participant.ParticipantCategoryId = participantCategory.Id;
@@ -81,13 +76,6 @@ public class ParticipantService : IParticipantService
         participant.DateOfBirth = newDateOfBirth ?? participant.DateOfBirth;
 
         await _participantRepository.UpdateAsync(participant);
-        
-        return true;
-    }
-
-    public static ParticipantDto CreateParticipantdto(Participant participant) {
-        var participantDto = new ParticipantDto(participant);
-
-        return participantDto;
+        return new ParticipantDto(participant);
     }
 }
