@@ -80,11 +80,7 @@ public class WorkspaceRoleService : IWorkspaceRoleService
             Id = workspaceRole.Id,
             Name = workspaceRole.Name,
             Description = workspaceRole.Description,
-            Users = workspaceRole.Users.Select(user => new UserDto {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-            }).ToList()
+            Users = workspaceRole.Users.Select(user => new UserDto(user)).ToList()
         };
 
         return workspaceRoleDto;

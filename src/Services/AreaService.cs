@@ -25,11 +25,7 @@ public class AreaService : IAreaService
 
         await _areaRepository.CreateAsync(area);
 
-        var areaDto = new AreaDto {
-            Id = area.Id,
-            Name = area.Name,
-            Description = area.Description,
-        };
+        var areaDto = new AreaDto(area);
 
         return areaDto;
     }
@@ -49,11 +45,7 @@ public class AreaService : IAreaService
         var area = await _areaRepository.GetByIdAsync(id);
         if (area == null) return null;
 
-        var areaDto = new AreaDto {
-            Id = area.Id,
-            Name = area.Name,
-            Description = area.Description,
-        };
+        var areaDto = new AreaDto(area);
 
         return areaDto;
     }

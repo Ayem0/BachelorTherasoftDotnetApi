@@ -38,17 +38,7 @@ public class EventService : IEventService
             if (participant == null) return null;
             if (!participants.Contains(participant)) {
                 participants.Add(participant);
-                participantDtos.Add( new ParticipantDto {
-                    Id = participant.Id,
-                    FirstName = participant.FirstName,
-                    LastName = participant.LastName,
-                    Email = participant.Email,
-                    Description = participant.Description,
-                    Address = participant.Address,
-                    City = participant.City,
-                    Country = participant.Country,
-                    DateOfBirth = participant.DateOfBirth
-                });
+                participantDtos.Add( new ParticipantDto(participant));
             }
         }
 
@@ -60,11 +50,7 @@ public class EventService : IEventService
             if (tag == null) return null;
             if (!tags.Contains(tag)) {
                 tags.Add(tag);
-                tagDtos.Add( new TagDto {
-                    Id = tag.Id,
-                    Icon = tag.Icon,
-                    Name = tag.Name,
-                });
+                tagDtos.Add( new TagDto(tag));
             }
         }
         
@@ -161,31 +147,8 @@ public class EventService : IEventService
     }
 
     public static EventDto GetEventDto(Event baseEvent) {
-        var eventDto = new EventDto {
-            Id = baseEvent.Id,
-            Description = baseEvent.Description,
-            StartDate = baseEvent.StartDate,
-            EndDate = baseEvent.EndDate,
-            Participants = baseEvent.Participants?.Select(p => new ParticipantDto {
-                Id = p.Id,
-                FirstName = p.FirstName,
-                LastName = p.LastName,
-            }).ToList(),
-            Tags = baseEvent.Tags?.Select(t => new TagDto {
-                Id = t.Id,
-                Name = t.Name,
-                Icon = t.Icon,
-            }).ToList(),
-            Room = new RoomDto {
-                Id = baseEvent.Room.Id,
-                Name = baseEvent.Room.Name
-            },
-            EventCategory = new EventCategoryDto {
-                Id = baseEvent.EventCategory.Id,
-                Name = baseEvent.EventCategory.Name,
-                Icon = baseEvent.EventCategory.Icon,
-            }
-        };
+        var eventDto = new EventDto(baseEvent,  new RoomDto(baseEvent.Room), new EventCategoryDto(baseEvent.EventCategory), 
+            baseEvent.Participants?.Select(participant => new ParticipantDto(participant)).ToList(), baseEvent.Tags?.Select(tag => new TagDto(tag)).ToList());
         return eventDto;
     }
 }

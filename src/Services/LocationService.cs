@@ -19,14 +19,7 @@ public class LocationService : ILocationService
         var location = await _locationRepository.GetByIdAsync(id);
         if (location == null) return null;
 
-        var locationDto = new LocationDto {
-            Id = location.Id,
-            Name = location.Name,
-            Description = location.Description,
-            Address = location.Address,
-            City = location.City,
-            Country = location.Country
-        };
+        var locationDto = new LocationDto(location);
 
         return locationDto;
     }
@@ -52,14 +45,7 @@ public class LocationService : ILocationService
 
         await _locationRepository.CreateAsync(location);
 
-        var locationDto = new LocationDto {
-            Id = location.Id,
-            Name = location.Name,
-            Description = location.Description,
-            Address = location.Address,
-            City = location.City,
-            Country = location.Country
-        };
+        var locationDto = new LocationDto(location);
 
         return locationDto;
     }

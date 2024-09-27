@@ -25,12 +25,7 @@ public class EventCategoryService : IEventCategoryService
 
         await _eventCategoryRepository.CreateAsync(eventCategory);
 
-        var eventCategoryDto = new EventCategoryDto {
-            Id = eventCategory.Id,
-            Name = eventCategory.Name,
-            Icon = eventCategory.Icon
-        };
-
+        var eventCategoryDto = new EventCategoryDto(eventCategory);
         return eventCategoryDto;
     }
 
@@ -49,11 +44,7 @@ public class EventCategoryService : IEventCategoryService
         var eventCategory = await _eventCategoryRepository.GetByIdAsync(id);
         if (eventCategory == null) return null;
 
-        var eventCategoryDto = new EventCategoryDto {
-            Id = eventCategory.Id,
-            Icon = eventCategory.Icon,
-            Name = eventCategory.Name
-        };
+        var eventCategoryDto = new EventCategoryDto(eventCategory);
 
         return eventCategoryDto;
     }

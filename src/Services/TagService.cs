@@ -26,11 +26,7 @@ public class TagService : ITagService
 
         await _tagRepository.CreateAsync(tag);
 
-        var tagDto = new TagDto {
-            Id = tag.Id,
-            Name = tag.Name,
-            Icon = tag.Icon
-        };
+        var tagDto = new TagDto(tag);
 
         return tagDto;
     }
@@ -50,11 +46,7 @@ public class TagService : ITagService
         var Tag = await _tagRepository.GetByIdAsync(id);
         if (Tag == null) return null;
 
-        var TagDto = new TagDto {
-            Id = Tag.Id,
-            Icon = Tag.Icon,
-            Name = Tag.Name
-        };
+        var TagDto = new TagDto(Tag);
 
         return TagDto;
     }

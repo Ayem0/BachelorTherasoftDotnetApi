@@ -19,15 +19,10 @@ public class WorkspaceService : IWorkspaceService
         var workspace = await _workspaceRepository.GetByIdAsync(id);
         if (workspace == null) return null;
 
-        var workspaceDto = new WorkspaceDto {
+        var workspaceDto = new WorkspaceDto(workspace) {
             Id = workspace.Id,
             Name = workspace.Name,
-            Description = workspace.Description,
-            Users = workspace.Users.Select(user => new UserDto {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-            }).ToList() 
+            Description = workspace.Description
         };
 
         return workspaceDto;
@@ -45,11 +40,7 @@ public class WorkspaceService : IWorkspaceService
 
         await _workspaceRepository.CreateAsync(workspace);
 
-        var workspaceDto = new WorkspaceDto {
-            Id = workspace.Id,
-            Name = workspace.Name,
-            Description = workspace.Description
-        };
+        var workspaceDto = new WorkspaceDto(workspace);
 
         return workspaceDto;
     }

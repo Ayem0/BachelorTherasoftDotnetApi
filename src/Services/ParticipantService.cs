@@ -32,17 +32,7 @@ public class ParticipantService : IParticipantService
 
         await _participantRepository.CreateAsync(participant);
 
-        var participantDto = new ParticipantDto {
-            Id = participant.Id,
-            FirstName = participant.FirstName,
-            LastName = participant.LastName,
-            Email = participant.Email,
-            Description = participant.Description,
-            Address = participant.Address,
-            City = participant.City,
-            Country = participant.Country,
-            DateOfBirth = participant.DateOfBirth
-        };
+        var participantDto = new ParticipantDto(participant);
 
         return participantDto;
     }
@@ -61,17 +51,7 @@ public class ParticipantService : IParticipantService
         var participant  = await _participantRepository.GetByIdAsync(id);
         if(participant == null) return null;
 
-        var participantDto = new ParticipantDto {
-            Id = participant.Id,
-            FirstName = participant.FirstName,
-            LastName = participant.LastName,
-            Email = participant.Email,
-            Description = participant.Description,
-            Address = participant.Address,
-            City = participant.City,
-            Country = participant.Country,
-            DateOfBirth = participant.DateOfBirth
-        };
+        var participantDto = new ParticipantDto(participant);
 
         return participantDto;
     }
@@ -106,17 +86,7 @@ public class ParticipantService : IParticipantService
     }
 
     public static ParticipantDto CreateParticipantdto(Participant participant) {
-        var participantDto = new ParticipantDto {
-            Id = participant.Id,
-            FirstName = participant.FirstName,
-            LastName = participant.LastName,
-            Email = participant.Email,
-            Description = participant.Description,
-            Address = participant.Address,
-            City = participant.City,
-            Country = participant.Country,
-            DateOfBirth = participant.DateOfBirth
-        };
+        var participantDto = new ParticipantDto(participant);
 
         return participantDto;
     }

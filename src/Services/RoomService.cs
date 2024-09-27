@@ -25,11 +25,7 @@ public class RoomService : IRoomService
 
         await _roomRepository.CreateAsync(room);
 
-        var roomDto = new RoomDto {
-            Id = room.Id,
-            Name = room.Name,
-            Description = room.Description
-        };
+        var roomDto = new RoomDto(room);
 
         return roomDto;
     }
@@ -49,11 +45,7 @@ public class RoomService : IRoomService
         var room = await _roomRepository.GetByIdAsync(id);
         if (room == null) return null;
 
-        var roomDto = new RoomDto {
-            Id = room.Id,
-            Name = room.Name,
-            Description = room.Description
-        };
+        var roomDto = new RoomDto(room);
 
         return roomDto;
     }

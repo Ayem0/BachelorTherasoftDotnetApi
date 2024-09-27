@@ -27,11 +27,7 @@ public class ParticipantCategoryService : IParticipantCategoryService
 
         await _participantCategoryRepository.CreateAsync(participantCategory);
 
-        var participantCategoryDto = new ParticipantCategoryDto {
-            Id = participantCategory.Id,
-            Name = participantCategory.Name,
-            Icon = participantCategory.Icon
-        };
+        var participantCategoryDto = new ParticipantCategoryDto(participantCategory);
         return participantCategoryDto;
     }
 
@@ -48,11 +44,7 @@ public class ParticipantCategoryService : IParticipantCategoryService
         var participantCategory = await _participantCategoryRepository.GetByIdAsync(id);
         if(participantCategory == null) return null;
         
-        var participantCategoryDto = new ParticipantCategoryDto {
-            Id = participantCategory.Id,
-            Name = participantCategory.Name,
-            Icon = participantCategory.Icon
-        };
+        var participantCategoryDto = new ParticipantCategoryDto(participantCategory);
 
         return participantCategoryDto;
     }

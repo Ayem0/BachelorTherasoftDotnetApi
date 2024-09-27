@@ -120,7 +120,7 @@ app.UseAuthorization();
 app.MapIdentityApi<User>();
 // TODO a delete lors de l'auth controller et auth service
 app.MapPost("/register2", async (
-    RegisterRequestDto request,
+    RegisterRequest request,
     UserManager<User> userManager) =>
 {
     var user = new User
