@@ -17,7 +17,7 @@ public class ParticipantService : IParticipantService
     }
 
     public async Task<ParticipantDto?> CreateAsync(string workspaceId, string participantCategoryId, string firstName, string lastName, string? email,
-        string? description, string? address, string? city, string? country, DateTime? dateOfBirth)
+        string? phoneNumber, string? description, string? address, string? city, string? country, DateTime? dateOfBirth)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
         if(workspace == null) return null;
@@ -25,19 +25,9 @@ public class ParticipantService : IParticipantService
         var participantCategory = await _participantCategoryRepository.GetByIdAsync(participantCategoryId);
         if(participantCategory == null) return null;
 
-        var participant = new Participant {
-            FirstName = firstName,
-            LastName = lastName,
-            Email = email, 
-            Description = description,
-            Address = address,
-            City = city,
-            Country = country,
-            DateOfBirth = dateOfBirth,
+        var participant = new Participant(workspace, participantCategory, firstName, lastName, description, email, phoneNumber, address, city, country, dateOfBirth) {
             ParticipantCategory = participantCategory,
-            ParticipantCategoryId = participantCategory.Id,
-            Workspace = workspace,
-            WorkspaceId = workspace.Id
+            Workspace = workspace
         };
 
         await _participantRepository.CreateAsync(participant);
@@ -113,5 +103,21 @@ public class ParticipantService : IParticipantService
         await _participantRepository.UpdateAsync(participant);
         
         return true;
+    }
+
+    public static ParticipantDto CreateParticipantdto(Participant participant) {
+        var participantDto = new ParticipantDto {
+            Id = participant.Id,
+            FirstName = participant.FirstName,
+            LastName = participant.LastName,
+            Email = participant.Email,
+            Description = participant.Description,
+            Address = participant.Address,
+            City = participant.City,
+            Country = participant.Country,
+            DateOfBirth = participant.DateOfBirth
+        };
+
+        return participantDto;
     }
 }

@@ -42,7 +42,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var Tag = await _tagService.CreateAsync(request.WorkspaceId, request.Name, request.Icon);
+            var Tag = await _tagService.CreateAsync(request.WorkspaceId, request.Name, request.Icon, request.Description);
 
             if (Tag == null) return BadRequest();
 
@@ -78,7 +78,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var res = await _tagService.UpdateAsync(id, request.NewName, request.NewIcon);
+            var res = await _tagService.UpdateAsync(id, request.NewName, request.NewIcon, request.NewDescription);
 
             if (res) return Ok();
 

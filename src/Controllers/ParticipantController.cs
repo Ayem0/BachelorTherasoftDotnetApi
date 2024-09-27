@@ -15,7 +15,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             _participantService = participantService;
         }
 
-         /// <summary>
+        /// <summary>
         /// Get a Participant by id.
         /// </summary>
         [HttpGet("{id}")]
@@ -43,7 +43,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
             var participant = await _participantService.CreateAsync(request.WorkspaceId, request.ParticipantCategoryId, request.FirstName, 
-                request.LastName, request.Email, request.Description, request.Address, request.City, request.Country, request.DateOfBirth);
+                request.LastName, request.Email, request.PhoneNumber, request.Description, request.Address, request.City, request.Country, request.DateOfBirth);
 
             if (participant == null) return BadRequest();
 

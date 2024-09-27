@@ -19,11 +19,8 @@ public class AreaService : IAreaService
         var location = await _locationRepository.GetByIdAsync(locationId);
         if (location == null) return null;
 
-        var area = new Area {
-            Name = name,
-            Description = description,
+        var area = new Area(location, name, description) {
             Location = location,
-            LocationId = location.Id
         };
 
         await _areaRepository.CreateAsync(area);

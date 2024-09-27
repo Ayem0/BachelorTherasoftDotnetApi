@@ -5,12 +5,31 @@ namespace BachelorTherasoftDotnetApi.src.Models;
 
 public class Slot : BaseModel
 {
-    public required string RoomId { get; set; }
+    public Slot(Room room, TimeOnly startTime, TimeOnly endTime, DateOnly startDate, DateOnly endDate)
+    {
+        Room = room;
+        RoomId = room.Id;
+        StartTime = startTime;
+        EndTime = endTime;
+        StartDate = startDate;
+        EndDate = endDate;
+    }
+    
+    public Slot(string roomId, TimeOnly startTime, TimeOnly endTime, DateOnly startDate, DateOnly endDate)
+    {
+        RoomId = roomId;
+        StartTime = startTime;
+        EndTime = endTime;
+        StartDate = startDate;
+        EndDate = endDate;
+    }
+
+    public string RoomId { get; set; }
     public required Room Room { get; set; }
-    public required TimeOnly StartTime { get; set; }
-    public required TimeOnly EndTime { get; set; }
-    public required DateOnly StartDate { get; set; }
-    public required DateOnly EndDate { get; set; }
+    public TimeOnly StartTime { get; set; }
+    public TimeOnly EndTime { get; set; }
+    public DateOnly StartDate { get; set; }
+    public DateOnly EndDate { get; set; }
     public List<DayOfWeek> ?Days { get; set; } // Voir si moyen de faire autre chose / a modifier dans le dbcontext pour en faire un objet json
     public List<EventCategory> EventCategories { get; set; } = [];
     public int ?IntervalDelay { get; set; }

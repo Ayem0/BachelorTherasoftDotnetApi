@@ -21,11 +21,8 @@ public class ParticipantCategoryService : IParticipantCategoryService
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
         if(workspace == null) return null;
 
-        var participantCategory = new ParticipantCategory {
-            Icon = icon,
-            Name = name,
-            Workspace = workspace,
-            WorkspaceId = workspace.Id
+        var participantCategory = new ParticipantCategory(workspace, name, icon) {
+            Workspace = workspace
         };
 
         await _participantCategoryRepository.CreateAsync(participantCategory);

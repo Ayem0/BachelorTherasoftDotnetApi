@@ -65,7 +65,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             
             var res = await _workspaceService.RemoveMemberAsync(id, memberId);
 
-            if ( res ) return Ok();
+            if (res) return Ok();
 
             return BadRequest();
         }
@@ -83,7 +83,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             
             var res = await _workspaceService.AddMemberAsync(id, memberId);
 
-            if ( res ) return Ok();
+            if (res) return Ok();
 
             return BadRequest();
         }
@@ -101,7 +101,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             
             var res = await _workspaceService.DeleteAsync(id);
 
-            if ( res ) return Ok();
+            if (res) return Ok();
 
             return BadRequest();
         }
@@ -119,7 +119,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             
             var res = await _workspaceService.UpdateAsync(id, request.NewName, request.Description);
 
-            if ( res ) return Ok();
+            if (res) return Ok();
 
             return BadRequest();
         }

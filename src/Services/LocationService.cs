@@ -46,14 +46,8 @@ public class LocationService : ILocationService
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
         if (workspace == null) return null;
 
-        var location = new Location {
-            Name = name,
-            WorkspaceId = workspaceId,
-            Workspace = workspace,
-            Description = description,
-            Address = address,
-            City = city,
-            Country = country
+        var location = new Location(workspace, name, description, address, city, country) {
+            Workspace = workspace
         };
 
         await _locationRepository.CreateAsync(location);

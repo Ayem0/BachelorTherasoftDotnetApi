@@ -64,7 +64,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             
             var res = await _locationService.DeleteAsync(id);
 
-            if ( res ) return Ok();
+            if (res) return Ok();
 
             return BadRequest();
         }
@@ -82,7 +82,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             
             var res = await _locationService.UpdateAsync(id, request.NewName, request.NewDescription, request.NewAddress, request.NewCity, request.NewCountry);
 
-            if ( res ) return Ok();
+            if (res) return Ok();
 
             return BadRequest();
         }

@@ -14,16 +14,13 @@ public class EventCategoryService : IEventCategoryService
         _workspaceRepository = workspaceRepository;
     }
 
-    public async Task<EventCategoryDto?> CreateAsync(string workspaceId, string name, string icon)
+    public async Task<EventCategoryDto?> CreateAsync(string workspaceId, string name, string icon, string color)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
         if (workspace == null) return null;
 
-        var eventCategory = new EventCategory {
-            Name = name,
-            WorkspaceId = workspace.Id,
-            Workspace = workspace,
-            Icon = icon
+        var eventCategory = new EventCategory(workspace, name, icon, color) {
+            Workspace = workspace
         };
 
         await _eventCategoryRepository.CreateAsync(eventCategory);

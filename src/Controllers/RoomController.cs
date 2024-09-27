@@ -11,11 +11,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
     [ApiController]
     public class RoomController : ControllerBase
     {
-        private readonly IRoomService _RoomService;
+        private readonly IRoomService _roomService;
         private readonly IWorkspaceService _workspaceService;
-        public RoomController(IRoomService RoomService, IWorkspaceService workspaceService)
+        public RoomController(IRoomService roomService, IWorkspaceService workspaceService)
         {
-            _RoomService = RoomService;   
+            _roomService = roomService;   
             _workspaceService = workspaceService;
         }
 
@@ -28,11 +28,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<RoomDto?>> GetById(string id)
         {
-            var Room = await _RoomService.GetByIdAsync(id);
+            var room = await _roomService.GetByIdAsync(id);
 
-            if (Room == null) return NotFound();
+            if (room == null) return NotFound();
   
-            return Ok(Room);
+            return Ok(room);
         }
 
         /// <summary>
@@ -46,11 +46,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var Room = await _RoomService.CreateAsync(request.Name, request.AreaId, request.Description);
+            var room = await _roomService.CreateAsync(request.Name, request.AreaId, request.Description);
 
-            if (Room == null) return BadRequest();
+            if (room == null) return BadRequest();
 
-            return CreatedAtAction(nameof(Create), new { id = Room.Id }, Room);
+            return CreatedAtAction(nameof(Create), new { id = room.Id }, room);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var res = await _RoomService.DeleteAsync(id);
+            var res = await _roomService.DeleteAsync(id);
 
             if (res) return Ok();
 
@@ -82,7 +82,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
             
-            var res = await _RoomService.UpdateAsync(id, request.NewName, request.NewDescription);
+            var res = await _roomService.UpdateAsync(id, request.NewName, request.NewDescription);
 
             if (res) return Ok();
 

@@ -68,37 +68,14 @@ public class EventService : IEventService
             }
         }
         
-        var eventToAdd = new Event {
-            Description = description,
-            StartDate = startDate,
-            EndDate = endDate,
+        var eventToAdd = new Event(description, startDate, endDate, room, eventCategory, participants, tags) {
             Room = room,
-            RoomId = room.Id,
-            EventCategory = eventCategory,
-            EventCategoryId = eventCategory.Id,
-            Participants = participants,
-            Tags = tags
+            EventCategory = eventCategory
         };
         
         await _eventRepository.CreateAsync(eventToAdd);
 
-        var eventDto = new EventDto {
-            Id = eventToAdd.Id,
-            Description = description,
-            StartDate = eventToAdd.StartDate,
-            EndDate = eventToAdd.EndDate,
-            Participants = participantDtos,
-            Tags = tagDtos,
-            Room = new RoomDto {
-                Id = eventToAdd.Room.Id,
-                Name = eventToAdd.Room.Name
-            },
-            EventCategory = new EventCategoryDto {
-                Id = eventToAdd.EventCategory.Id,
-                Name = eventToAdd.EventCategory.Name,
-                Icon = eventToAdd.EventCategory.Icon,
-            }
-        };
+        var eventDto = GetEventDto(eventToAdd);
 
         return eventDto;
     }
@@ -118,36 +95,7 @@ public class EventService : IEventService
         var eventToGet = await _eventRepository.GetByIdAsync(id);
         if (eventToGet == null) return null;
         
-        var eventDto = new EventDto {
-            EndDate = eventToGet.EndDate,
-            StartDate = eventToGet.StartDate,
-            Id = eventToGet.Id,
-            Room = new RoomDto {
-                Id = eventToGet.Room.Id,
-                Name = eventToGet.Room.Name
-            },
-            EventCategory = new EventCategoryDto {
-                Id = eventToGet.EventCategory.Icon,
-                Name = eventToGet.EventCategory.Name,
-                Icon = eventToGet.EventCategory.Icon,
-            },
-            Participants = eventToGet.Participants.Select(participant => new ParticipantDto {
-                Id = participant.Id,
-                FirstName = participant.FirstName,
-                LastName = participant.LastName,
-                Email = participant.Email,
-                Description = participant.Description,
-                Address = participant.Address,
-                City = participant.City,
-                Country = participant.Country,
-                DateOfBirth = participant.DateOfBirth
-            }).ToList(),
-            Tags = eventToGet.Tags.Select(tag => new TagDto {
-                Id = tag.Id,
-                Icon = tag.Icon,
-                Name = tag.Name,
-            }).ToList()
-        };
+        var eventDto = GetEventDto(eventToGet);
 
         return eventDto;
     }
@@ -207,32 +155,37 @@ public class EventService : IEventService
 
         await _eventRepository.UpdateAsync(eventToUpdate);
         
+        var eventDto = GetEventDto(eventToUpdate);
+
+        return eventDto;
+    }
+
+    public static EventDto GetEventDto(Event baseEvent) {
         var eventDto = new EventDto {
-            Id = eventToUpdate.Id,
-            Description = eventToUpdate.Description,
-            StartDate = eventToUpdate.StartDate,
-            EndDate = eventToUpdate.EndDate,
-            Participants = eventToUpdate.Participants.Select(p => new ParticipantDto {
+            Id = baseEvent.Id,
+            Description = baseEvent.Description,
+            StartDate = baseEvent.StartDate,
+            EndDate = baseEvent.EndDate,
+            Participants = baseEvent.Participants?.Select(p => new ParticipantDto {
                 Id = p.Id,
                 FirstName = p.FirstName,
                 LastName = p.LastName,
             }).ToList(),
-            Tags = eventToUpdate.Tags.Select(t => new TagDto {
+            Tags = baseEvent.Tags?.Select(t => new TagDto {
                 Id = t.Id,
                 Name = t.Name,
                 Icon = t.Icon,
             }).ToList(),
             Room = new RoomDto {
-                Id = eventToUpdate.Room.Id,
-                Name = eventToUpdate.Room.Name
+                Id = baseEvent.Room.Id,
+                Name = baseEvent.Room.Name
             },
             EventCategory = new EventCategoryDto {
-                Id = eventToUpdate.EventCategory.Id,
-                Name = eventToUpdate.EventCategory.Name,
-                Icon = eventToUpdate.EventCategory.Icon,
+                Id = baseEvent.EventCategory.Id,
+                Name = baseEvent.EventCategory.Name,
+                Icon = baseEvent.EventCategory.Icon,
             }
         };
-
         return eventDto;
     }
 }

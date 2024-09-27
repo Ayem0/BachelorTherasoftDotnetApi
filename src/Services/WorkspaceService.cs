@@ -40,11 +40,8 @@ public class WorkspaceService : IWorkspaceService
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null) return null;
 
-        var workspace = new Workspace { 
-            Name = name,
-            Description = description
-        };
-        workspace.Users.Add(user);
+        var workspace = new Workspace(name, description, [user]);
+        // workspace.Users.Add(user);
 
         await _workspaceRepository.CreateAsync(workspace);
 

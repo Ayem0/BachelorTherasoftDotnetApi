@@ -19,11 +19,8 @@ public class RoomService : IRoomService
         var area = await _areaRepository.GetByIdAsync(areaId);
         if (area == null) return null;
 
-        var room = new Room {
-            Name = name,
-            AreaId = area.Id,
-            Area = area,
-            Description = description
+        var room = new Room(area, name, description) {
+            Area = area
         };
 
         await _roomRepository.CreateAsync(room);
