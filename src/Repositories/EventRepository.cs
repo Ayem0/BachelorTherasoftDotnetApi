@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
 
-public class EventRepository : BaseRepository<Event>, IEventRepository
+public class EventRepository : BaseMySqlRepository<Event>, IEventRepository
 {
     public EventRepository(MySqlDbContext context) : base(context)
     {

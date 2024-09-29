@@ -2,6 +2,7 @@ using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Databases;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Models;
+using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
@@ -13,10 +14,7 @@ public class ConversationRepository : BaseMongoDbRepository<Conversation>, IConv
     }
     public async Task<List<Conversation>> GetByUserIdAsync(string id)
     {
-        var filter = Builders<Conversation>.Filter.And(
-            Builders<Conversation>.Filter.AnyEq(doc => doc.UserIds, id),
-            Builders<Conversation>.Filter.Eq(doc => doc.DeletedAt, null)
-        );
-        return await collection.Find(filter).ToListAsync();
+
+        return await _context.Conversation.Where(c => c.DeletedAt == null && c.UserIds.All(u => u == id)).ToListAsync();
     }
 }

@@ -54,11 +54,17 @@ builder.Services.AddSwaggerGen(o =>
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     o.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
+// MySQL service
 builder.Services.AddDbContext<MySqlDbContext>( 
     options => options.UseMySql(
         new MySqlConnection(builder.Configuration.GetConnectionString("MySQL")),
         new MySqlServerVersion(new Version(8, 0, 38))
 ));
+// MongoDB service
+builder.Services.AddDbContext<MongoDbContext>(
+    options => options.UseMongoDB(builder.Configuration.GetConnectionString("MongoDB")!, builder.Configuration["MongoDbSettings:DbName"]!)
+);
+// Identity service
 builder.Services.AddIdentityApiEndpoints<User>(options => {
     // options.SignIn.RequireConfirmedEmail = true;
     options.User.RequireUniqueEmail = true;
@@ -74,9 +80,6 @@ builder.Services.AddIdentityApiEndpoints<User>(options => {
 // Email service
 //builder.Services.AddTransient<IEmailSender, EmailSender>();
 //builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
-
-// MongoDb service
-builder.Services.AddSingleton<MongoDbContext>();
 
 // Authentication service
 builder.Services.AddAuthentication();

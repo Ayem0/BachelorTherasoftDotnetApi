@@ -1,42 +1,52 @@
 using System;
 using BachelorTherasoftDotnetApi.src.Databases;
+using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 
 namespace BachelorTherasoftDotnetApi.src.Base;
 
 public class BaseMongoDbRepository<T> : IBaseRepository<T> where T : BaseModel
 {
-    protected readonly IMongoCollection<T> collection;
-    public BaseMongoDbRepository(MongoDbContext mongoDbContext)
+    protected readonly MongoDbContext _context;
+    private readonly DbSet<T> _dbSet;
+    public BaseMongoDbRepository(MongoDbContext context)
     {
-        collection = mongoDbContext._database.GetCollection<T>(typeof(T).Name);
+        _context = context;
+        _dbSet = context.Set<T>();
     }
     public async Task CreateAsync(T entity)
     {
         entity.CreatedAt = DateTime.Now;
-        await collection.InsertOneAsync(entity);
+        _dbSet.Add(entity);
+        await _context.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(T entity)
     {
         entity.DeletedAt = DateTime.Now;
-        var filter = Builders<T>.Filter.Eq(doc => doc.Id, entity.Id);
-        await collection.ReplaceOneAsync(filter, entity);
+        _dbSet.Update(entity);
+        await _context.SaveChangesAsync();
     }
 
     public async Task<T?> GetByIdAsync(string id)
     {
-        var filter = Builders<T>.Filter.And(
-            Builders<T>.Filter.Eq(doc => doc.Id, id),
-            Builders<T>.Filter.Eq(doc => doc.DeletedAt, null)
-        );
-        return await collection.Find(filter).FirstOrDefaultAsync();
+        IQueryable<T> query = _dbSet;
+
+        // Charger toutes les relations (propriétés de navigation)
+        var navigations = _context.Model.FindEntityType(typeof(T))!.GetNavigations();
+
+        foreach (var navigation in navigations)
+        {
+            query = query.Include(navigation.Name);
+        }
+
+        return await query.Where(x => x.Id == id && x.DeletedAt == null).FirstOrDefaultAsync();
     }
 
     public async Task UpdateAsync(T entity)
     {
         entity.UpdatedAt = DateTime.Now;
-        var filter = Builders<T>.Filter.Eq(doc => doc.Id, entity.Id);
-        await collection.ReplaceOneAsync(filter, entity);
+        _dbSet.Update(entity);
+        await _context.SaveChangesAsync();
     }
 }

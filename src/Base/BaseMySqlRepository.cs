@@ -3,12 +3,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.src.Base;
 
-public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel
+public class BaseMySqlRepository<T> : IBaseRepository<T> where T : BaseModel
 {
     protected readonly MySqlDbContext _context;
     private readonly DbSet<T> _dbSet;
 
-    public BaseRepository(MySqlDbContext context)
+    public BaseMySqlRepository(MySqlDbContext context)
     {
         _context = context;
         _dbSet = _context.Set<T>();
@@ -31,6 +31,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel
 
     public async Task CreateAsync(T entity)
     {
+        entity.CreatedAt = DateTime.Now;
         _dbSet.Add(entity);
         await _context.SaveChangesAsync();
     }

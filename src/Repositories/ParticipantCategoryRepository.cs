@@ -5,7 +5,7 @@ using BachelorTherasoftDotnetApi.src.Models;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
 
-public class ParticipantCategoryRepository : BaseRepository<ParticipantCategory>, IParticipantCategoryRepository
+public class ParticipantCategoryRepository : BaseMySqlRepository<ParticipantCategory>, IParticipantCategoryRepository
 {
     public ParticipantCategoryRepository(MySqlDbContext context) : base(context)
     {
