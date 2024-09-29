@@ -1,7 +1,5 @@
-using System;
 using BachelorTherasoftDotnetApi.src.Databases;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
 
 namespace BachelorTherasoftDotnetApi.src.Base;
 
