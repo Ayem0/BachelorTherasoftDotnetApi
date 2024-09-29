@@ -1,5 +1,6 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,7 +14,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         private readonly IWorkspaceService _workspaceService;
         public LocationController(ILocationService locationService, IWorkspaceService workspaceService)
         {
-            _locationService = locationService;   
+            _locationService = locationService;
             _workspaceService = workspaceService;
         }
 
@@ -27,7 +28,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             var location = await _locationService.GetByIdAsync(id);
             if (location == null) return NotFound();
-  
+
             return Ok(location);
         }
 
@@ -40,7 +41,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<ActionResult<LocationDto>> Create([FromBody] CreateLocationRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
+
             var location = await _locationService.CreateAsync(request.WorkspaceId, request.Name, request.Description, request.Address, request.City, request.Country);
             if (location == null) return BadRequest();
 
@@ -60,7 +61,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
 
             return Ok();
         }
-        
+
         /// <summary>
         /// Updates a location.
         /// </summary>
@@ -70,7 +71,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Update(string id, [FromBody] UpdateLocationRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
+
             var res = await _locationService.UpdateAsync(id, request.NewName, request.NewDescription, request.NewAddress, request.NewCity, request.NewCountry);
             if (res == null) return BadRequest();
 

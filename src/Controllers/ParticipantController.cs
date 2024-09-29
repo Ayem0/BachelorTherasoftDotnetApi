@@ -1,5 +1,6 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,7 +26,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             var participant = await _participantService.GetByIdAsync(id);
             if (participant == null) return NotFound();
-  
+
             return Ok(participant);
         }
 
@@ -38,8 +39,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<ActionResult<ParticipantDto>> Create([FromBody] CreateParticipantRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
-            var participant = await _participantService.CreateAsync(request.WorkspaceId, request.ParticipantCategoryId, request.FirstName, 
+
+            var participant = await _participantService.CreateAsync(request.WorkspaceId, request.ParticipantCategoryId, request.FirstName,
                 request.LastName, request.Email, request.PhoneNumber, request.Description, request.Address, request.City, request.Country, request.DateOfBirth);
             if (participant == null) return BadRequest();
 
@@ -59,7 +60,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
 
             return Ok();
         }
-        
+
         /// <summary>
         /// Updates a Participant.
         /// </summary>
@@ -69,8 +70,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Update(string id, [FromBody] UpdateParticipantRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
-            var res = await _participantService.UpdateAsync(id, request.NewParticipantCategoryId, request.NewFirstName, request.NewLastName, 
+
+            var res = await _participantService.UpdateAsync(id, request.NewParticipantCategoryId, request.NewFirstName, request.NewLastName,
                 request.NewEmail, request.NewDescription, request.NewAddress, request.NewCity, request.NewCountry, request.NewDateOfBirth);
             if (res == null) return BadRequest();
 

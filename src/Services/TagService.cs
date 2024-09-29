@@ -1,6 +1,7 @@
 
 using BachelorTherasoftDotnetApi.src.Dtos;
-using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
@@ -20,7 +21,8 @@ public class TagService : ITagService
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
         if (workspace == null) return null;
 
-        var tag = new Tag(workspace, name, icon, description) {
+        var tag = new Tag(workspace, name, icon, description)
+        {
             Workspace = workspace
         };
         await _tagRepository.CreateAsync(tag);
@@ -53,7 +55,7 @@ public class TagService : ITagService
         Tag.Name = newName ?? Tag.Name;
         Tag.Icon = newIcon ?? Tag.Icon;
         Tag.Description = newDescription ?? Tag.Description;
-        
+
         await _tagRepository.UpdateAsync(Tag);
         return new TagDto(Tag);
     }

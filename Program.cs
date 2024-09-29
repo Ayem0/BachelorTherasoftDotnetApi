@@ -1,7 +1,8 @@
 
 using BachelorTherasoftDotnetApi.src.Databases;
 using BachelorTherasoftDotnetApi.src.Dtos;
-using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
 using BachelorTherasoftDotnetApi.src.Repositories;
 using BachelorTherasoftDotnetApi.src.Services;
@@ -56,8 +57,7 @@ builder.Services.AddSwaggerGen(o =>
 builder.Services.AddDbContext<MySqlDbContext>( 
     options => options.UseMySql(
         new MySqlConnection(builder.Configuration.GetConnectionString("MySQL")),
-        new MySqlServerVersion(new Version(8, 0, 38)),
-        options => options.EnableRetryOnFailure()
+        new MySqlServerVersion(new Version(8, 0, 38))
 ));
 builder.Services.AddIdentityApiEndpoints<User>(options => {
     // options.SignIn.RequireConfirmedEmail = true;
@@ -75,6 +75,9 @@ builder.Services.AddIdentityApiEndpoints<User>(options => {
 //builder.Services.AddTransient<IEmailSender, EmailSender>();
 //builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 
+// MongoDb service
+builder.Services.AddSingleton<MongoDbContext>();
+
 // Authentication service
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
@@ -90,6 +93,7 @@ builder.Services.AddScoped<IEventCategoryRepository, EventCategoryRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IParticipantRepository, ParticipantRepository>();
 builder.Services.AddScoped<IParticipantCategoryRepository, ParticipantCategoryRepository>();
+builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
 // Custom Services
 builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
 builder.Services.AddScoped<IWorkspaceRoleService, WorkspaceRoleService>();
@@ -101,6 +105,7 @@ builder.Services.AddScoped<IEventCategoryService, EventCategoryService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IParticipantService, ParticipantService>();
 builder.Services.AddScoped<IParticipantCategoryService, ParticipantCategoryService>();
+builder.Services.AddScoped<IConversationService, ConversationService>();
 
 var app = builder.Build();
 

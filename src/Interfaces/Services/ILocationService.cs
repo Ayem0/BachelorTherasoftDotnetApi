@@ -1,6 +1,6 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
 
-namespace BachelorTherasoftDotnetApi.src.Interfaces;
+namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 
 public interface ILocationService
 {

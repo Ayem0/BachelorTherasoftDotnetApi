@@ -9,7 +9,7 @@ namespace BachelorTherasoftDotnetApi.src.Databases;
 
 public class MySqlDbContext : IdentityDbContext<User, Role, string>
 {
-     public MySqlDbContext(DbContextOptions<MySqlDbContext> options) : base(options)
+    public MySqlDbContext(DbContextOptions<MySqlDbContext> options) : base(options)
     {
     }
     public DbSet<Area> Area { get; set; }
@@ -27,32 +27,32 @@ public class MySqlDbContext : IdentityDbContext<User, Role, string>
     public DbSet<Workspace> Workspace { get; set; }
     public DbSet<WorkspaceRight> WorkspaceRight { get; set; }
     public DbSet<WorkspaceRole> WorkspaceRole { get; set; }
-    
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        var JsonSerializerOptions = new JsonSerializerOptions  { Converters = { new JsonStringEnumConverter() } };
+        var JsonSerializerOptions = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
         var dayOfWeekConverter = new ValueConverter<List<DayOfWeek>?, string?>(
             v => v == null ? null : JsonSerializer.Serialize(v, JsonSerializerOptions), // Si `v` est null, retourner null
             v => v == null ? null : JsonSerializer.Deserialize<List<DayOfWeek>>(v, JsonSerializerOptions) // Si la chaîne est null, retourner null
         );
 
-       //builder.Entity<User_Workspace>()
-       //     .HasKey(uw => new { uw.UserId, uw.WorkspaceId }); 
+        //builder.Entity<User_Workspace>()
+        //     .HasKey(uw => new { uw.UserId, uw.WorkspaceId }); 
 
-       // builder.Entity<User_Workspace>()
-       //     .HasOne(uw => uw.User)
-       //     .WithMany(u => u.Workspaces)
-       //     .HasForeignKey(uw => uw.UserId);
+        // builder.Entity<User_Workspace>()
+        //     .HasOne(uw => uw.User)
+        //     .WithMany(u => u.Workspaces)
+        //     .HasForeignKey(uw => uw.UserId);
 
-       // builder.Entity<User_Workspace>()
-       //     .HasOne(uw => uw.Workspace)
-       //     .WithMany(w => w.Users)
-       //     .HasForeignKey(uw => uw.WorkspaceId);
+        // builder.Entity<User_Workspace>()
+        //     .HasOne(uw => uw.Workspace)
+        //     .WithMany(w => w.Users)
+        //     .HasForeignKey(uw => uw.WorkspaceId);
 
         builder.Entity<Slot>()
             .Property(e => e.Days)
-            .HasConversion(dayOfWeekConverter); 
+            .HasConversion(dayOfWeekConverter);
     }
-    
+
 }

@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,7 +27,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             var workspace = await _workspaceService.GetByIdAsync(id);
             if (workspace == null) return NotFound();
-  
+
             return Ok(workspace);
         }
 
@@ -90,7 +91,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
 
             return Ok();
         }
-        
+
         /// <summary>
         /// Updates a workspace.
         /// </summary>
@@ -100,7 +101,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Update(string id, [FromBody] UpdateWorkspaceRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
+
             var res = await _workspaceService.UpdateAsync(id, request.NewName, request.Description);
             if (res == null) return BadRequest();
 

@@ -1,5 +1,6 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
-using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
@@ -19,7 +20,8 @@ public class EventCategoryService : IEventCategoryService
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
         if (workspace == null) return null;
 
-        var eventCategory = new EventCategory(workspace, name, icon, color) {
+        var eventCategory = new EventCategory(workspace, name, icon, color)
+        {
             Workspace = workspace
         };
 

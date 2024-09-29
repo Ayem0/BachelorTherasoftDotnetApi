@@ -1,5 +1,6 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,7 +25,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             var Event = await _eventService.GetByIdAsync(id);
             if (Event == null) return NotFound();
-  
+
             return Ok(Event);
         }
 
@@ -37,7 +38,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<ActionResult<EventDto>> Create([FromBody] CreateEventRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
+
             var Event = await _eventService.CreateAsync(request.Description, request.RoomId, request.EventCategoryId, request.StartDate, request.EndDate, request.ParticipantIds, request.TagIds);
             if (Event == null) return BadRequest();
 
@@ -57,7 +58,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
 
             return Ok();
         }
-        
+
         /// <summary>
         /// Updates a Event.
         /// </summary>
@@ -67,7 +68,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Update(string id, [FromBody] UpdateEventRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
+
             var res = await _eventService.UpdateAsync(id, request.NewStartDate, request.NewEndDate, request.NewRoomId, request.NewDescription, request.NewEventCategoryId, request.NewParticipantIds, request.NewTagIds);
             if (res == null) return BadRequest();
 

@@ -1,5 +1,5 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
-using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,9 +24,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<ActionResult<EventCategoryDto?>> GetById(string id)
         {
             var EventCategory = await _eventCategoryService.GetByIdAsync(id);
-            if (EventCategory == null) return NotFound();
-  
-            return Ok(EventCategory);
+
+            return EventCategory != null ? Ok(EventCategory) : NotFound();
         }
 
         /// <summary>
@@ -38,11 +37,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<ActionResult<EventCategoryDto>> Create([FromBody] CreateEventCategoryRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
-            var EventCategory = await _eventCategoryService.CreateAsync(request.WorkspaceId, request.Name, request.Icon, request.Color);
-            if (EventCategory == null) return BadRequest();
 
-            return CreatedAtAction(nameof(Create), new { id = EventCategory.Id }, EventCategory);
+            var EventCategory = await _eventCategoryService.CreateAsync(request.WorkspaceId, request.Name, request.Icon, request.Color);
+
+            return EventCategory != null ? CreatedAtAction(nameof(Create), new { id = EventCategory.Id }, EventCategory) : BadRequest();
         }
 
         /// <summary>
@@ -52,13 +50,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Delete(string id)
-        {   
+        {
             var res = await _eventCategoryService.DeleteAsync(id);
-            if (!res) return BadRequest();
-            
-            return Ok();
+
+            return res ? Ok() : BadRequest();
         }
-        
+
         /// <summary>
         /// Updates a EventCategory.
         /// </summary>
@@ -68,7 +65,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Update(string id, [FromBody] UpdateEventCategoryRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
+
             var res = await _eventCategoryService.UpdateAsync(id, request.NewName, request.NewIcon);
             if (res == null) return BadRequest();
 

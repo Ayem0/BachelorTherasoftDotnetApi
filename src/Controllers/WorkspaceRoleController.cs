@@ -1,5 +1,6 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,7 +11,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
     public class WorkspaceRoleController : ControllerBase
     {
         private readonly IWorkspaceRoleService _workspaceRoleService;
-        
+
         public WorkspaceRoleController(IWorkspaceRoleService workspaceRoleService)
         {
             _workspaceRoleService = workspaceRoleService;
@@ -25,10 +26,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<ActionResult> Create([FromBody] CreateWorkspaceRoleRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
+
             var workspaceRole = await _workspaceRoleService.CreateAsync(request.WorkspaceId, request.Name, request.Description);
-            if ( workspaceRole == null) return BadRequest();
-            
+            if (workspaceRole == null) return BadRequest();
+
             return CreatedAtAction(nameof(Create), new { id = workspaceRole.Id }, workspaceRole);
         }
 
@@ -83,7 +84,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<ActionResult> Update(string id, [FromBody] UpdateWorkspaceRoleRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
+
             var res = await _workspaceRoleService.UpdateAsync(id, request.NewName, request.Description);
             if (res == null) return BadRequest();
 
@@ -100,7 +101,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             var role = await _workspaceRoleService.GetByIdAsync(id);
             if (role == null) return NotFound();
-            
+
             return Ok(role);
         }
     }

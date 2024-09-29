@@ -2,10 +2,15 @@
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-internal class Conversation : BaseModel
+public class Conversation : BaseModel
 {
-    public string ?Name { get; set; }
-    public required List<string> MembersId { get; set; }
-    public required List<Message> Messages { get; set; } = [];
+    public Conversation(List<string> userIds, string? name)
+    {
+        UserIds = userIds;
+        Name = name;
+    }
+    public string? Name { get; set; }
+    public List<string> UserIds { get; set; }
+    public List<Message> Messages { get; set; } = [];
 }
 

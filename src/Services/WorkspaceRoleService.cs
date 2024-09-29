@@ -1,5 +1,6 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
-using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -8,9 +9,9 @@ namespace BachelorTherasoftDotnetApi.src.Services;
 public class WorkspaceRoleService : IWorkspaceRoleService
 {
     private readonly IWorkspaceRoleRepository _workspaceRoleRepository;
-     private readonly IWorkspaceRepository _workspaceRepository;
+    private readonly IWorkspaceRepository _workspaceRepository;
     private readonly UserManager<User> _userManager;
-    public WorkspaceRoleService(IWorkspaceRoleRepository workspaceRoleRepository, UserManager<User> userManager,IWorkspaceRepository workspaceRepository)
+    public WorkspaceRoleService(IWorkspaceRoleRepository workspaceRoleRepository, UserManager<User> userManager, IWorkspaceRepository workspaceRepository)
     {
         _workspaceRoleRepository = workspaceRoleRepository;
         _userManager = userManager;
@@ -26,7 +27,8 @@ public class WorkspaceRoleService : IWorkspaceRoleService
         if (user == null) return false;
 
         var isContained = workspaceRole.Users.Contains(user);
-        if (!isContained) {
+        if (!isContained)
+        {
             workspaceRole.Users.Add(user);
             await _workspaceRoleRepository.UpdateAsync(workspaceRole);
         }
@@ -38,7 +40,7 @@ public class WorkspaceRoleService : IWorkspaceRoleService
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
         if (workspace == null) return null;
 
-        var workspaceRole = new WorkspaceRole(workspace, name, description){ Workspace = workspace };
+        var workspaceRole = new WorkspaceRole(workspace, name, description) { Workspace = workspace };
         await _workspaceRoleRepository.CreateAsync(workspaceRole);
 
         return new WorkspaceRoleDto(workspaceRole);
@@ -68,10 +70,10 @@ public class WorkspaceRoleService : IWorkspaceRoleService
 
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null) return false;
-        
-        var isContained =  workspaceRole.Users.Remove(user);
+
+        var isContained = workspaceRole.Users.Remove(user);
         if (isContained) await _workspaceRoleRepository.UpdateAsync(workspaceRole);
-            
+
         return isContained;
     }
 

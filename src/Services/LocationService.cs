@@ -1,5 +1,6 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
-using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
@@ -14,7 +15,7 @@ public class LocationService : ILocationService
         _workspaceRepository = workspaceRepository;
     }
 
-    public async Task<LocationDto?> GetByIdAsync(string id) 
+    public async Task<LocationDto?> GetByIdAsync(string id)
     {
         var location = await _locationRepository.GetByIdAsync(id);
         if (location == null) return null;
@@ -22,7 +23,7 @@ public class LocationService : ILocationService
         return new LocationDto(location);
     }
 
-    public async Task<bool> DeleteAsync(string id) 
+    public async Task<bool> DeleteAsync(string id)
     {
         var location = await _locationRepository.GetByIdAsync(id);
         if (location == null) return false;
@@ -31,7 +32,7 @@ public class LocationService : ILocationService
         return true;
     }
 
-    public async Task<LocationDto?> CreateAsync(string workspaceId, string name, string? description, string? address, string? city, string? country) 
+    public async Task<LocationDto?> CreateAsync(string workspaceId, string name, string? description, string? address, string? city, string? country)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
         if (workspace == null) return null;
@@ -42,7 +43,7 @@ public class LocationService : ILocationService
         return new LocationDto(location);
     }
 
-    public async Task<LocationDto?> UpdateAsync(string id, string? newName, string? newDescription, string? newAddress, string? newCity, string? newCountry) 
+    public async Task<LocationDto?> UpdateAsync(string id, string? newName, string? newDescription, string? newAddress, string? newCity, string? newCountry)
     {
         var location = await _locationRepository.GetByIdAsync(id);
         if (location == null || (newName == null && newDescription == null && newAddress == null && newCity == null && newCountry == null)) return null;

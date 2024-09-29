@@ -17,7 +17,7 @@ public class ParticipantCategory : BaseModel
         Name = name;
         Icon = icon;
     }
-    
+
     public string WorkspaceId { get; set; }
     public required Workspace Workspace { get; set; }
     public string Name { get; set; }

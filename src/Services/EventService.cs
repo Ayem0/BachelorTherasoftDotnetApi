@@ -1,5 +1,6 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
-using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
@@ -11,7 +12,7 @@ public class EventService : IEventService
     private readonly IEventCategoryRepository _eventCategoryRepository;
     private readonly IParticipantRepository _participantRepository;
     private readonly ITagRepository _tagRepository;
-    public EventService(IEventRepository eventRepository, IEventCategoryRepository eventCategoryRepository, IRoomRepository roomRepository, 
+    public EventService(IEventRepository eventRepository, IEventCategoryRepository eventCategoryRepository, IRoomRepository roomRepository,
         IParticipantRepository participantRepository, ITagRepository tagRepository)
     {
         _eventRepository = eventRepository;
@@ -21,7 +22,7 @@ public class EventService : IEventService
         _tagRepository = tagRepository;
     }
 
-    public async Task<EventDto?> CreateAsync(string? description, string roomId, string eventCategoryId, DateTime startDate, DateTime endDate, 
+    public async Task<EventDto?> CreateAsync(string? description, string roomId, string eventCategoryId, DateTime startDate, DateTime endDate,
         List<string>? participantIds, List<string>? tagIds)
     {
         var room = await _roomRepository.GetByIdAsync(roomId);
@@ -32,27 +33,32 @@ public class EventService : IEventService
 
         List<Participant> participants = [];
         List<ParticipantDto> participantDtos = [];
-        for (int i = 0; i < participantIds?.Count; i++) {
+        for (int i = 0; i < participantIds?.Count; i++)
+        {
             var participant = await _participantRepository.GetByIdAsync(participantIds[i]);
             if (participant == null) return null;
-            if (!participants.Contains(participant)) {
+            if (!participants.Contains(participant))
+            {
                 participants.Add(participant);
-                participantDtos.Add( new ParticipantDto(participant));
+                participantDtos.Add(new ParticipantDto(participant));
             }
         }
 
         List<Tag> tags = [];
         List<TagDto> tagDtos = [];
-        for (int i = 0; i < tagIds?.Count; i++) {
+        for (int i = 0; i < tagIds?.Count; i++)
+        {
             var tag = await _tagRepository.GetByIdAsync(tagIds[i]);
             if (tag == null) return null;
-            if (!tags.Contains(tag)) {
+            if (!tags.Contains(tag))
+            {
                 tags.Add(tag);
-                tagDtos.Add( new TagDto(tag));
+                tagDtos.Add(new TagDto(tag));
             }
         }
-        
-        var eventToAdd = new Event(description, startDate, endDate, room, eventCategory, participants, tags) {
+
+        var eventToAdd = new Event(description, startDate, endDate, room, eventCategory, participants, tags)
+        {
             Room = room,
             EventCategory = eventCategory
         };
@@ -74,18 +80,19 @@ public class EventService : IEventService
     {
         var eventToGet = await _eventRepository.GetByIdAsync(id);
         if (eventToGet == null) return null;
-        
+
         return GetEventDto(eventToGet);
     }
 
-    public async Task<EventDto?> UpdateAsync(string id, DateTime? newStartDate, DateTime? newEndDate, string? newRoomId, string? newDescription, 
+    public async Task<EventDto?> UpdateAsync(string id, DateTime? newStartDate, DateTime? newEndDate, string? newRoomId, string? newDescription,
         string? newEventCategoryId, List<string>? newParticipantIds, List<string>? newTagIds)
     {
         var eventToUpdate = await _eventRepository.GetByIdAsync(id);
-        if (eventToUpdate == null || (newStartDate == null && newEndDate == null && newRoomId == null && newDescription == null && 
+        if (eventToUpdate == null || (newStartDate == null && newEndDate == null && newRoomId == null && newDescription == null &&
             newEventCategoryId == null && newParticipantIds == null && newTagIds == null)) return null;
 
-        if (newRoomId != null) {
+        if (newRoomId != null)
+        {
             var room = await _roomRepository.GetByIdAsync(id);
             if (room == null) return null;
 
@@ -93,7 +100,8 @@ public class EventService : IEventService
             eventToUpdate.RoomId = room.Id;
         }
 
-        if (newEventCategoryId != null) {
+        if (newEventCategoryId != null)
+        {
             var eventCategory = await _eventCategoryRepository.GetByIdAsync(id);
             if (eventCategory == null) return null;
 
@@ -102,25 +110,33 @@ public class EventService : IEventService
         }
 
         List<Participant> participants = [];
-        for (int i = 0; i < newParticipantIds?.Count; i++) {
+        for (int i = 0; i < newParticipantIds?.Count; i++)
+        {
             var participantToAdd = eventToUpdate.Participants.Find(x => x.Id == newParticipantIds[i]);
-            if (participantToAdd == null) {
+            if (participantToAdd == null)
+            {
                 var participant = await _participantRepository.GetByIdAsync(newParticipantIds[i]);
                 if (participant == null) return null;
                 participants.Add(participant);
-            } else {
+            }
+            else
+            {
                 participants.Add(participantToAdd);
             }
         }
 
         List<Tag> tags = [];
-        for (int i = 0; i < newTagIds?.Count; i++) {
+        for (int i = 0; i < newTagIds?.Count; i++)
+        {
             var tagToAdd = eventToUpdate.Tags.Find(x => x.Id == newTagIds[i]);
-            if (tagToAdd == null) {
+            if (tagToAdd == null)
+            {
                 var tag = await _tagRepository.GetByIdAsync(newTagIds[i]);
                 if (tag == null) return null;
                 tags.Add(tag);
-            } else {
+            }
+            else
+            {
                 tags.Add(tagToAdd);
             }
         }
@@ -136,8 +152,9 @@ public class EventService : IEventService
         return GetEventDto(eventToUpdate);
     }
 
-    private static EventDto GetEventDto(Event baseEvent) {
-        return new EventDto(baseEvent,  new RoomDto(baseEvent.Room), new EventCategoryDto(baseEvent.EventCategory), 
-            baseEvent.Participants?.Select(participant => new ParticipantDto(participant)).ToList(), baseEvent.Tags?.Select(tag => new TagDto(tag)).ToList());
+    private static EventDto GetEventDto(Event baseEvent)
+    {
+        return new EventDto(baseEvent, new RoomDto(baseEvent.Room), new EventCategoryDto(baseEvent.EventCategory),
+            baseEvent.Participants.Select(participant => new ParticipantDto(participant)).ToList(), baseEvent.Tags.Select(tag => new TagDto(tag)).ToList());
     }
 }

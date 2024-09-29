@@ -18,7 +18,7 @@ public class Room : BaseModel
         Name = name;
         Description = description;
     }
-    
+
     public string AreaId { get; set; }
     public required Area Area { get; set; }
     public string Name { get; set; }

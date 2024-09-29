@@ -1,5 +1,6 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
-using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
@@ -20,12 +21,13 @@ public class ParticipantService : IParticipantService
         string? phoneNumber, string? description, string? address, string? city, string? country, DateTime? dateOfBirth)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
-        if(workspace == null) return null;
+        if (workspace == null) return null;
 
         var participantCategory = await _participantCategoryRepository.GetByIdAsync(participantCategoryId);
-        if(participantCategory == null) return null;
+        if (participantCategory == null) return null;
 
-        var participant = new Participant(workspace, participantCategory, firstName, lastName, description, email, phoneNumber, address, city, country, dateOfBirth) {
+        var participant = new Participant(workspace, participantCategory, firstName, lastName, description, email, phoneNumber, address, city, country, dateOfBirth)
+        {
             ParticipantCategory = participantCategory,
             Workspace = workspace
         };
@@ -36,8 +38,8 @@ public class ParticipantService : IParticipantService
 
     public async Task<bool> DeleteAsync(string id)
     {
-        var participant  = await _participantRepository.GetByIdAsync(id);
-        if(participant == null) return false;
+        var participant = await _participantRepository.GetByIdAsync(id);
+        if (participant == null) return false;
 
         await _participantRepository.DeleteAsync(participant);
         return true;
@@ -45,20 +47,21 @@ public class ParticipantService : IParticipantService
 
     public async Task<ParticipantDto?> GetByIdAsync(string id)
     {
-        var participant  = await _participantRepository.GetByIdAsync(id);
-        if(participant == null) return null;
+        var participant = await _participantRepository.GetByIdAsync(id);
+        if (participant == null) return null;
 
         return new ParticipantDto(participant);
     }
 
-    public async Task<ParticipantDto?> UpdateAsync(string id, string? newParticipantCategoryId, string? newFirstName, string? newLastName, string? newEmail, 
+    public async Task<ParticipantDto?> UpdateAsync(string id, string? newParticipantCategoryId, string? newFirstName, string? newLastName, string? newEmail,
         string? newDescription, string? newAddress, string? newCity, string? newCountry, DateTime? newDateOfBirth)
     {
         var participant = await _participantRepository.GetByIdAsync(id);
-        if(participant == null || (newParticipantCategoryId == null && newFirstName == null && newLastName == null && newEmail == null && 
+        if (participant == null || (newParticipantCategoryId == null && newFirstName == null && newLastName == null && newEmail == null &&
             newDescription == null && newAddress == null && newCity == null && newCountry == null && newDateOfBirth == null)) return null;
 
-        if (newParticipantCategoryId != null) {
+        if (newParticipantCategoryId != null)
+        {
             var participantCategory = await _participantCategoryRepository.GetByIdAsync(newParticipantCategoryId);
             if (participantCategory == null) return null;
 

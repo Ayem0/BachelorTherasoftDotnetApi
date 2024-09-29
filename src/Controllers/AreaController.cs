@@ -1,5 +1,5 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
-using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +15,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         private readonly IWorkspaceService _workspaceService;
         public AreaController(IAreaService areaService, IWorkspaceService workspaceService)
         {
-            _areaService = areaService;   
+            _areaService = areaService;
             _workspaceService = workspaceService;
         }
 
@@ -28,9 +28,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<ActionResult<AreaDto?>> GetById(string id)
         {
             var Area = await _areaService.GetByIdAsync(id);
-            if (Area == null) return NotFound();
-  
-            return Ok(Area);
+
+            return Area != null ? Ok(Area) : NotFound();
         }
 
         /// <summary>
@@ -42,11 +41,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<ActionResult<AreaDto>> Create([FromBody] CreateAreaRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
-            var Area = await _areaService.CreateAsync(request.LocationId, request.Name, request.Description);
-            if (Area == null) return BadRequest();
 
-            return CreatedAtAction(nameof(Create), new { id = Area.Id }, Area);
+            var Area = await _areaService.CreateAsync(request.LocationId, request.Name, request.Description);
+
+            return Area != null ? CreatedAtAction(nameof(Create), new { id = Area.Id }, Area) : BadRequest();
         }
 
         /// <summary>
@@ -58,11 +56,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             var res = await _areaService.DeleteAsync(id);
-            if (!res) return BadRequest();
 
-            return Ok();
+            return res ? Ok() : BadRequest();
         }
-        
+
         /// <summary>
         /// Updates a Area.
         /// </summary>
@@ -72,11 +69,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Update(string id, [FromBody] UpdateAreaRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
-            var res = await _areaService.UpdateAsync(id, request.NewName, request.NewDescription);
-            if (res == null) return BadRequest();
 
-            return Ok(res);
+            var res = await _areaService.UpdateAsync(id, request.NewName, request.NewDescription);
+
+            return res != null ? Ok(res) : BadRequest();
         }
     }
 }

@@ -11,7 +11,7 @@ public class Area : BaseModel
         Name = name;
         Description = description;
     }
-    public Area( string locationId, string name, string? description)
+    public Area(string locationId, string name, string? description)
     {
         LocationId = locationId;
         Name = name;

@@ -1,5 +1,6 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
-using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -23,7 +24,7 @@ public class WorkspaceService : IWorkspaceService
         return new WorkspaceDto(workspace);
     }
 
-    public async Task<WorkspaceDto?> CreateAsync(string userId, string name, string? description) 
+    public async Task<WorkspaceDto?> CreateAsync(string userId, string name, string? description)
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null) return null;
@@ -57,7 +58,8 @@ public class WorkspaceService : IWorkspaceService
         if (user == null) return false;
 
         var isContained = workspace.Users.Contains(user);
-        if (!isContained) {
+        if (!isContained)
+        {
             workspace.Users.Add(user);
             await _workspaceRepository.UpdateAsync(workspace);
         }
@@ -65,7 +67,7 @@ public class WorkspaceService : IWorkspaceService
     }
 
     public async Task<bool> DeleteAsync(string id)
-    { 
+    {
         var workspace = await _workspaceRepository.GetByIdAsync(id);
         if (workspace == null) return false;
 
@@ -73,7 +75,7 @@ public class WorkspaceService : IWorkspaceService
         return true;
     }
 
-    public async Task<WorkspaceDto?> UpdateAsync(string id, string? newName, string? newDescription) 
+    public async Task<WorkspaceDto?> UpdateAsync(string id, string? newName, string? newDescription)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(id);
         if (workspace == null || (newDescription == null && newName == null)) return null;

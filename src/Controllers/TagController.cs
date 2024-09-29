@@ -1,5 +1,6 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,7 +26,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             var Tag = await _tagService.GetByIdAsync(id);
             if (Tag == null) return NotFound();
-  
+
             return Ok(Tag);
         }
 
@@ -38,7 +39,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<ActionResult<TagDto>> Create([FromBody] CreateTagRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
+
             var Tag = await _tagService.CreateAsync(request.WorkspaceId, request.Name, request.Icon, request.Description);
             if (Tag == null) return BadRequest();
 
@@ -58,7 +59,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
 
             return Ok();
         }
-        
+
         /// <summary>
         /// Updates a Tag.
         /// </summary>
@@ -68,7 +69,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Update(string id, [FromBody] UpdateTagRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
+
             var res = await _tagService.UpdateAsync(id, request.NewName, request.NewIcon, request.NewDescription);
             if (res == null) return BadRequest();
 

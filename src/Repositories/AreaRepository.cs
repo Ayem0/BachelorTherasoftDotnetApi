@@ -1,8 +1,8 @@
 using BachelorTherasoftDotnetApi.src.Models;
-using BachelorTherasoftDotnetApi.src.Interfaces;
 using BachelorTherasoftDotnetApi.src.Databases;
 using BachelorTherasoftDotnetApi.src.Base;
 using Microsoft.EntityFrameworkCore;
+using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
 
@@ -17,7 +17,7 @@ public class AreaRepository : BaseRepository<Area>, IAreaRepository
         return await _context.Area
             .Include(w => w.Rooms)
             .Include(w => w.Location)
-            .Where(w => w.Id == id && w.DeletedAt == null &&  w.Location.DeletedAt == null && w.Rooms.All(r => r.DeletedAt == null))
+            .Where(w => w.Id == id && w.DeletedAt == null && w.Location.DeletedAt == null && w.Rooms.All(r => r.DeletedAt == null))
             .FirstOrDefaultAsync();
     }
 }

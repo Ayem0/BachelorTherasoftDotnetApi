@@ -5,7 +5,7 @@ namespace BachelorTherasoftDotnetApi.src.Models;
 
 public class WorkspaceRole : BaseModel
 {
-    public WorkspaceRole(Workspace workspace,string name, string? description)
+    public WorkspaceRole(Workspace workspace, string name, string? description)
     {
         Workspace = workspace;
         WorkspaceId = workspace.Id;

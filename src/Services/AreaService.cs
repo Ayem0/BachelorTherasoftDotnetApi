@@ -1,5 +1,6 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
-using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
@@ -19,7 +20,8 @@ public class AreaService : IAreaService
         var location = await _locationRepository.GetByIdAsync(locationId);
         if (location == null) return null;
 
-        var area = new Area(location, name, description) {
+        var area = new Area(location, name, description)
+        {
             Location = location,
         };
         await _areaRepository.CreateAsync(area);

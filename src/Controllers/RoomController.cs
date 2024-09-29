@@ -1,5 +1,6 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +16,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         private readonly IWorkspaceService _workspaceService;
         public RoomController(IRoomService roomService, IWorkspaceService workspaceService)
         {
-            _roomService = roomService;   
+            _roomService = roomService;
             _workspaceService = workspaceService;
         }
 
@@ -29,7 +30,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             var room = await _roomService.GetByIdAsync(id);
             if (room == null) return NotFound();
-  
+
             return Ok(room);
         }
 
@@ -42,7 +43,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<ActionResult<RoomDto>> Create([FromBody] CreateRoomRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
+
             var room = await _roomService.CreateAsync(request.Name, request.AreaId, request.Description);
             if (room == null) return BadRequest();
 
@@ -62,7 +63,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
 
             return Ok();
         }
-        
+
         /// <summary>
         /// Updates a Room.
         /// </summary>
@@ -72,7 +73,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Update(string id, [FromBody] UpdateRoomRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-            
+
             var res = await _roomService.UpdateAsync(id, request.NewName, request.NewDescription);
             if (res == null) return BadRequest();
 

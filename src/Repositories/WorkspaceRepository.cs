@@ -2,7 +2,7 @@ using BachelorTherasoftDotnetApi.src.Models;
 using BachelorTherasoftDotnetApi.src.Databases;
 using Microsoft.EntityFrameworkCore;
 using BachelorTherasoftDotnetApi.src.Base;
-using BachelorTherasoftDotnetApi.src.Interfaces;
+using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
 
