@@ -2,30 +2,33 @@ using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Enums;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
-
+// TODO voir si possible de modeliser mieux les créneaux + voir comment en faire les horaires d'ouvertures maybe champs eventCategories a null mais en vrai un bool c mieux
 public class Slot : BaseModel
 {
-    public Slot(Room room, TimeOnly startTime, TimeOnly endTime, DateOnly startDate, DateOnly endDate)
+    public Slot(Workspace workspace, List<Room> rooms, List<EventCategory> eventCategories, TimeOnly startTime, TimeOnly endTime, DateOnly startDate, DateOnly endDate)
     {
-        Room = room;
-        RoomId = room.Id;
+        EventCategories = eventCategories;
+        Workspace = workspace;
+        WorkspaceId = workspace.Id;
+        Rooms = rooms;
         StartTime = startTime;
         EndTime = endTime;
         StartDate = startDate;
         EndDate = endDate;
     }
 
-    public Slot(string roomId, TimeOnly startTime, TimeOnly endTime, DateOnly startDate, DateOnly endDate)
+    public Slot(string workspaceId, TimeOnly startTime, TimeOnly endTime, DateOnly startDate, DateOnly endDate)
     {
-        RoomId = roomId;
+        WorkspaceId = workspaceId;
         StartTime = startTime;
         EndTime = endTime;
         StartDate = startDate;
         EndDate = endDate;
     }
+    public required Workspace Workspace { get; set; }
+    public string WorkspaceId { get; set; }
 
-    public string RoomId { get; set; }
-    public required Room Room { get; set; }
+    public List<Room> Rooms { get; set; } = [];
     public TimeOnly StartTime { get; set; }
     public TimeOnly EndTime { get; set; }
     public DateOnly StartDate { get; set; }

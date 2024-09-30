@@ -6,6 +6,7 @@ public class Room : BaseModel
 {
     public Room(Area area, string name, string? description)
     {
+        // TODO ajouter la list<slot>
         Area = area;
         AreaId = area.Id;
         Name = name;
