@@ -19,6 +19,14 @@ public class Member : BaseModel
         WorkspaceId = workspaceId;
         Status = status;
     }
+    public Member(User user, Workspace workspace, Status status)
+    {
+        User = user;
+        Workspace = workspace;
+        UserId = user.Id;
+        WorkspaceId = workspace.Id;
+        Status = status;
+    }
     public string UserId { get; set; }
     public required User User { get; set; }
     public string WorkspaceId { get; set; }

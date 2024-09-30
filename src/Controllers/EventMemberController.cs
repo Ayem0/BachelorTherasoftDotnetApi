@@ -39,9 +39,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var eventMember = await _eventMemberService.CreateAsync(request.WorkspaceId, request.UserId);
+            var eventMember = await _eventMemberService.CreateAsync(request.EventId, request.MemberId);
 
-            return eventMember != null ? CreatedAtAction(nameof(Create), new { id = eventMember.Id }, eventMember) : BadRequest();
+            return eventMember != null ? CreatedAtAction(nameof(Create), eventMember) : BadRequest();
         }
 
         /// <summary>

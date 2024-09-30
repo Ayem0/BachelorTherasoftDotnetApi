@@ -1,4 +1,5 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
+using BachelorTherasoftDotnetApi.src.Enums;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
@@ -32,16 +33,13 @@ public class WorkspaceService : IWorkspaceService
         if (user == null) return null;
 
         var workspace = new Workspace(name, description);
-        var member = new Member(user, workspace) {
+        var member = new Member(user, workspace, Status.Accepeted) {
             User = user,
             Workspace = workspace
         };
 
         workspace.Members.Add(member);
         await _workspaceRepository.CreateAsync(workspace);
-
-
-        // await _memberRepository.CreateAsync(member);
 
         return new WorkspaceDto(workspace);
     }
