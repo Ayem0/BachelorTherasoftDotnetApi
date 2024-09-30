@@ -9,11 +9,13 @@ namespace BachelorTherasoftDotnetApi.src.Services;
 public class WorkspaceService : IWorkspaceService
 {
     private readonly IWorkspaceRepository _workspaceRepository;
+    private readonly IMemberRepository _memberRepository;
     private readonly UserManager<User> _userManager;
-    public WorkspaceService(IWorkspaceRepository workspaceRepository, UserManager<User> userManager)
+    public WorkspaceService(IWorkspaceRepository workspaceRepository, UserManager<User> userManager, IMemberRepository memberRepository)
     {
         _workspaceRepository = workspaceRepository;
         _userManager = userManager;
+        _memberRepository = memberRepository;
     }
 
     public async Task<WorkspaceDto?> GetByIdAsync(string id)
@@ -29,38 +31,47 @@ public class WorkspaceService : IWorkspaceService
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null) return null;
 
-        var workspace = new Workspace(name, description, [user]);
+        var workspace = new Workspace(name, description);
+        var member = new Member(user, workspace) {
+            User = user,
+            Workspace = workspace
+        };
+
+        workspace.Members.Add(member);
         await _workspaceRepository.CreateAsync(workspace);
+
+
+        // await _memberRepository.CreateAsync(member);
 
         return new WorkspaceDto(workspace);
     }
 
-    public async Task<bool> RemoveMemberAsync(string id, string userId)
+    public async Task<bool> RemoveMemberAsync(string id, string memberId)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(id);
         if (workspace == null) return false;
 
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user == null) return false;
+        var member = await _memberRepository.GetByIdAsync(memberId);
+        if (member == null) return false;
 
-        var isContained = workspace.Users.Remove(user);
+        var isContained = workspace.Members.Remove(member);
         if (isContained) await _workspaceRepository.UpdateAsync(workspace);
 
         return isContained;
     }
 
-    public async Task<bool> AddMemberAsync(string id, string userId)
+    public async Task<bool> AddMemberAsync(string id, string memberId)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(id);
         if (workspace == null) return false;
 
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user == null) return false;
+        var member = await _memberRepository.GetByIdAsync(memberId);
+        if (member == null) return false;
 
-        var isContained = workspace.Users.Contains(user);
+        var isContained = workspace.Members.Contains(member);
         if (!isContained)
         {
-            workspace.Users.Add(user);
+            workspace.Members.Add(member);
             await _workspaceRepository.UpdateAsync(workspace);
         }
         return !isContained;

@@ -195,6 +195,40 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.ToTable("EventCategory");
                 });
 
+            modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.EventMember", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("EventId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("MemberId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("MemberId");
+
+                    b.ToTable("EventMember");
+                });
+
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Location", b =>
                 {
                     b.Property<string>("Id")
@@ -234,6 +268,40 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.HasIndex("WorkspaceId");
 
                     b.ToTable("Location");
+                });
+
+            modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Member", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("WorkspaceId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("WorkspaceId");
+
+                    b.ToTable("Member");
                 });
 
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Participant", b =>
@@ -419,10 +487,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<int?>("IntervalDelay")
                         .HasColumnType("int");
 
-                    b.Property<string>("RoomId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
                     b.Property<DateOnly>("StartDate")
                         .HasColumnType("date");
 
@@ -432,9 +496,13 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("WorkspaceId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("RoomId");
+                    b.HasIndex("WorkspaceId");
 
                     b.ToTable("Slot");
                 });
@@ -583,35 +651,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.ToTable("Workspace");
                 });
 
-            modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.WorkspaceRight", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("WorkspaceId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WorkspaceId");
-
-                    b.ToTable("WorkspaceRight");
-                });
-
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.WorkspaceRole", b =>
                 {
                     b.Property<string>("Id")
@@ -689,19 +728,19 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.ToTable("EventTag");
                 });
 
-            modelBuilder.Entity("EventUser", b =>
+            modelBuilder.Entity("MemberWorkspaceRole", b =>
                 {
-                    b.Property<string>("EventsId")
+                    b.Property<string>("MembersId")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("UsersId")
+                    b.Property<string>("RolesId")
                         .HasColumnType("varchar(255)");
 
-                    b.HasKey("EventsId", "UsersId");
+                    b.HasKey("MembersId", "RolesId");
 
-                    b.HasIndex("UsersId");
+                    b.HasIndex("RolesId");
 
-                    b.ToTable("EventUser");
+                    b.ToTable("MemberWorkspaceRole");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -810,49 +849,19 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("UserWorkspace", b =>
+            modelBuilder.Entity("RoomSlot", b =>
                 {
-                    b.Property<string>("UsersId")
+                    b.Property<string>("RoomsId")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("WorkspacesId")
+                    b.Property<string>("SlotsId")
                         .HasColumnType("varchar(255)");
 
-                    b.HasKey("UsersId", "WorkspacesId");
+                    b.HasKey("RoomsId", "SlotsId");
 
-                    b.HasIndex("WorkspacesId");
+                    b.HasIndex("SlotsId");
 
-                    b.ToTable("UserWorkspace");
-                });
-
-            modelBuilder.Entity("UserWorkspaceRole", b =>
-                {
-                    b.Property<string>("UsersId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("WorkspaceRolesId")
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("UsersId", "WorkspaceRolesId");
-
-                    b.HasIndex("WorkspaceRolesId");
-
-                    b.ToTable("UserWorkspaceRole");
-                });
-
-            modelBuilder.Entity("WorkspaceRightWorkspaceRole", b =>
-                {
-                    b.Property<string>("WorkspaceRightsId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("WorkspaceRolesId")
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("WorkspaceRightsId", "WorkspaceRolesId");
-
-                    b.HasIndex("WorkspaceRolesId");
-
-                    b.ToTable("WorkspaceRightWorkspaceRole");
+                    b.ToTable("RoomSlot");
                 });
 
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Area", b =>
@@ -918,12 +927,31 @@ namespace BachelorTherasoftDotnetApi.Migrations
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.EventCategory", b =>
                 {
                     b.HasOne("BachelorTherasoftDotnetApi.src.Models.Workspace", "Workspace")
-                        .WithMany()
+                        .WithMany("EventCategories")
                         .HasForeignKey("WorkspaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Workspace");
+                });
+
+            modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.EventMember", b =>
+                {
+                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.Event", "Event")
+                        .WithMany("Members")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.Member", "Member")
+                        .WithMany("Events")
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Member");
                 });
 
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Location", b =>
@@ -937,6 +965,25 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Navigation("Workspace");
                 });
 
+            modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Member", b =>
+                {
+                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.User", "User")
+                        .WithMany("Members")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.Workspace", "Workspace")
+                        .WithMany("Members")
+                        .HasForeignKey("WorkspaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("Workspace");
+                });
+
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Participant", b =>
                 {
                     b.HasOne("BachelorTherasoftDotnetApi.src.Models.ParticipantCategory", "ParticipantCategory")
@@ -946,7 +993,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .IsRequired();
 
                     b.HasOne("BachelorTherasoftDotnetApi.src.Models.Workspace", "Workspace")
-                        .WithMany()
+                        .WithMany("Participants")
                         .HasForeignKey("WorkspaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -959,7 +1006,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.ParticipantCategory", b =>
                 {
                     b.HasOne("BachelorTherasoftDotnetApi.src.Models.Workspace", "Workspace")
-                        .WithMany()
+                        .WithMany("ParticipantCategories")
                         .HasForeignKey("WorkspaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -980,19 +1027,8 @@ namespace BachelorTherasoftDotnetApi.Migrations
 
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Slot", b =>
                 {
-                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.Room", "Room")
-                        .WithMany("Slots")
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Room");
-                });
-
-            modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Tag", b =>
-                {
                     b.HasOne("BachelorTherasoftDotnetApi.src.Models.Workspace", "Workspace")
-                        .WithMany()
+                        .WithMany("Slots")
                         .HasForeignKey("WorkspaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1000,10 +1036,10 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Navigation("Workspace");
                 });
 
-            modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.WorkspaceRight", b =>
+            modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Tag", b =>
                 {
                     b.HasOne("BachelorTherasoftDotnetApi.src.Models.Workspace", "Workspace")
-                        .WithMany("WorkspaceRights")
+                        .WithMany("Tags")
                         .HasForeignKey("WorkspaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1067,17 +1103,17 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("EventUser", b =>
+            modelBuilder.Entity("MemberWorkspaceRole", b =>
                 {
-                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.Event", null)
+                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.Member", null)
                         .WithMany()
-                        .HasForeignKey("EventsId")
+                        .HasForeignKey("MembersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.User", null)
+                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.WorkspaceRole", null)
                         .WithMany()
-                        .HasForeignKey("UsersId")
+                        .HasForeignKey("RolesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1133,47 +1169,17 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("UserWorkspace", b =>
+            modelBuilder.Entity("RoomSlot", b =>
                 {
-                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.User", null)
+                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.Room", null)
                         .WithMany()
-                        .HasForeignKey("UsersId")
+                        .HasForeignKey("RoomsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.Workspace", null)
+                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.Slot", null)
                         .WithMany()
-                        .HasForeignKey("WorkspacesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("UserWorkspaceRole", b =>
-                {
-                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.WorkspaceRole", null)
-                        .WithMany()
-                        .HasForeignKey("WorkspaceRolesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("WorkspaceRightWorkspaceRole", b =>
-                {
-                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.WorkspaceRight", null)
-                        .WithMany()
-                        .HasForeignKey("WorkspaceRightsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.WorkspaceRole", null)
-                        .WithMany()
-                        .HasForeignKey("WorkspaceRolesId")
+                        .HasForeignKey("SlotsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1188,6 +1194,11 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Navigation("Documents");
                 });
 
+            modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Event", b =>
+                {
+                    b.Navigation("Members");
+                });
+
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.EventCategory", b =>
                 {
                     b.Navigation("Events");
@@ -1198,6 +1209,11 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Navigation("Areas");
                 });
 
+            modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Member", b =>
+                {
+                    b.Navigation("Events");
+                });
+
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.ParticipantCategory", b =>
                 {
                     b.Navigation("Participants");
@@ -1206,15 +1222,28 @@ namespace BachelorTherasoftDotnetApi.Migrations
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Room", b =>
                 {
                     b.Navigation("Events");
+                });
 
-                    b.Navigation("Slots");
+            modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.User", b =>
+                {
+                    b.Navigation("Members");
                 });
 
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Workspace", b =>
                 {
+                    b.Navigation("EventCategories");
+
                     b.Navigation("Locations");
 
-                    b.Navigation("WorkspaceRights");
+                    b.Navigation("Members");
+
+                    b.Navigation("ParticipantCategories");
+
+                    b.Navigation("Participants");
+
+                    b.Navigation("Slots");
+
+                    b.Navigation("Tags");
 
                     b.Navigation("WorkspaceRoles");
                 });

@@ -2,7 +2,6 @@ using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
-using Microsoft.AspNetCore.Identity;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
@@ -10,26 +9,26 @@ public class WorkspaceRoleService : IWorkspaceRoleService
 {
     private readonly IWorkspaceRoleRepository _workspaceRoleRepository;
     private readonly IWorkspaceRepository _workspaceRepository;
-    private readonly UserManager<User> _userManager;
-    public WorkspaceRoleService(IWorkspaceRoleRepository workspaceRoleRepository, UserManager<User> userManager, IWorkspaceRepository workspaceRepository)
+    private readonly IMemberRepository _memberRepository;
+    public WorkspaceRoleService(IWorkspaceRoleRepository workspaceRoleRepository, IMemberRepository memberRepository, IWorkspaceRepository workspaceRepository)
     {
         _workspaceRoleRepository = workspaceRoleRepository;
-        _userManager = userManager;
+        _memberRepository = memberRepository;
         _workspaceRepository = workspaceRepository;
     }
 
-    public async Task<bool> AddRoleToMemberAsync(string id, string userId)
+    public async Task<bool> AddRoleToMemberAsync(string id, string memberId)
     {
         var workspaceRole = await _workspaceRoleRepository.GetByIdAsync(id);
         if (workspaceRole == null) return false;
 
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user == null) return false;
+        var member = await _memberRepository.GetByIdAsync(memberId);
+        if (member == null) return false;
 
-        var isContained = workspaceRole.Users.Contains(user);
+        var isContained = workspaceRole.Members.Contains(member);
         if (!isContained)
         {
-            workspaceRole.Users.Add(user);
+            workspaceRole.Members.Add(member);
             await _workspaceRoleRepository.UpdateAsync(workspaceRole);
         }
         return !isContained;
@@ -63,15 +62,15 @@ public class WorkspaceRoleService : IWorkspaceRoleService
         return new WorkspaceRoleDto(workspaceRole);
     }
 
-    public async Task<bool> RemoveRoleFromMemberAsync(string id, string userId)
+    public async Task<bool> RemoveRoleFromMemberAsync(string id, string memberId)
     {
         var workspaceRole = await _workspaceRoleRepository.GetByIdAsync(id);
         if (workspaceRole == null) return false;
 
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user == null) return false;
+        var member = await _memberRepository.GetByIdAsync(memberId);
+        if (member == null) return false;
 
-        var isContained = workspaceRole.Users.Remove(user);
+        var isContained = workspaceRole.Members.Remove(member);
         if (isContained) await _workspaceRoleRepository.UpdateAsync(workspaceRole);
 
         return isContained;

@@ -22,6 +22,5 @@ public class WorkspaceRole : BaseModel
     public required Workspace Workspace { get; set; }
     public string Name { get; set; }
     public string? Description { get; set; }
-    public List<User> Users { get; set; } = [];
-    public List<WorkspaceRight> WorkspaceRights { get; set; } = [];
+    public List<Member> Members { get; set; } = [];
 }

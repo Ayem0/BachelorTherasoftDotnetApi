@@ -319,6 +319,39 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Member",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    WorkspaceId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Member", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Member_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Member_Workspace_WorkspaceId",
+                        column: x => x.WorkspaceId,
+                        principalTable: "Workspace",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "ParticipantCategory",
                 columns: table => new
                 {
@@ -339,6 +372,38 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     table.PrimaryKey("PK_ParticipantCategory", x => x.Id);
                     table.ForeignKey(
                         name: "FK_ParticipantCategory_Workspace_WorkspaceId",
+                        column: x => x.WorkspaceId,
+                        principalTable: "Workspace",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Slot",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    WorkspaceId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    StartTime = table.Column<TimeOnly>(type: "time(6)", nullable: false),
+                    EndTime = table.Column<TimeOnly>(type: "time(6)", nullable: false),
+                    StartDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    EndDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    Days = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IntervalDelay = table.Column<int>(type: "int", nullable: true),
+                    Interval = table.Column<int>(type: "int", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Slot", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Slot_Workspace_WorkspaceId",
                         column: x => x.WorkspaceId,
                         principalTable: "Workspace",
                         principalColumn: "Id",
@@ -369,59 +434,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     table.PrimaryKey("PK_Tag", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Tag_Workspace_WorkspaceId",
-                        column: x => x.WorkspaceId,
-                        principalTable: "Workspace",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "UserWorkspace",
-                columns: table => new
-                {
-                    UsersId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    WorkspacesId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserWorkspace", x => new { x.UsersId, x.WorkspacesId });
-                    table.ForeignKey(
-                        name: "FK_UserWorkspace_AspNetUsers_UsersId",
-                        column: x => x.UsersId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserWorkspace_Workspace_WorkspacesId",
-                        column: x => x.WorkspacesId,
-                        principalTable: "Workspace",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "WorkspaceRight",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    WorkspaceId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Name = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WorkspaceRight", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_WorkspaceRight_Workspace_WorkspaceId",
                         column: x => x.WorkspaceId,
                         principalTable: "Workspace",
                         principalColumn: "Id",
@@ -535,53 +547,53 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "UserWorkspaceRole",
+                name: "EventCategorySlot",
                 columns: table => new
                 {
-                    UsersId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    EventCategoriesId = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    WorkspaceRolesId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    SlotsId = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserWorkspaceRole", x => new { x.UsersId, x.WorkspaceRolesId });
+                    table.PrimaryKey("PK_EventCategorySlot", x => new { x.EventCategoriesId, x.SlotsId });
                     table.ForeignKey(
-                        name: "FK_UserWorkspaceRole_AspNetUsers_UsersId",
-                        column: x => x.UsersId,
-                        principalTable: "AspNetUsers",
+                        name: "FK_EventCategorySlot_EventCategory_EventCategoriesId",
+                        column: x => x.EventCategoriesId,
+                        principalTable: "EventCategory",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserWorkspaceRole_WorkspaceRole_WorkspaceRolesId",
-                        column: x => x.WorkspaceRolesId,
-                        principalTable: "WorkspaceRole",
+                        name: "FK_EventCategorySlot_Slot_SlotsId",
+                        column: x => x.SlotsId,
+                        principalTable: "Slot",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "WorkspaceRightWorkspaceRole",
+                name: "MemberWorkspaceRole",
                 columns: table => new
                 {
-                    WorkspaceRightsId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    MembersId = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    WorkspaceRolesId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    RolesId = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WorkspaceRightWorkspaceRole", x => new { x.WorkspaceRightsId, x.WorkspaceRolesId });
+                    table.PrimaryKey("PK_MemberWorkspaceRole", x => new { x.MembersId, x.RolesId });
                     table.ForeignKey(
-                        name: "FK_WorkspaceRightWorkspaceRole_WorkspaceRight_WorkspaceRightsId",
-                        column: x => x.WorkspaceRightsId,
-                        principalTable: "WorkspaceRight",
+                        name: "FK_MemberWorkspaceRole_Member_MembersId",
+                        column: x => x.MembersId,
+                        principalTable: "Member",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_WorkspaceRightWorkspaceRole_WorkspaceRole_WorkspaceRolesId",
-                        column: x => x.WorkspaceRolesId,
+                        name: "FK_MemberWorkspaceRole_WorkspaceRole_RolesId",
+                        column: x => x.RolesId,
                         principalTable: "WorkspaceRole",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -653,32 +665,27 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Slot",
+                name: "RoomSlot",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                    RoomsId = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    RoomId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    StartTime = table.Column<TimeOnly>(type: "time(6)", nullable: false),
-                    EndTime = table.Column<TimeOnly>(type: "time(6)", nullable: false),
-                    StartDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    EndDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    Days = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    IntervalDelay = table.Column<int>(type: "int", nullable: true),
-                    Interval = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                    SlotsId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Slot", x => x.Id);
+                    table.PrimaryKey("PK_RoomSlot", x => new { x.RoomsId, x.SlotsId });
                     table.ForeignKey(
-                        name: "FK_Slot_Room_RoomId",
-                        column: x => x.RoomId,
+                        name: "FK_RoomSlot_Room_RoomsId",
+                        column: x => x.RoomsId,
                         principalTable: "Room",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RoomSlot_Slot_SlotsId",
+                        column: x => x.SlotsId,
+                        principalTable: "Slot",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -711,6 +718,39 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         name: "FK_Document_Event_EventId",
                         column: x => x.EventId,
                         principalTable: "Event",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "EventMember",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    MemberId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    EventId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EventMember", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EventMember_Event_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Event",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EventMember_Member_MemberId",
+                        column: x => x.MemberId,
+                        principalTable: "Member",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -765,60 +805,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         name: "FK_EventTag_Tag_TagsId",
                         column: x => x.TagsId,
                         principalTable: "Tag",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "EventUser",
-                columns: table => new
-                {
-                    EventsId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    UsersId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EventUser", x => new { x.EventsId, x.UsersId });
-                    table.ForeignKey(
-                        name: "FK_EventUser_AspNetUsers_UsersId",
-                        column: x => x.UsersId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_EventUser_Event_EventsId",
-                        column: x => x.EventsId,
-                        principalTable: "Event",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "EventCategorySlot",
-                columns: table => new
-                {
-                    EventCategoriesId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    SlotsId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EventCategorySlot", x => new { x.EventCategoriesId, x.SlotsId });
-                    table.ForeignKey(
-                        name: "FK_EventCategorySlot_EventCategory_EventCategoriesId",
-                        column: x => x.EventCategoriesId,
-                        principalTable: "EventCategory",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_EventCategorySlot_Slot_SlotsId",
-                        column: x => x.SlotsId,
-                        principalTable: "Slot",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -902,6 +888,16 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 column: "SlotsId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EventMember_EventId",
+                table: "EventMember",
+                column: "EventId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventMember_MemberId",
+                table: "EventMember",
+                column: "MemberId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_EventParticipant_ParticipantsId",
                 table: "EventParticipant",
                 column: "ParticipantsId");
@@ -912,14 +908,24 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 column: "TagsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventUser_UsersId",
-                table: "EventUser",
-                column: "UsersId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Location_WorkspaceId",
                 table: "Location",
                 column: "WorkspaceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Member_UserId",
+                table: "Member",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Member_WorkspaceId",
+                table: "Member",
+                column: "WorkspaceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MemberWorkspaceRole_RolesId",
+                table: "MemberWorkspaceRole",
+                column: "RolesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Participant_ParticipantCategoryId",
@@ -942,34 +948,19 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 column: "AreaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Slot_RoomId",
+                name: "IX_RoomSlot_SlotsId",
+                table: "RoomSlot",
+                column: "SlotsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Slot_WorkspaceId",
                 table: "Slot",
-                column: "RoomId");
+                column: "WorkspaceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tag_WorkspaceId",
                 table: "Tag",
                 column: "WorkspaceId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserWorkspace_WorkspacesId",
-                table: "UserWorkspace",
-                column: "WorkspacesId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserWorkspaceRole_WorkspaceRolesId",
-                table: "UserWorkspaceRole",
-                column: "WorkspaceRolesId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WorkspaceRight_WorkspaceId",
-                table: "WorkspaceRight",
-                column: "WorkspaceId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WorkspaceRightWorkspaceRole_WorkspaceRolesId",
-                table: "WorkspaceRightWorkspaceRole",
-                column: "WorkspaceRolesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WorkspaceRole_WorkspaceId",
@@ -1002,22 +993,19 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 name: "EventCategorySlot");
 
             migrationBuilder.DropTable(
+                name: "EventMember");
+
+            migrationBuilder.DropTable(
                 name: "EventParticipant");
 
             migrationBuilder.DropTable(
                 name: "EventTag");
 
             migrationBuilder.DropTable(
-                name: "EventUser");
+                name: "MemberWorkspaceRole");
 
             migrationBuilder.DropTable(
-                name: "UserWorkspace");
-
-            migrationBuilder.DropTable(
-                name: "UserWorkspaceRole");
-
-            migrationBuilder.DropTable(
-                name: "WorkspaceRightWorkspaceRole");
+                name: "RoomSlot");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -1026,25 +1014,22 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 name: "DocumentCategory");
 
             migrationBuilder.DropTable(
-                name: "Slot");
-
-            migrationBuilder.DropTable(
                 name: "Participant");
-
-            migrationBuilder.DropTable(
-                name: "Tag");
 
             migrationBuilder.DropTable(
                 name: "Event");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Tag");
 
             migrationBuilder.DropTable(
-                name: "WorkspaceRight");
+                name: "Member");
 
             migrationBuilder.DropTable(
                 name: "WorkspaceRole");
+
+            migrationBuilder.DropTable(
+                name: "Slot");
 
             migrationBuilder.DropTable(
                 name: "ParticipantCategory");
@@ -1054,6 +1039,9 @@ namespace BachelorTherasoftDotnetApi.Migrations
 
             migrationBuilder.DropTable(
                 name: "Room");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "Area");

@@ -10,8 +10,6 @@ public class User : IdentityUser
     public DateTime? DeletedAt { get; set; }
     public DateTime? ModifiedAt { get; set; }
     public DateTime? DisabledAt { get; set; }
-    public virtual List<Workspace> Workspaces { get; set; } = [];
-    public virtual List<WorkspaceRole> WorkspaceRoles { get; set; } = [];
-    public virtual List<Event> Events { get; set; } = [];
+    public virtual List<Member> Members { get; set; } = [];
 }
 

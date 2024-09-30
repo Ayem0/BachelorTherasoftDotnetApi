@@ -4,11 +4,11 @@ namespace BachelorTherasoftDotnetApi.src.Models;
 
 public class Workspace : BaseModel
 {
-        public Workspace(string name, string? description, List<User> users)
+        public Workspace(string name, string? description, List<Member> members)
         {
                 Name = name;
                 Description = description;
-                Users = users;
+                Members = members;
         }
         public Workspace(string name, string? description)
         {
@@ -17,9 +17,13 @@ public class Workspace : BaseModel
         }
         public string Name { get; set; }
         public string? Description { get; set; }
-        public List<User> Users { get; set; } = [];
-        public List<WorkspaceRight> WorkspaceRights { get; set; } = [];
+        public List<Member> Members { get; set; } = [];
+        public List<Slot> Slots { get; set; } = [];
         public List<WorkspaceRole> WorkspaceRoles { get; set; } = [];
         public List<Location> Locations { get; set; } = [];
+        public List<EventCategory> EventCategories { get; set; } = [];
+        public List<ParticipantCategory> ParticipantCategories { get; set; } = [];
+        public List<Participant> Participants { get; set; } = [];
+        public List<Tag> Tags { get; set; } = [];
 
 }

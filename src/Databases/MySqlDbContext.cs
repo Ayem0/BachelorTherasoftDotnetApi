@@ -23,9 +23,9 @@ public class MySqlDbContext : IdentityDbContext<User, Role, string>
     public DbSet<ParticipantCategory> ParticipantCategory { get; set; }
     public DbSet<Room> Room { get; set; }
     public DbSet<Slot> Slot { get; set; }
-    //public DbSet<User_Workspace> User_Workspace { get; set; }
     public DbSet<Workspace> Workspace { get; set; }
-    public DbSet<WorkspaceRight> WorkspaceRight { get; set; }
+    public DbSet<Member> Member { get; set; }
+    public DbSet<EventMember> EventMember { get; set; }
     public DbSet<WorkspaceRole> WorkspaceRole { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)

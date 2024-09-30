@@ -15,9 +15,9 @@ public class WorkspaceRepository : BaseMySqlRepository<Workspace>, IWorkspaceRep
     public async new Task<Workspace?> GetByIdAsync(string id)
     {
         return await _context.Workspace
-            .Include(w => w.Users)
+            .Include(w => w.Members)
             .Include(w => w.WorkspaceRoles)
-            .Where(w => w.Id == id && w.DeletedAt == null && w.Users.All(u => u.DeletedAt == null) && w.WorkspaceRoles.All(wr => wr.DeletedAt == null))
+            .Where(w => w.Id == id && w.DeletedAt == null && w.Members.All(u => u.DeletedAt == null) && w.WorkspaceRoles.All(wr => wr.DeletedAt == null))
             .FirstOrDefaultAsync();
     }
 }

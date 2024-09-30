@@ -19,10 +19,10 @@ public class EventRepository : BaseMySqlRepository<Event>, IEventRepository
         return await _context.Event
             .Include(e => e.Room)
             .Include(e => e.EventCategory)
-            .Include(e => e.Users)
+            .Include(e => e.Members)
             .Include(e => e.Participants)
             .Include(e => e.Tags)
-            .Where(e => e.Id == id && e.DeletedAt == null && e.Room.DeletedAt == null && e.EventCategory.DeletedAt == null && e.Users.All(u => u.DeletedAt == null) &&
+            .Where(e => e.Id == id && e.DeletedAt == null && e.Room.DeletedAt == null && e.EventCategory.DeletedAt == null && e.Members.All(u => u.DeletedAt == null) &&
                 e.Participants.All(p => p.DeletedAt == null) && e.Tags.All(t => t.DeletedAt == null))
             .FirstOrDefaultAsync();
     }

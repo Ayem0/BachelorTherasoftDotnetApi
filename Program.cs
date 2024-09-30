@@ -58,7 +58,8 @@ builder.Services.AddSwaggerGen(o =>
 builder.Services.AddDbContext<MySqlDbContext>( 
     options => options.UseMySql(
         new MySqlConnection(builder.Configuration.GetConnectionString("MySQL")),
-        new MySqlServerVersion(new Version(8, 0, 38))
+        new MySqlServerVersion(new Version(8, 0, 38)),
+        options => options.EnableRetryOnFailure()
 ));
 // MongoDB service
 builder.Services.AddDbContext<MongoDbContext>(
@@ -97,6 +98,8 @@ builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IParticipantRepository, ParticipantRepository>();
 builder.Services.AddScoped<IParticipantCategoryRepository, ParticipantCategoryRepository>();
 builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
+builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+
 // Custom Services
 builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
 builder.Services.AddScoped<IWorkspaceRoleService, WorkspaceRoleService>();
@@ -109,6 +112,7 @@ builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IParticipantService, ParticipantService>();
 builder.Services.AddScoped<IParticipantCategoryService, ParticipantCategoryService>();
 builder.Services.AddScoped<IConversationService, ConversationService>();
+builder.Services.AddScoped<IMemberService, MemberService>();
 
 var app = builder.Build();
 
