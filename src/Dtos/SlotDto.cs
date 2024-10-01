@@ -10,7 +10,9 @@ public class SlotDto
         WorkspaceId = slot.WorkspaceId;
         StartDate = slot.StartDate;
         EndDate = slot.EndDate;
+        Id = slot.Id;
     }
+    public string Id { get; set; }
     public string WorkspaceId { get; set; }
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }

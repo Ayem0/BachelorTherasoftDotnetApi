@@ -1,11 +1,12 @@
 using System;
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
-public class SlotService
+public class SlotService : ISlotService
 {
     private readonly ISlotRepository _slotRepository;
     private readonly IWorkspaceRepository _workspaceRepository;
@@ -24,12 +25,12 @@ public class SlotService
         return slot != null ? new SlotDto(slot) : null;
     }
 
-    public async Task<SlotDto?> CreateAsync(string workspaceId, DateOnly startDate, DateOnly endDate) 
+    public async Task<SlotDto?> CreateAsync(string workspaceId, DateOnly startDate, DateOnly endDate, TimeOnly startTime, TimeOnly endTime) 
     {
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
         if (workspace == null) return null;
 
-        var slot = new Slot(workspace, startDate, endDate) {
+        var slot = new Slot(workspace, startDate, endDate, startTime, endTime) {
             Workspace = workspace
         };
         await _slotRepository.CreateAsync(slot);
@@ -37,13 +38,15 @@ public class SlotService
         return new SlotDto(slot);
     }
 
-    public async Task<SlotDto?> UpdateAsync(string id, DateOnly? newStartDate, DateOnly? newEndDate) 
+    public async Task<SlotDto?> UpdateAsync(string id, DateOnly? newStartDate, DateOnly? newEndDate, TimeOnly? newStartTime, TimeOnly? newEndTime) 
     {
         var slot = await _slotRepository.GetByIdAsync(id);
         if (slot == null) return null;
 
         slot.StartDate = newStartDate ?? slot.StartDate;
-        slot.EndDate = newEndDate ?? slot.EndDate;    
+        slot.EndDate = newEndDate ?? slot.EndDate;  
+        slot.StartTime = newStartTime ?? slot.StartTime;
+        slot.EndTime = newEndTime ?? slot.EndTime;      
         await _slotRepository.UpdateAsync(slot);
 
         return new SlotDto(slot);
@@ -59,30 +62,47 @@ public class SlotService
         return true;
     }
 
-    // public async Task<bool> AddSlotToRoom(string slotId, string roomId)
-    // {
-    //     var room = await _roomRepository.GetByIdAsync(roomId);
-    //     if (room == null) return false;
+    public async Task<bool> AddSlotToRoom(string slotId, string roomId)
+    {
+        var room = await _roomRepository.GetByIdAsync(roomId);
+        if (room == null) return false;
 
-    //     var slot = await _slotRepository.GetByIdAsync(slotId);
-    //     if (slot == null) return false;
+        var slot = await _slotRepository.GetByIdAsync(slotId);
+        if (slot == null) return false;
 
-    //     var roomSlots = room.Slots.Where(roomSlot => roomSlot.DeletedAt == null && 
-    //         (roomSlot.StartDate <= slot.StartDate && roomSlot.EndDate >= slot.EndDate || 
-    //         roomSlot.StartDate > slot.StartDate && roomSlot.EndDate < slot.EndDate ||
+       var canAdd = CanAddSlotToRoom(room, slot);
 
-    //         roomSlot.StartDate < slot.StartDate && roomSlot.EndDate > slot.StartDate && roomSlot.EndDate < slot.EndDate ||
+       if (canAdd)
+       {
+            room.Slots.Add(slot);
+            await _roomRepository.UpdateAsync(room);
+       }
+       return canAdd;
+    }
 
-    //         roomSlot.EndDate < slot.EndDate && roomSlot.StartDate > slot.StartDate && roomSlot.StartDate < slot.EndDate )).ToList();
-        
-    //     string[,] RoomSlotMatrix = new string[288, 7];
-    //     for ( int j = 0; j < 7; j++) {
-    //         for (int i = 0; i < 288; i++ ) {
-                
-    //         }
-    //     }
+    private static bool CanAddSlotToRoom(Room room, Slot slot)
+    {
+        // TODO si garder ce fonctionnement refactoriser cette partie
+        var roomSlots = room.Slots.Where(existingSlot => existingSlot.DeletedAt == null && 
+            (existingSlot.StartDate <= slot.StartDate && existingSlot.EndDate >= slot.EndDate || 
 
+            existingSlot.StartDate > slot.StartDate && existingSlot.EndDate < slot.EndDate ||
 
+            existingSlot.StartDate < slot.StartDate && existingSlot.EndDate > slot.StartDate && existingSlot.EndDate < slot.EndDate ||
 
-    // }
+            existingSlot.EndDate < slot.EndDate && existingSlot.StartDate > slot.StartDate && existingSlot.StartDate < slot.EndDate)).ToList();
+
+        if (roomSlots.Count == 0) return true;
+        var roomSlotHours = roomSlots.Where(existingSlot => existingSlot.DeletedAt == null && 
+            (existingSlot.StartTime <= slot.StartTime && existingSlot.EndTime >= slot.EndTime || 
+
+            existingSlot.StartTime > slot.StartTime && existingSlot.EndTime < slot.EndTime ||
+
+            existingSlot.StartTime < slot.StartTime && existingSlot.EndTime > slot.StartTime && existingSlot.EndTime < slot.EndTime ||
+
+            existingSlot.EndTime < slot.EndTime && existingSlot.StartTime > slot.StartTime && existingSlot.StartTime < slot.EndTime)).ToList();
+        if (roomSlotHours.Count == 0) return true;
+        // TODO faire le check si il y a déja des rendez vous entre les dates et qui n'ont pas au moins une des catégories
+        return false;
+    }
 }

@@ -387,10 +387,10 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     WorkspaceId = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    StartTime = table.Column<TimeOnly>(type: "time(6)", nullable: false),
-                    EndTime = table.Column<TimeOnly>(type: "time(6)", nullable: false),
                     StartDate = table.Column<DateOnly>(type: "date", nullable: false),
                     EndDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    StartTime = table.Column<TimeOnly>(type: "time(6)", nullable: false),
+                    EndTime = table.Column<TimeOnly>(type: "time(6)", nullable: false),
                     Days = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IntervalDelay = table.Column<int>(type: "int", nullable: true),

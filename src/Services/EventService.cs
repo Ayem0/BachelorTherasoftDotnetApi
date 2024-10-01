@@ -157,4 +157,29 @@ public class EventService : IEventService
         return new EventDto(baseEvent, new RoomDto(baseEvent.Room), new EventCategoryDto(baseEvent.EventCategory),
             baseEvent.Participants.Select(participant => new ParticipantDto(participant)).ToList(), baseEvent.Tags.Select(tag => new TagDto(tag)).ToList());
     }
+
+
+    private static bool CanAddEvent(Room room, Event @event)
+    {
+        var eventStartDate = new DateOnly(@event.StartDate.Year, @event.StartDate.Month, @event.StartDate.Day);
+        var eventEndDate = new DateOnly(@event.EndDate.Year, @event.EndDate.Month, @event.EndDate.Day);
+        var roomSlots = room.Slots.Where(existingSlot => existingSlot.DeletedAt == null && 
+            (existingSlot.StartDate <= eventStartDate && existingSlot.EndDate >= eventEndDate || 
+
+            existingSlot.StartDate > eventStartDate && existingSlot.EndDate < eventEndDate ||
+
+            existingSlot.StartDate < eventStartDate && existingSlot.EndDate > eventStartDate && existingSlot.EndDate < eventEndDate ||
+
+            existingSlot.EndDate < eventEndDate && existingSlot.StartDate > eventStartDate && existingSlot.StartDate < eventEndDate)).ToList();
+
+        if (roomSlots.Count == 0) return true;
+        var roomSlotHours = roomSlots.Where(existingSlot => existingSlot.DeletedAt == null && 
+            (existingSlot.StartTime <= slot.StartTime && existingSlot.EndTime >= slot.EndTime || 
+
+            existingSlot.StartTime > slot.StartTime && existingSlot.EndTime < slot.EndTime ||
+
+            existingSlot.StartTime < slot.StartTime && existingSlot.EndTime > slot.StartTime && existingSlot.EndTime < slot.EndTime ||
+
+            existingSlot.EndTime < slot.EndTime && existingSlot.StartTime > slot.StartTime && existingSlot.StartTime < slot.EndTime)).ToList();
+    }
 }
