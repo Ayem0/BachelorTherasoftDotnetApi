@@ -163,6 +163,10 @@ public class EventService : IEventService
     {
         var eventStartDate = new DateOnly(@event.StartDate.Year, @event.StartDate.Month, @event.StartDate.Day);
         var eventEndDate = new DateOnly(@event.EndDate.Year, @event.EndDate.Month, @event.EndDate.Day);
+        
+        var eventStartTime = new TimeOnly(@event.StartDate.Hour, @event.StartDate.Minute, @event.StartDate.Second);
+        var eventEndTime = new TimeOnly(@event.EndDate.Hour, @event.EndDate.Minute, @event.EndDate.Second);  
+
         var roomSlots = room.Slots.Where(existingSlot => existingSlot.DeletedAt == null && 
             (existingSlot.StartDate <= eventStartDate && existingSlot.EndDate >= eventEndDate || 
 
@@ -172,14 +176,37 @@ public class EventService : IEventService
 
             existingSlot.EndDate < eventEndDate && existingSlot.StartDate > eventStartDate && existingSlot.StartDate < eventEndDate)).ToList();
 
-        if (roomSlots.Count == 0) return true;
-        var roomSlotHours = roomSlots.Where(existingSlot => existingSlot.DeletedAt == null && 
-            (existingSlot.StartTime <= slot.StartTime && existingSlot.EndTime >= slot.EndTime || 
+        if (roomSlots.Count > 0) 
+        {
+            var roomSlotsHour = roomSlots.Where(existingSlot => existingSlot.DeletedAt == null && 
+            (existingSlot.StartTime <= eventStartTime && existingSlot.EndTime >= eventEndTime || 
 
-            existingSlot.StartTime > slot.StartTime && existingSlot.EndTime < slot.EndTime ||
+            existingSlot.StartTime > eventStartTime && existingSlot.EndTime < eventEndTime ||
 
-            existingSlot.StartTime < slot.StartTime && existingSlot.EndTime > slot.StartTime && existingSlot.EndTime < slot.EndTime ||
+            existingSlot.StartTime < eventStartTime && existingSlot.EndTime > eventStartTime && existingSlot.EndTime < eventEndTime ||
 
-            existingSlot.EndTime < slot.EndTime && existingSlot.StartTime > slot.StartTime && existingSlot.StartTime < slot.EndTime)).ToList();
+            existingSlot.EndTime < eventEndTime && existingSlot.StartTime > eventStartTime && existingSlot.StartTime < eventEndTime)).ToList();
+            if (roomSlotsHour.Count > 0) 
+            {
+                foreach (var roomSlotHour in roomSlotsHour)
+                {
+                    if ( !roomSlotHour.EventCategories.Contains(@event.EventCategory))
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        var roomEvents = room.Events.Where(existingSlot => existingSlot.DeletedAt == null && 
+            (existingSlot.StartTime <= eventStartTime && existingSlot.EndTime >= eventEndTime || 
+
+            existingSlot.StartTime > eventStartTime && existingSlot.EndTime < eventEndTime ||
+
+            existingSlot.StartTime < eventStartTime && existingSlot.EndTime > eventStartTime && existingSlot.EndTime < eventEndTime ||
+
+            existingSlot.EndTime < eventEndTime && existingSlot.StartTime > eventStartTime && existingSlot.StartTime < eventEndTime)).ToList();
+
+        
     }
 }
