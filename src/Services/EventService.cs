@@ -29,37 +29,35 @@ public class EventService : IEventService
     {
         var room = await _roomRepository.GetByIdAsync(roomId);
         if (room == null) return null;
-        //Console.Write(JsonSerializer.Serialize(room, new JsonSerializerOptions { WriteIndented = true }));
 
         var eventCategory = await _eventCategoryRepository.GetByIdAsync(eventCategoryId);
         if (eventCategory == null) return null;
-        //Console.Write(JsonSerializer.Serialize(eventCategory, new JsonSerializerOptions { WriteIndented = true }));
 
         List<Participant> participants = [];
-        // List<ParticipantDto> participantDtos = [];
-        // for (int i = 0; i < participantIds?.Count; i++)
-        // {
-        //     var participant = await _participantRepository.GetByIdAsync(participantIds[i]);
-        //     if (participant == null) return null;
-        //     if (!participants.Contains(participant))
-        //     {
-        //         participants.Add(participant);
-        //         participantDtos.Add(new ParticipantDto(participant));
-        //     }
-        // }
+        List<ParticipantDto> participantDtos = [];
+        for (int i = 0; i < participantIds?.Count; i++)
+        {
+            var participant = await _participantRepository.GetByIdAsync(participantIds[i]);
+            if (participant == null) return null;
+            if (!participants.Contains(participant))
+            {
+                participants.Add(participant);
+                participantDtos.Add(new ParticipantDto(participant));
+            }
+        }
 
         List<Tag> tags = [];
-        // List<TagDto> tagDtos = [];
-        // for (int i = 0; i < tagIds?.Count; i++)
-        // {
-        //     var tag = await _tagRepository.GetByIdAsync(tagIds[i]);
-        //     if (tag == null) return null;
-        //     if (!tags.Contains(tag))
-        //     {
-        //         tags.Add(tag);
-        //         tagDtos.Add(new TagDto(tag));
-        //     }
-        // }
+        List<TagDto> tagDtos = [];
+        for (int i = 0; i < tagIds?.Count; i++)
+        {
+            var tag = await _tagRepository.GetByIdAsync(tagIds[i]);
+            if (tag == null) return null;
+            if (!tags.Contains(tag))
+            {
+                tags.Add(tag);
+                tagDtos.Add(new TagDto(tag));
+            }
+        }
 
         var eventToAdd = new Event(description, startDate, endDate, room, eventCategory, participants, tags)
         {
