@@ -16,7 +16,14 @@ public class BaseMySqlRepository<T> : IBaseRepository<T> where T : BaseModel
 
     public async Task<T?> GetByIdAsync(string id)
     {
-        return await _dbSet.Where(x => x.Id == id && x.DeletedAt == null).FirstOrDefaultAsync();
+        IQueryable<T> query = _dbSet;
+        // Charger toutes les relations (propriétés de navigation)
+        var navigations = _context.Model.FindEntityType(typeof(T))!.GetNavigations();
+        foreach (var navigation in navigations)
+        {
+            query = query.Include(navigation.Name);
+        }
+        return await query.Where(x => x.Id == id && x.DeletedAt == null).FirstOrDefaultAsync();
     }
 
     public async Task CreateAsync(T entity)

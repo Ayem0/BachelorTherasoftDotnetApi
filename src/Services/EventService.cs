@@ -1,7 +1,9 @@
+using System.Text.Json;
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
+using MongoDB.Bson;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
@@ -27,41 +29,46 @@ public class EventService : IEventService
     {
         var room = await _roomRepository.GetByIdAsync(roomId);
         if (room == null) return null;
+        //Console.Write(JsonSerializer.Serialize(room, new JsonSerializerOptions { WriteIndented = true }));
 
         var eventCategory = await _eventCategoryRepository.GetByIdAsync(eventCategoryId);
         if (eventCategory == null) return null;
+        //Console.Write(JsonSerializer.Serialize(eventCategory, new JsonSerializerOptions { WriteIndented = true }));
 
         List<Participant> participants = [];
-        List<ParticipantDto> participantDtos = [];
-        for (int i = 0; i < participantIds?.Count; i++)
-        {
-            var participant = await _participantRepository.GetByIdAsync(participantIds[i]);
-            if (participant == null) return null;
-            if (!participants.Contains(participant))
-            {
-                participants.Add(participant);
-                participantDtos.Add(new ParticipantDto(participant));
-            }
-        }
+        // List<ParticipantDto> participantDtos = [];
+        // for (int i = 0; i < participantIds?.Count; i++)
+        // {
+        //     var participant = await _participantRepository.GetByIdAsync(participantIds[i]);
+        //     if (participant == null) return null;
+        //     if (!participants.Contains(participant))
+        //     {
+        //         participants.Add(participant);
+        //         participantDtos.Add(new ParticipantDto(participant));
+        //     }
+        // }
 
         List<Tag> tags = [];
-        List<TagDto> tagDtos = [];
-        for (int i = 0; i < tagIds?.Count; i++)
-        {
-            var tag = await _tagRepository.GetByIdAsync(tagIds[i]);
-            if (tag == null) return null;
-            if (!tags.Contains(tag))
-            {
-                tags.Add(tag);
-                tagDtos.Add(new TagDto(tag));
-            }
-        }
+        // List<TagDto> tagDtos = [];
+        // for (int i = 0; i < tagIds?.Count; i++)
+        // {
+        //     var tag = await _tagRepository.GetByIdAsync(tagIds[i]);
+        //     if (tag == null) return null;
+        //     if (!tags.Contains(tag))
+        //     {
+        //         tags.Add(tag);
+        //         tagDtos.Add(new TagDto(tag));
+        //     }
+        // }
 
         var eventToAdd = new Event(description, startDate, endDate, room, eventCategory, participants, tags)
         {
             Room = room,
             EventCategory = eventCategory
         };
+        var canAdd = CanAddEvent(room, eventToAdd);
+        if (!canAdd) return null;
+        
         await _eventRepository.CreateAsync(eventToAdd);
 
         return GetEventDto(eventToAdd);
@@ -158,7 +165,6 @@ public class EventService : IEventService
             baseEvent.Participants.Select(participant => new ParticipantDto(participant)).ToList(), baseEvent.Tags.Select(tag => new TagDto(tag)).ToList());
     }
 
-
     private static bool CanAddEvent(Room room, Event @event)
     {
         var eventStartDate = new DateOnly(@event.StartDate.Year, @event.StartDate.Month, @event.StartDate.Day);
@@ -190,23 +196,25 @@ public class EventService : IEventService
             {
                 foreach (var roomSlotHour in roomSlotsHour)
                 {
-                    if ( !roomSlotHour.EventCategories.Contains(@event.EventCategory))
+                    if (roomSlotHour.EventCategories.Count > 0 && !roomSlotHour.EventCategories.Contains(@event.EventCategory))
                     {
+                        Console.WriteLine(roomSlotHour.EventCategories.ToJson());
                         return false;
                     }
                 }
             }
         }
 
-        var roomEvents = room.Events.Where(existingSlot => existingSlot.DeletedAt == null && 
-            (existingSlot.StartTime <= eventStartTime && existingSlot.EndTime >= eventEndTime || 
+        var roomEvents = room.Events.Where(existingEvent => existingEvent.DeletedAt == null && 
+            (existingEvent.StartDate <= @event.StartDate && existingEvent.EndDate >= @event.EndDate || 
 
-            existingSlot.StartTime > eventStartTime && existingSlot.EndTime < eventEndTime ||
+            existingEvent.StartDate > @event.StartDate && existingEvent.EndDate < @event.EndDate ||
 
-            existingSlot.StartTime < eventStartTime && existingSlot.EndTime > eventStartTime && existingSlot.EndTime < eventEndTime ||
+            existingEvent.StartDate < @event.StartDate && existingEvent.EndDate > @event.StartDate && existingEvent.EndDate < @event.EndDate ||
 
-            existingSlot.EndTime < eventEndTime && existingSlot.StartTime > eventStartTime && existingSlot.StartTime < eventEndTime)).ToList();
+            existingEvent.EndDate < @event.EndDate && existingEvent.StartDate > @event.StartDate && existingEvent.StartDate < @event.EndDate)).ToList();
 
+        return roomEvents.Count <= 0;
         
     }
 }

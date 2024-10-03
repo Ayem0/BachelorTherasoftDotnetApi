@@ -9,4 +9,5 @@ public class CreateSlotRequest
     public required DateOnly EndDate { get; set; }
     public required TimeOnly StartTime { get; set; }
     public required TimeOnly EndTime { get; set; }
+    public List<string>? EventCategoryIds { get; set; }
 }

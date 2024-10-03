@@ -1,7 +1,6 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
@@ -40,7 +39,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var Slot = await _SlotService.CreateAsync(request.WorkspaceId, request.StartDate, request.EndDate, request.StartTime, request.EndTime);
+            var Slot = await _SlotService.CreateAsync(request.WorkspaceId, request.StartDate, request.EndDate, request.StartTime, request.EndTime, request.EventCategoryIds);
             if (Slot == null) return BadRequest();
 
             return CreatedAtAction(nameof(Create), new { id = Slot.Id }, Slot);

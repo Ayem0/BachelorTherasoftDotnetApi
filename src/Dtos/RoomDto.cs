@@ -10,10 +10,12 @@ public class RoomDto
         Id = room.Id;
         Name = room.Name;
         Description = room.Description;
+        Slots = room.Slots.Select(x => new SlotDto(x)).ToList();
     }
     [Required]
     public string Id { get; set; }
     [Required]
     public string Name { get; set; }
     public string? Description { get; set; }
+    List<SlotDto> Slots{ get; set; }
 }

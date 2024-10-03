@@ -17,6 +17,7 @@ public class RoomRepository : BaseMySqlRepository<Room>, IRoomRepository
         return await _context.Room
             .Include(r => r.Area)
             .Include(r => r.Slots)
+                .ThenInclude(s => s.EventCategories.Where(x => x.DeletedAt == null)) 
             .Include(r => r.Events)
             .Where(r => r.Id == id && r.DeletedAt == null && r.Area.DeletedAt == null && r.Slots.All(s => s.DeletedAt == null) && r.Events.All(e => e.DeletedAt == null))
             .FirstOrDefaultAsync();

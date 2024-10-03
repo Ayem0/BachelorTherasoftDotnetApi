@@ -10,12 +10,14 @@ public class SlotService : ISlotService
 {
     private readonly ISlotRepository _slotRepository;
     private readonly IWorkspaceRepository _workspaceRepository;
+    private readonly IEventCategoryRepository _eventCategoryRepository;
     private readonly IRoomRepository _roomRepository;
-    public SlotService(ISlotRepository slotRepository, IWorkspaceRepository workspaceRepository, IRoomRepository roomRepository)
+    public SlotService(ISlotRepository slotRepository, IWorkspaceRepository workspaceRepository, IRoomRepository roomRepository, IEventCategoryRepository eventCategoryRepository)
     {
         _slotRepository = slotRepository;
         _workspaceRepository = workspaceRepository;
         _roomRepository = roomRepository;
+        _eventCategoryRepository = eventCategoryRepository;
     }
 
     public async Task<SlotDto?> GetByIdAsync(string id)
@@ -25,12 +27,23 @@ public class SlotService : ISlotService
         return slot != null ? new SlotDto(slot) : null;
     }
 
-    public async Task<SlotDto?> CreateAsync(string workspaceId, DateOnly startDate, DateOnly endDate, TimeOnly startTime, TimeOnly endTime) 
+    public async Task<SlotDto?> CreateAsync(string workspaceId, DateOnly startDate, DateOnly endDate, TimeOnly startTime, TimeOnly endTime, List<string>? eventCategoryIds) 
     {
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
         if (workspace == null) return null;
 
-        var slot = new Slot(workspace, startDate, endDate, startTime, endTime) {
+        List<EventCategory> eventCategories = [];
+        if (eventCategoryIds != null)
+        {
+            foreach(var eventCategoryId in eventCategoryIds)
+            {   
+                var eventCategory = await _eventCategoryRepository.GetByIdAsync(eventCategoryId);
+                if (eventCategory == null) return null;
+                eventCategories.Add(eventCategory);
+            }
+        }
+
+        var slot = new Slot(workspace, startDate, endDate, startTime, endTime, eventCategories) {
             Workspace = workspace
         };
         await _slotRepository.CreateAsync(slot);
