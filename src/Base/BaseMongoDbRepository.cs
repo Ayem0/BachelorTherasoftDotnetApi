@@ -19,6 +19,12 @@ public class BaseMongoDbRepository<T> : IBaseRepository<T> where T : BaseModel
         await _context.SaveChangesAsync();
     }
 
+    public async Task CreateMultipleAsync(List<T> entities)
+    {
+        _dbSet.AddRange(entities);
+        await _context.SaveChangesAsync();
+    }
+
     public async Task DeleteAsync(T entity)
     {
         entity.DeletedAt = DateTime.Now;
@@ -37,4 +43,6 @@ public class BaseMongoDbRepository<T> : IBaseRepository<T> where T : BaseModel
         _dbSet.Update(entity);
         await _context.SaveChangesAsync();
     }
+
+    
 }

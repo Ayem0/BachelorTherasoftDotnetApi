@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BachelorTherasoftDotnetApi.Migrations
 {
     [DbContext(typeof(MySqlDbContext))]
-    [Migration("20241007070921_Initial")]
+    [Migration("20241007132023_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -142,6 +142,18 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
+                    b.Property<string>("MainEventId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime?>("RepetitionEndDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("RepetitionInterval")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RepetitionNumber")
+                        .HasColumnType("int");
+
                     b.Property<string>("RoomId")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
@@ -155,6 +167,8 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("EventCategoryId");
+
+                    b.HasIndex("MainEventId");
 
                     b.HasIndex("RoomId");
 
@@ -916,6 +930,10 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.Event", "MainEvent")
+                        .WithMany()
+                        .HasForeignKey("MainEventId");
+
                     b.HasOne("BachelorTherasoftDotnetApi.src.Models.Room", "Room")
                         .WithMany("Events")
                         .HasForeignKey("RoomId")
@@ -923,6 +941,8 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .IsRequired();
 
                     b.Navigation("EventCategory");
+
+                    b.Navigation("MainEvent");
 
                     b.Navigation("Room");
                 });

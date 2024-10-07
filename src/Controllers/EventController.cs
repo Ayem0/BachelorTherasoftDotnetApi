@@ -74,5 +74,21 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
 
             return Ok(res);
         }
+
+        /// <summary>
+        /// Creates a Event with repetition.
+        /// </summary>
+        [HttpPost("WithRepetition")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status201Created / StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<EventDto>> CreateWithRepetition([FromBody] CreateEventWithRepetitionRequest request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
+
+            var @event = await _eventService.CreateWithRepetitionAsync(request);
+            if (@event == null) return BadRequest();
+
+            return CreatedAtAction(nameof(Create), @event);
+        }
     }
 }

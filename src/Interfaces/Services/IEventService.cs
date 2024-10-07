@@ -10,4 +10,5 @@ public interface IEventService
     Task<bool> DeleteAsync(string id);
     Task<EventDto?> UpdateAsync(string id, DateTime? newStartDate, DateTime? newEndDate, string? newRoomId, string? newDescription,
         string? newEventCategoryId, List<string>? newParticipantIds, List<string>? tagIds);
+    Task<List<EventDto>?> CreateWithRepetitionAsync(CreateEventWithRepetitionRequest request);
 }

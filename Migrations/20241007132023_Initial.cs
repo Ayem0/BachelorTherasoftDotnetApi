@@ -642,6 +642,11 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     EventCategoryId = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    RepetitionInterval = table.Column<int>(type: "int", nullable: true),
+                    RepetitionNumber = table.Column<int>(type: "int", nullable: true),
+                    MainEventId = table.Column<string>(type: "varchar(255)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RepetitionEndDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
@@ -655,6 +660,11 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         principalTable: "EventCategory",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Event_Event_MainEventId",
+                        column: x => x.MainEventId,
+                        principalTable: "Event",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Event_Room_RoomId",
                         column: x => x.RoomId,
@@ -871,6 +881,11 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 name: "IX_Event_EventCategoryId",
                 table: "Event",
                 column: "EventCategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Event_MainEventId",
+                table: "Event",
+                column: "MainEventId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Event_RoomId",

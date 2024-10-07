@@ -6,5 +6,6 @@ public interface IBaseRepository<T> where T : BaseModel
     Task CreateAsync(T entity);
     Task UpdateAsync(T entity);
     Task DeleteAsync(T entity);
+    Task CreateMultipleAsync(List<T> entities);
 }
 

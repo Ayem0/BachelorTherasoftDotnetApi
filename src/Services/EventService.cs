@@ -1,9 +1,10 @@
-using System.Text.Json;
 using BachelorTherasoftDotnetApi.src.Dtos;
+using BachelorTherasoftDotnetApi.src.Enums;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
 using MongoDB.Bson;
+using MongoDB.Driver.Linq;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
@@ -216,7 +217,7 @@ public class EventService : IEventService
         
     }
 
-    public async Task<EventDto?> CreateWithRepetitionAsync(CreateEventWithRepetitionRequest request)
+    public async Task<List<EventDto>?> CreateWithRepetitionAsync(CreateEventWithRepetitionRequest request)
     {
         var room = await _roomRepository.GetByIdAsync(request.RoomId);
         if (room == null) return null;
@@ -250,7 +251,9 @@ public class EventService : IEventService
             }
         }
 
-        var mainEvent = new Event(request.Description, request.StartDate, request.EndDate, room, eventCategory, participants, tags, request.RepetitionInterval, request.RepetitionNumber, null, request.RepetitionEndDate)
+        List<Event> events = [];
+        var mainEvent = new Event(request.Description, request.StartDate, request.EndDate, room, eventCategory, participants, tags, 
+            request.RepetitionInterval, request.RepetitionNumber, null, request.RepetitionEndDate)
         {
             Room = room,
             EventCategory = eventCategory
@@ -258,9 +261,51 @@ public class EventService : IEventService
 
         var canAdd = CanAddEvent(room, mainEvent);
         if (!canAdd) return null;
-        
-        await _eventRepository.CreateAsync(mainEvent);
 
-        return GetEventDto(mainEvent);
+        events.Add(mainEvent);
+
+        var repetitionStartDate = request.StartDate;
+        var repetitionEndDate = request.EndDate;
+
+        while (repetitionStartDate < request.RepetitionEndDate)
+        {
+            switch (request.RepetitionInterval) 
+            {
+                case Interval.Day:
+                    repetitionStartDate.AddDays(request.RepetitionNumber);
+                    repetitionEndDate.AddDays(request.RepetitionNumber);
+                    break;
+                case Interval.Week:
+                    repetitionStartDate.AddWeeks(request.RepetitionNumber);
+                    repetitionEndDate.AddWeeks(request.RepetitionNumber);
+                    break;
+                case Interval.Month:
+                    repetitionStartDate.AddMonths(request.RepetitionNumber);
+                    repetitionEndDate.AddMonths(request.RepetitionNumber);
+                    break;
+                case Interval.Year: 
+                    repetitionStartDate.AddYears(request.RepetitionNumber);
+                    repetitionEndDate.AddYears(request.RepetitionNumber);
+                    break;
+            }
+
+            Event @event = new(request.Description, repetitionStartDate, repetitionEndDate, room, eventCategory, participants, tags, 
+                null, null, mainEvent, null)
+            {
+                Room = room,
+                EventCategory = eventCategory
+            };
+            
+            bool canAddEvent = CanAddEvent(room, @event);
+            if (canAddEvent) {
+                events.Add(@event);
+            } else {
+                return null;
+            }
+        }
+        
+        await _eventRepository.CreateMultipleAsync(events);
+
+        return events.Select(x => GetEventDto(x)).ToList();
     }
 }
