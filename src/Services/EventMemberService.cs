@@ -1,5 +1,3 @@
-using System;
-using System.Text.Json;
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Enums;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
@@ -24,8 +22,6 @@ public class EventMemberService : IEventMemberService
     {
         var eventToGet = await _eventRepository.GetByIdJoinWorkspaceAsync(eventId);
         if(eventToGet == null) return null;
-        Console.WriteLine(eventToGet.Room.Area.Location.WorkspaceId);
-        Console.WriteLine(JsonSerializer.Serialize(eventToGet.Members));
 
         var member = await _memberRepository.GetByIdAsync(memberId);
         if(member == null) return null;

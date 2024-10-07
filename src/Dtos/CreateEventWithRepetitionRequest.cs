@@ -1,8 +1,8 @@
-using System.ComponentModel.DataAnnotations;
+using System;
 
 namespace BachelorTherasoftDotnetApi.src.Dtos;
 
-public class CreateEventRequest
+public class CreateEventWithRepetitionRequest : RepetitionRequest
 {
     public required DateTime StartDate { get; set; }
     public required DateTime EndDate { get; set; }

@@ -59,7 +59,7 @@ public class EventService : IEventService
             }
         }
 
-        var eventToAdd = new Event(description, startDate, endDate, room, eventCategory, participants, tags)
+        var eventToAdd = new Event(description, startDate, endDate, room, eventCategory, participants, tags, null, null, null, null)
         {
             Room = room,
             EventCategory = eventCategory
@@ -214,5 +214,53 @@ public class EventService : IEventService
 
         return roomEvents.Count <= 0;
         
+    }
+
+    public async Task<EventDto?> CreateWithRepetitionAsync(CreateEventWithRepetitionRequest request)
+    {
+        var room = await _roomRepository.GetByIdAsync(request.RoomId);
+        if (room == null) return null;
+
+        var eventCategory = await _eventCategoryRepository.GetByIdAsync(request.EventCategoryId);
+        if (eventCategory == null) return null;
+
+        List<Participant> participants = [];
+        List<ParticipantDto> participantDtos = [];
+        for (int i = 0; i < request.ParticipantIds?.Count; i++)
+        {
+            var participant = await _participantRepository.GetByIdAsync(request.ParticipantIds[i]);
+            if (participant == null) return null;
+            if (!participants.Contains(participant))
+            {
+                participants.Add(participant);
+                participantDtos.Add(new ParticipantDto(participant));
+            }
+        }
+
+        List<Tag> tags = [];
+        List<TagDto> tagDtos = [];
+        for (int i = 0; i < request.TagIds?.Count; i++)
+        {
+            var tag = await _tagRepository.GetByIdAsync(request.TagIds[i]);
+            if (tag == null) return null;
+            if (!tags.Contains(tag))
+            {
+                tags.Add(tag);
+                tagDtos.Add(new TagDto(tag));
+            }
+        }
+
+        var mainEvent = new Event(request.Description, request.StartDate, request.EndDate, room, eventCategory, participants, tags, request.RepetitionInterval, request.RepetitionNumber, null, request.RepetitionEndDate)
+        {
+            Room = room,
+            EventCategory = eventCategory
+        };
+
+        var canAdd = CanAddEvent(room, mainEvent);
+        if (!canAdd) return null;
+        
+        await _eventRepository.CreateAsync(mainEvent);
+
+        return GetEventDto(mainEvent);
     }
 }

@@ -46,5 +46,11 @@ public class BaseMySqlRepository<T> : IBaseRepository<T> where T : BaseModel
         _dbSet.Update(entity);
         await _context.SaveChangesAsync();
     }
+
+    public async Task CreateMultipleAsync(List<T> entities)
+    {
+        _dbSet.AddRange(entities);
+        await _context.SaveChangesAsync();
+    }
 }
 
