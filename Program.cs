@@ -116,6 +116,7 @@ builder.Services.AddScoped<IParticipantService, ParticipantService>();
 builder.Services.AddScoped<IParticipantCategoryService, ParticipantCategoryService>();
 builder.Services.AddScoped<IConversationService, ConversationService>();
 builder.Services.AddScoped<IMemberService, MemberService>();
+builder.Services.AddScoped<ISlotService, SlotService>();
 builder.Services.AddScoped<IEventMemberService, EventMemberService>();
 
 var app = builder.Build();

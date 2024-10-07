@@ -195,11 +195,8 @@ public class EventService : IEventService
             {
                 foreach (var roomSlotHour in roomSlotsHour)
                 {
-                    if (roomSlotHour.EventCategories.Count > 0 && !roomSlotHour.EventCategories.Contains(@event.EventCategory))
-                    {
-                        Console.WriteLine(roomSlotHour.EventCategories.ToJson());
-                        return false;
-                    }
+                    if (roomSlotHour.EventCategories.Count == 0) return false;
+                    else if (roomSlotHour.EventCategories.Count > 0 && !roomSlotHour.EventCategories.Contains(@event.EventCategory)) return false;
                 }
             }
         }
@@ -264,31 +261,11 @@ public class EventService : IEventService
 
         events.Add(mainEvent);
 
-        var repetitionStartDate = request.StartDate;
-        var repetitionEndDate = request.EndDate;
+        var repetitionStartDate = IncrementDate(request.StartDate, request.RepetitionInterval, request.RepetitionNumber);
+        var repetitionEndDate = IncrementDate(request.EndDate, request.RepetitionInterval, request.RepetitionNumber);
 
         while (repetitionStartDate < request.RepetitionEndDate)
         {
-            switch (request.RepetitionInterval) 
-            {
-                case Interval.Day:
-                    repetitionStartDate.AddDays(request.RepetitionNumber);
-                    repetitionEndDate.AddDays(request.RepetitionNumber);
-                    break;
-                case Interval.Week:
-                    repetitionStartDate.AddWeeks(request.RepetitionNumber);
-                    repetitionEndDate.AddWeeks(request.RepetitionNumber);
-                    break;
-                case Interval.Month:
-                    repetitionStartDate.AddMonths(request.RepetitionNumber);
-                    repetitionEndDate.AddMonths(request.RepetitionNumber);
-                    break;
-                case Interval.Year: 
-                    repetitionStartDate.AddYears(request.RepetitionNumber);
-                    repetitionEndDate.AddYears(request.RepetitionNumber);
-                    break;
-            }
-
             Event @event = new(request.Description, repetitionStartDate, repetitionEndDate, room, eventCategory, participants, tags, 
                 null, null, mainEvent, null)
             {
@@ -297,15 +274,33 @@ public class EventService : IEventService
             };
             
             bool canAddEvent = CanAddEvent(room, @event);
+
             if (canAddEvent) {
                 events.Add(@event);
             } else {
                 return null;
             }
+            repetitionStartDate = IncrementDate(repetitionStartDate, request.RepetitionInterval, request.RepetitionNumber);
+            repetitionEndDate = IncrementDate(repetitionEndDate, request.RepetitionInterval, request.RepetitionNumber);
         }
-        
+
         await _eventRepository.CreateMultipleAsync(events);
 
         return events.Select(x => GetEventDto(x)).ToList();
+    }
+
+    public static DateTime IncrementDate(DateTime date, Interval repetitionInterval, int repetitionNumber)
+    {
+        switch (repetitionInterval) 
+        {
+            case Interval.Day:
+                return date.AddDays(repetitionNumber);
+            case Interval.Week:
+                return date.AddWeeks(repetitionNumber);
+            case Interval.Month:
+                return date.AddMonths(repetitionNumber);
+            default: 
+                return date.AddYears(repetitionNumber);
+        }
     }
 }
