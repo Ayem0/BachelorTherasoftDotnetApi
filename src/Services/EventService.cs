@@ -83,7 +83,7 @@ public class EventService : IEventService
 
     public async Task<EventDto?> GetByIdAsync(string id)
     {
-        var eventToGet = await _eventRepository.GetByIdAsync(id);
+        var eventToGet = await _eventRepository.GetByIdWithRelationsAsync(id);
         if (eventToGet == null) return null;
 
         return GetEventDto(eventToGet);
@@ -92,7 +92,7 @@ public class EventService : IEventService
     public async Task<EventDto?> UpdateAsync(string id, DateTime? newStartDate, DateTime? newEndDate, string? newRoomId, string? newDescription,
         string? newEventCategoryId, List<string>? newParticipantIds, List<string>? newTagIds)
     {
-        var eventToUpdate = await _eventRepository.GetByIdAsync(id);
+        var eventToUpdate = await _eventRepository.GetByIdWithRelationsAsync(id);
         if (eventToUpdate == null || (newStartDate == null && newEndDate == null && newRoomId == null && newDescription == null &&
             newEventCategoryId == null && newParticipantIds == null && newTagIds == null)) return null;
 

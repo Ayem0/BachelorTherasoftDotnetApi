@@ -100,6 +100,8 @@ builder.Services.AddScoped<IParticipantCategoryRepository, ParticipantCategoryRe
 builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
 builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 builder.Services.AddScoped<ISlotRepository, SlotRepository>();
+builder.Services.AddScoped<IEventMemberRepository, EventMemberRepository>();
+
 
 // Custom Services
 builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
@@ -114,7 +116,7 @@ builder.Services.AddScoped<IParticipantService, ParticipantService>();
 builder.Services.AddScoped<IParticipantCategoryService, ParticipantCategoryService>();
 builder.Services.AddScoped<IConversationService, ConversationService>();
 builder.Services.AddScoped<IMemberService, MemberService>();
-builder.Services.AddScoped<ISlotService, SlotService>();
+builder.Services.AddScoped<IEventMemberService, EventMemberService>();
 
 var app = builder.Build();
 

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Enums;
 
@@ -32,12 +33,18 @@ public class Slot : BaseModel
     }
     public required Workspace Workspace { get; set; }
     public string WorkspaceId { get; set; }
-
-
     public List<Room> Rooms { get; set; } = [];
+
+    [DataType(DataType.Date)]
     public DateOnly StartDate { get; set; }
+
+    [DataType(DataType.Date)]
     public DateOnly EndDate { get; set; }
+
+    [DataType(DataType.Time)]
     public TimeOnly StartTime { get; set; }
+    
+    [DataType(DataType.Time)]
     public TimeOnly EndTime { get; set; }
 
     public List<DayOfWeek>? Days { get; set; } // Voir si moyen de faire autre chose / a modifier dans le dbcontext pour en faire un objet json

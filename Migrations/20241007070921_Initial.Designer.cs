@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BachelorTherasoftDotnetApi.Migrations
 {
     [DbContext(typeof(MySqlDbContext))]
-    [Migration("20241003081610_Initial")]
+    [Migration("20241007070921_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
