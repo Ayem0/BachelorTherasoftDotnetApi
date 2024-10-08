@@ -6,5 +6,5 @@ namespace BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 
 public interface ISlotRepository : IBaseRepository<Slot>
 {
-    
+    Task<List<Slot>> GetRepetitionsById(string id);
 }

@@ -21,4 +21,11 @@ public class SlotRepository : BaseMySqlRepository<Slot>, ISlotRepository
             .Where(r => r.Id == id && r.DeletedAt == null && r.EventCategories.All(s => s.DeletedAt == null))
             .FirstOrDefaultAsync();
     }
+    public async Task<List<Slot>> GetRepetitionsById(string id)
+    {
+        return await _context.Slot
+            .Include(r => r.EventCategories)
+            .Where(r => r.MainSlotId == id && r.DeletedAt == null && r.EventCategories.All(s => s.DeletedAt == null))
+            .ToListAsync();
+    }
 }

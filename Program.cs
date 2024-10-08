@@ -119,6 +119,10 @@ builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddScoped<ISlotService, SlotService>();
 builder.Services.AddScoped<IEventMemberService, EventMemberService>();
 
+
+// Utils Services
+builder.Services.AddScoped<IRepetitionService, RepetitionService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

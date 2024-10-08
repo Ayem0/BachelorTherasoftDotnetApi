@@ -1,9 +1,9 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
-using BachelorTherasoftDotnetApi.src.Enums;
+using BachelorTherasoftDotnetApi.src.Dtos.Create;
+using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
-using MongoDB.Bson;
 using MongoDB.Driver.Linq;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
@@ -15,14 +15,16 @@ public class EventService : IEventService
     private readonly IEventCategoryRepository _eventCategoryRepository;
     private readonly IParticipantRepository _participantRepository;
     private readonly ITagRepository _tagRepository;
+    private readonly IRepetitionService _repetitionService;
     public EventService(IEventRepository eventRepository, IEventCategoryRepository eventCategoryRepository, IRoomRepository roomRepository,
-        IParticipantRepository participantRepository, ITagRepository tagRepository)
+        IParticipantRepository participantRepository, ITagRepository tagRepository, IRepetitionService repetitionService)
     {
         _eventRepository = eventRepository;
         _roomRepository = roomRepository;
         _eventCategoryRepository = eventCategoryRepository;
         _participantRepository = participantRepository;
         _tagRepository = tagRepository;
+        _repetitionService = repetitionService;
     }
 
     public async Task<EventDto?> CreateAsync(string? description, string roomId, string eventCategoryId, DateTime startDate, DateTime endDate,
@@ -248,7 +250,7 @@ public class EventService : IEventService
             }
         }
 
-        List<Event> events = [];
+
         var mainEvent = new Event(request.Description, request.StartDate, request.EndDate, room, eventCategory, participants, tags, 
             request.RepetitionInterval, request.RepetitionNumber, null, request.RepetitionEndDate)
         {
@@ -258,15 +260,15 @@ public class EventService : IEventService
 
         var canAdd = CanAddEvent(room, mainEvent);
         if (!canAdd) return null;
+        
+        List<Event> events = [mainEvent];
 
-        events.Add(mainEvent);
+        var repetitionStartDate = _repetitionService.IncrementDateTime(request.StartDate, request.RepetitionInterval, request.RepetitionNumber);
+        var repetitionEndDate = _repetitionService.IncrementDateTime(request.EndDate, request.RepetitionInterval, request.RepetitionNumber);
 
-        var repetitionStartDate = IncrementDate(request.StartDate, request.RepetitionInterval, request.RepetitionNumber);
-        var repetitionEndDate = IncrementDate(request.EndDate, request.RepetitionInterval, request.RepetitionNumber);
-
-        while (repetitionStartDate < request.RepetitionEndDate)
+        while (DateOnly.FromDateTime(repetitionStartDate) < request.RepetitionEndDate)
         {
-            Event @event = new(request.Description, repetitionStartDate, repetitionEndDate, room, eventCategory, participants, tags, 
+            var @event = new Event(request.Description, repetitionStartDate, repetitionEndDate, room, eventCategory, participants, tags, 
                 null, null, mainEvent, null)
             {
                 Room = room,
@@ -280,8 +282,8 @@ public class EventService : IEventService
             } else {
                 return null;
             }
-            repetitionStartDate = IncrementDate(repetitionStartDate, request.RepetitionInterval, request.RepetitionNumber);
-            repetitionEndDate = IncrementDate(repetitionEndDate, request.RepetitionInterval, request.RepetitionNumber);
+            repetitionStartDate = _repetitionService.IncrementDateTime(repetitionStartDate, request.RepetitionInterval, request.RepetitionNumber);
+            repetitionEndDate = _repetitionService.IncrementDateTime(repetitionEndDate, request.RepetitionInterval, request.RepetitionNumber);
         }
 
         await _eventRepository.CreateMultipleAsync(events);
@@ -289,18 +291,5 @@ public class EventService : IEventService
         return events.Select(x => GetEventDto(x)).ToList();
     }
 
-    public static DateTime IncrementDate(DateTime date, Interval repetitionInterval, int repetitionNumber)
-    {
-        switch (repetitionInterval) 
-        {
-            case Interval.Day:
-                return date.AddDays(repetitionNumber);
-            case Interval.Week:
-                return date.AddWeeks(repetitionNumber);
-            case Interval.Month:
-                return date.AddMonths(repetitionNumber);
-            default: 
-                return date.AddYears(repetitionNumber);
-        }
-    }
+    
 }

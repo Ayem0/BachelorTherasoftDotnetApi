@@ -6,7 +6,7 @@ namespace BachelorTherasoftDotnetApi.src.Models;
 public class Event : BaseModel
 {
     public Event(string? description, DateTime startDate, DateTime endDate, Room room, EventCategory eventCategory, List<Participant> participants, 
-        List<Tag> tags, Interval? repetitionInterval, int? repetitionNumber, Event? mainEvent, DateTime? repetitionEndDate)
+        List<Tag> tags, Interval? repetitionInterval, int? repetitionNumber, Event? mainEvent, DateOnly? repetitionEndDate)
     {
         Description = description;
         StartDate = startDate;
@@ -20,11 +20,12 @@ public class Event : BaseModel
         RepetitionInterval = repetitionInterval;
         RepetitionNumber = repetitionNumber;
         MainEvent = mainEvent;
+        MainEventId = mainEvent?.Id;
         RepetitionEndDate = repetitionEndDate;
         // TODO ajouter la liste des Users
     }
     public Event(string? description, DateTime startDate, DateTime endDate, string roomId, string eventCategoryId, Interval? repetitionInterval, 
-    int? repetitionNumber, string? mainEventId, DateTime? repetitionEndDate)
+    int? repetitionNumber, string? mainEventId, DateOnly? repetitionEndDate)
     {
         Description = description;
         StartDate = startDate;
@@ -48,7 +49,7 @@ public class Event : BaseModel
     public int? RepetitionNumber { get; set; }
     public Event? MainEvent { get; set; }
     public string? MainEventId { get; set; }
-    public DateTime? RepetitionEndDate { get; set; }
+    public DateOnly? RepetitionEndDate { get; set; }
 
 
 

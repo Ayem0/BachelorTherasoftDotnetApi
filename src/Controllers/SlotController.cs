@@ -1,4 +1,6 @@
 using BachelorTherasoftDotnetApi.src.Dtos;
+using BachelorTherasoftDotnetApi.src.Dtos.Create;
+using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -61,6 +63,22 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
 
 
         /// <summary>
+        /// Creates a Slot with repetition.
+        /// </summary>
+        [HttpPost("WithRepetition")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status201Created / StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<SlotDto>> CreateWithRepetition([FromBody] CreateSlotWithRepetitionRequest request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
+
+            var slots = await _SlotService.CreateWithRepetitionAsync(request);
+            if (slots == null) return BadRequest();
+
+            return CreatedAtAction(nameof(Create), slots);
+        }
+
+        /// <summary>
         /// Add a Slot to a Room.
         /// </summary>
         [HttpPost("AddSlot/{id}/ToRoom/{roomId}")]
@@ -69,11 +87,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> AddSlotToRoom(string id, string roomId)
         {
             var res = await _SlotService.AddSlotToRoom(id, roomId);
-            if (!res) return BadRequest();
 
-            return Ok();
+            return res ? Ok() : BadRequest();
         }
 
+        // TODO faire le update d'un slot / super chiant a faire car faut check pour chaque salle du créneaux si cela pose probleme
         // /// <summary>
         // /// Updates a Slot.
         // /// </summary>

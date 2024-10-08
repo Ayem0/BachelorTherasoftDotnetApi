@@ -1,5 +1,6 @@
 
 using BachelorTherasoftDotnetApi.src.Dtos;
+using BachelorTherasoftDotnetApi.src.Dtos.Models;
 
 namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 
