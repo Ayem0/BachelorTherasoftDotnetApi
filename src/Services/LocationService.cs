@@ -1,3 +1,4 @@
+using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
@@ -16,38 +17,41 @@ public class LocationService : ILocationService
         _workspaceRepository = workspaceRepository;
     }
 
-    public async Task<LocationDto?> GetByIdAsync(string id)
+    public async Task<Response<LocationDto?>> GetByIdAsync(string id)
     {
         var location = await _locationRepository.GetByIdAsync(id);
-        if (location == null) return null;
+        if (location == null) return new Response<LocationDto?>(success: false, errors: ["Location not found."]);
 
-        return new LocationDto(location);
+        return new Response<LocationDto?>(success: true, content: new LocationDto(location));
     }
 
-    public async Task<bool> DeleteAsync(string id)
+    public async Task<Response<string>> DeleteAsync(string id)
     {
         var location = await _locationRepository.GetByIdAsync(id);
-        if (location == null) return false;
+        if (location == null) return new Response<string>(success: false, errors: ["Location not found."]);
 
         await _locationRepository.DeleteAsync(location);
-        return true;
+        return new Response<string>(success: true, errors: ["Location successfully deleted."]);
     }
 
-    public async Task<LocationDto?> CreateAsync(string workspaceId, string name, string? description, string? address, string? city, string? country)
+    public async Task<Response<LocationDto?>> CreateAsync(string workspaceId, string name, string? description, string? address, string? city, string? country)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
-        if (workspace == null) return null;
+        if (workspace == null) return new Response<LocationDto?>(success: false, errors: ["Workspace not found."]);
 
         var location = new Location(workspace, name, description, address, city, country) { Workspace = workspace };
         await _locationRepository.CreateAsync(location);
 
-        return new LocationDto(location);
+        return new Response<LocationDto?>(success: true, content: new LocationDto(location));
     }
 
-    public async Task<LocationDto?> UpdateAsync(string id, string? newName, string? newDescription, string? newAddress, string? newCity, string? newCountry)
+    public async Task<Response<LocationDto?>> UpdateAsync(string id, string? newName, string? newDescription, string? newAddress, string? newCity, string? newCountry)
     {
+        if (newName == null && newDescription == null && newAddress == null && newCity == null && newCountry == null) 
+            return new Response<LocationDto?>(success: false, errors: ["At least one field is required."]);
+            
         var location = await _locationRepository.GetByIdAsync(id);
-        if (location == null || (newName == null && newDescription == null && newAddress == null && newCity == null && newCountry == null)) return null;
+        if (location == null ) return new Response<LocationDto?>(success: false, errors: ["Location not found."]);
 
         location.Name = newName ?? location.Name;
         location.Description = newDescription ?? location.Description;
@@ -56,6 +60,6 @@ public class LocationService : ILocationService
         location.Country = newCountry ?? location.Country;
 
         await _locationRepository.UpdateAsync(location);
-        return new LocationDto(location);
+        return new Response<LocationDto?>(success: true, content: new LocationDto(location));
     }
 }

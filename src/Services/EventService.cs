@@ -1,3 +1,4 @@
+using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
@@ -27,39 +28,33 @@ public class EventService : IEventService
         _repetitionService = repetitionService;
     }
 
-    public async Task<EventDto?> CreateAsync(string? description, string roomId, string eventCategoryId, DateTime startDate, DateTime endDate,
+    public async Task<Response<EventDto?>> CreateAsync(string? description, string roomId, string eventCategoryId, DateTime startDate, DateTime endDate,
         List<string>? participantIds, List<string>? tagIds)
     {
         var room = await _roomRepository.GetByIdAsync(roomId);
-        if (room == null) return null;
+        if (room == null) return new Response<EventDto?>(success: false, errors: ["Room not found."]);
 
         var eventCategory = await _eventCategoryRepository.GetByIdAsync(eventCategoryId);
-        if (eventCategory == null) return null;
+        if (eventCategory == null) return new Response<EventDto?>(success: false, errors: ["Event category not found."]);
 
         List<Participant> participants = [];
-        List<ParticipantDto> participantDtos = [];
         for (int i = 0; i < participantIds?.Count; i++)
         {
             var participant = await _participantRepository.GetByIdAsync(participantIds[i]);
-            if (participant == null) return null;
-            if (!participants.Contains(participant))
-            {
-                participants.Add(participant);
-                participantDtos.Add(new ParticipantDto(participant));
-            }
+            // TODO retourner l'id du participant qui pose probleme
+            if (participant == null) return new Response<EventDto?>(success: false, errors: ["Participant not found."]);
+
+            if (!participants.Contains(participant)) participants.Add(participant);
         }
 
         List<Tag> tags = [];
-        List<TagDto> tagDtos = [];
         for (int i = 0; i < tagIds?.Count; i++)
         {
             var tag = await _tagRepository.GetByIdAsync(tagIds[i]);
-            if (tag == null) return null;
-            if (!tags.Contains(tag))
-            {
-                tags.Add(tag);
-                tagDtos.Add(new TagDto(tag));
-            }
+            // TODO retourner l'id du tag qui pose probleme
+            if (tag == null) return new Response<EventDto?>(success: false, errors: ["Tag not found."]);
+
+            if (!tags.Contains(tag)) tags.Add(tag);
         }
 
         var eventToAdd = new Event(description, startDate, endDate, room, eventCategory, participants, tags, null, null, null, null)
@@ -68,41 +63,45 @@ public class EventService : IEventService
             EventCategory = eventCategory
         };
         var canAdd = CanAddEvent(room, eventToAdd);
-        if (!canAdd) return null;
+        // TODO faire en sorte de retourner si c'est un probleme de slot ou un probleme d'event
+        if (!canAdd) return new Response<EventDto?>(success: false, errors: ["TODO"]);
         
         await _eventRepository.CreateAsync(eventToAdd);
 
-        return GetEventDto(eventToAdd);
+        return new Response<EventDto?>(success: true, content: GetEventDto(eventToAdd));
     }
 
-    public async Task<bool> DeleteAsync(string id)
+    public async Task<Response<string>> DeleteAsync(string id)
     {
         var eventToDelete = await _eventRepository.GetByIdAsync(id);
-        if (eventToDelete == null) return false;
+        if (eventToDelete == null) return new Response<string>(success: false, errors: ["Event not found."]);
 
         await _eventRepository.DeleteAsync(eventToDelete);
-        return true;
+        return new Response<string>(success: true, content: "Event deleted successfully.");
     }
 
-    public async Task<EventDto?> GetByIdAsync(string id)
+    public async Task<Response<EventDto?>> GetByIdAsync(string id)
     {
         var eventToGet = await _eventRepository.GetByIdWithRelationsAsync(id);
-        if (eventToGet == null) return null;
+        if (eventToGet == null) return new Response<EventDto?>(success: false, errors: ["Event not found."]);
 
-        return GetEventDto(eventToGet);
+        return new Response<EventDto?>(success: true, content: GetEventDto(eventToGet));
     }
 
-    public async Task<EventDto?> UpdateAsync(string id, DateTime? newStartDate, DateTime? newEndDate, string? newRoomId, string? newDescription,
+    public async Task<Response<EventDto?>> UpdateAsync(string id, DateTime? newStartDate, DateTime? newEndDate, string? newRoomId, string? newDescription,
         string? newEventCategoryId, List<string>? newParticipantIds, List<string>? newTagIds)
     {
         var eventToUpdate = await _eventRepository.GetByIdWithRelationsAsync(id);
-        if (eventToUpdate == null || (newStartDate == null && newEndDate == null && newRoomId == null && newDescription == null &&
-            newEventCategoryId == null && newParticipantIds == null && newTagIds == null)) return null;
+        if (eventToUpdate == null) return new Response<EventDto?>(success: false, errors: ["Event not found."]);
+
+        if (newStartDate == null && newEndDate == null && newRoomId == null && newDescription == null &&
+            newEventCategoryId == null && newParticipantIds == null && newTagIds == null)
+            return new Response<EventDto?>(success: false, errors: ["At least one field is required."]);
 
         if (newRoomId != null)
         {
             var room = await _roomRepository.GetByIdAsync(id);
-            if (room == null) return null;
+            if (room == null) return new Response<EventDto?>(success: false, errors: ["Room not found."]);
 
             eventToUpdate.Room = room;
             eventToUpdate.RoomId = room.Id;
@@ -111,7 +110,7 @@ public class EventService : IEventService
         if (newEventCategoryId != null)
         {
             var eventCategory = await _eventCategoryRepository.GetByIdAsync(id);
-            if (eventCategory == null) return null;
+            if (eventCategory == null) return new Response<EventDto?>(success: false, errors: ["Event category not found."]);
 
             eventToUpdate.EventCategory = eventCategory;
             eventToUpdate.EventCategoryId = eventCategory.Id;
@@ -124,7 +123,7 @@ public class EventService : IEventService
             if (participantToAdd == null)
             {
                 var participant = await _participantRepository.GetByIdAsync(newParticipantIds[i]);
-                if (participant == null) return null;
+                if (participant == null) return new Response<EventDto?>(success: false, errors: ["Participant not found."]);
                 participants.Add(participant);
             }
             else
@@ -140,7 +139,7 @@ public class EventService : IEventService
             if (tagToAdd == null)
             {
                 var tag = await _tagRepository.GetByIdAsync(newTagIds[i]);
-                if (tag == null) return null;
+                if (tag == null) return new Response<EventDto?>(success: false, errors: ["Tag not found."]);
                 tags.Add(tag);
             }
             else
@@ -157,7 +156,7 @@ public class EventService : IEventService
 
         await _eventRepository.UpdateAsync(eventToUpdate);
 
-        return GetEventDto(eventToUpdate);
+        return new Response<EventDto?>(success: true, content: GetEventDto(eventToUpdate));
     }
 
     private static EventDto GetEventDto(Event baseEvent)
@@ -165,7 +164,7 @@ public class EventService : IEventService
         return new EventDto(baseEvent, new RoomDto(baseEvent.Room), new EventCategoryDto(baseEvent.EventCategory),
             baseEvent.Participants.Select(participant => new ParticipantDto(participant)).ToList(), baseEvent.Tags.Select(tag => new TagDto(tag)).ToList());
     }
-
+    // TODO renvoyer un message d'erreur avec le slot ou l'event qui pose probleme
     private static bool CanAddEvent(Room room, Event @event)
     {
         var eventStartDate = new DateOnly(@event.StartDate.Year, @event.StartDate.Month, @event.StartDate.Day);
@@ -216,40 +215,33 @@ public class EventService : IEventService
         
     }
 
-    public async Task<List<EventDto>?> CreateWithRepetitionAsync(CreateEventWithRepetitionRequest request)
+    public async Task<Response<List<EventDto>?>> CreateWithRepetitionAsync(CreateEventWithRepetitionRequest request)
     {
         var room = await _roomRepository.GetByIdAsync(request.RoomId);
-        if (room == null) return null;
+        if (room == null) return new Response<List<EventDto>?>(success: false, errors: ["Room not found."]);
 
         var eventCategory = await _eventCategoryRepository.GetByIdAsync(request.EventCategoryId);
-        if (eventCategory == null) return null;
+        if (eventCategory == null) return new Response<List<EventDto>?>(success: false, errors: ["Event category not found."]);
 
         List<Participant> participants = [];
-        List<ParticipantDto> participantDtos = [];
         for (int i = 0; i < request.ParticipantIds?.Count; i++)
         {
             var participant = await _participantRepository.GetByIdAsync(request.ParticipantIds[i]);
-            if (participant == null) return null;
-            if (!participants.Contains(participant))
-            {
-                participants.Add(participant);
-                participantDtos.Add(new ParticipantDto(participant));
-            }
+
+            if (participant == null) return new Response<List<EventDto>?>(success: false, errors: ["Participant not found."]);
+
+            if (!participants.Contains(participant)) participants.Add(participant);      
         }
 
         List<Tag> tags = [];
-        List<TagDto> tagDtos = [];
         for (int i = 0; i < request.TagIds?.Count; i++)
         {
             var tag = await _tagRepository.GetByIdAsync(request.TagIds[i]);
-            if (tag == null) return null;
-            if (!tags.Contains(tag))
-            {
-                tags.Add(tag);
-                tagDtos.Add(new TagDto(tag));
-            }
-        }
 
+            if (tag == null) return new Response<List<EventDto>?>(success: false, errors: ["Tag not found."]);
+
+            if (!tags.Contains(tag)) tags.Add(tag);
+        }
 
         var mainEvent = new Event(request.Description, request.StartDate, request.EndDate, room, eventCategory, participants, tags, 
             request.RepetitionInterval, request.RepetitionNumber, null, request.RepetitionEndDate)
@@ -259,7 +251,8 @@ public class EventService : IEventService
         };
 
         var canAdd = CanAddEvent(room, mainEvent);
-        if (!canAdd) return null;
+        // TODO changer le type de response de canAdd et récupérer l'erreur en dessous a la place de todo
+        if (!canAdd) return new Response<List<EventDto>?>(success: false, errors: ["TODO"]);
         
         List<Event> events = [mainEvent];
 
@@ -276,20 +269,17 @@ public class EventService : IEventService
             };
             
             bool canAddEvent = CanAddEvent(room, @event);
+            // TODO changer le type de response de canAdd et récupérer l'erreur en dessous a la place de todo
+            if (!canAddEvent) return new Response<List<EventDto>?>(success: false, errors: ["TODO"]);
 
-            if (canAddEvent) {
-                events.Add(@event);
-            } else {
-                return null;
-            }
+            events.Add(@event);
+            
             repetitionStartDate = _repetitionService.IncrementDateTime(repetitionStartDate, request.RepetitionInterval, request.RepetitionNumber);
             repetitionEndDate = _repetitionService.IncrementDateTime(repetitionEndDate, request.RepetitionInterval, request.RepetitionNumber);
         }
 
         await _eventRepository.CreateMultipleAsync(events);
 
-        return events.Select(x => GetEventDto(x)).ToList();
+        return new Response<List<EventDto>?>(success: true, content: events.Select(x => GetEventDto(x)).ToList());
     }
-
-    
 }

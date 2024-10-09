@@ -391,10 +391,11 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     EndDate = table.Column<DateOnly>(type: "date", nullable: false),
                     StartTime = table.Column<TimeOnly>(type: "time(6)", nullable: false),
                     EndTime = table.Column<TimeOnly>(type: "time(6)", nullable: false),
-                    Days = table.Column<string>(type: "longtext", nullable: true)
+                    RepetitionInterval = table.Column<int>(type: "int", nullable: true),
+                    RepetitionNumber = table.Column<int>(type: "int", nullable: true),
+                    MainSlotId = table.Column<string>(type: "varchar(255)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    IntervalDelay = table.Column<int>(type: "int", nullable: true),
-                    Interval = table.Column<int>(type: "int", nullable: true),
+                    RepetitionEndDate = table.Column<DateOnly>(type: "date", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
@@ -402,6 +403,11 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Slot", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Slot_Slot_MainSlotId",
+                        column: x => x.MainSlotId,
+                        principalTable: "Slot",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Slot_Workspace_WorkspaceId",
                         column: x => x.WorkspaceId,
@@ -646,7 +652,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     RepetitionNumber = table.Column<int>(type: "int", nullable: true),
                     MainEventId = table.Column<string>(type: "varchar(255)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    RepetitionEndDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    RepetitionEndDate = table.Column<DateOnly>(type: "date", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
@@ -966,6 +972,11 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 name: "IX_RoomSlot_SlotsId",
                 table: "RoomSlot",
                 column: "SlotsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Slot_MainSlotId",
+                table: "Slot",
+                column: "MainSlotId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Slot_WorkspaceId",

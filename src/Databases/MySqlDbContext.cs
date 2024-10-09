@@ -28,8 +28,8 @@ public class MySqlDbContext : IdentityDbContext<User, Role, string>
     public DbSet<EventMember> EventMember { get; set; }
     public DbSet<WorkspaceRole> WorkspaceRole { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder builder)
-    {
+    // protected override void OnModelCreating(ModelBuilder builder)
+    // {
         // base.OnModelCreating(builder);
         // var JsonSerializerOptions = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
         // var dayOfWeekConverter = new ValueConverter<List<DayOfWeek>?, string?>(
@@ -53,6 +53,6 @@ public class MySqlDbContext : IdentityDbContext<User, Role, string>
         // builder.Entity<Slot>()
         //     .Property(e => e.Days)
         //     .HasConversion(dayOfWeekConverter);
-    }
+    // }
 
 }

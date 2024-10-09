@@ -1,4 +1,3 @@
-using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
@@ -30,9 +29,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
         public async Task<ActionResult<AreaDto?>> GetById(string id)
         {
-            var Area = await _areaService.GetByIdAsync(id);
+            var area = await _areaService.GetByIdAsync(id);
 
-            return Area != null ? Ok(Area) : NotFound();
+            if (!area.Success) return NotFound(area.Errors);
+            
+            return Ok(area.Content);
         }
 
         /// <summary>
@@ -45,9 +46,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var Area = await _areaService.CreateAsync(request.LocationId, request.Name, request.Description);
+            var area = await _areaService.CreateAsync(request.LocationId, request.Name, request.Description);
 
-            return Area != null ? CreatedAtAction(nameof(Create), new { id = Area.Id }, Area) : BadRequest();
+            if (!area.Success) return BadRequest(area.Errors);
+            
+            return CreatedAtAction(nameof(Create), new { id = area.Content?.Id }, area.Content);
         }
 
         /// <summary>
@@ -60,7 +63,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             var res = await _areaService.DeleteAsync(id);
 
-            return res ? Ok() : BadRequest();
+            if (!res.Success) return BadRequest(res.Errors);
+            
+            return Ok(res.Content);
         }
 
         /// <summary>
@@ -75,7 +80,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
 
             var res = await _areaService.UpdateAsync(id, request.NewName, request.NewDescription);
 
-            return res != null ? Ok(res) : BadRequest();
+            if (!res.Success) return BadRequest(res.Errors);
+            
+            return Ok(res.Content);
         }
     }
 }

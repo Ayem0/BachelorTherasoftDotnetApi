@@ -26,9 +26,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
         public async Task<ActionResult<EventCategoryDto?>> GetById(string id)
         {
-            var EventCategory = await _eventCategoryService.GetByIdAsync(id);
+            var res = await _eventCategoryService.GetByIdAsync(id);
 
-            return EventCategory != null ? Ok(EventCategory) : NotFound();
+            if (!res.Success) return NotFound(res.Errors);
+
+            return Ok(res.Content);
         }
 
         /// <summary>
@@ -41,9 +43,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var EventCategory = await _eventCategoryService.CreateAsync(request.WorkspaceId, request.Name, request.Icon, request.Color);
+            var res = await _eventCategoryService.CreateAsync(request.WorkspaceId, request.Name, request.Icon, request.Color);
 
-            return EventCategory != null ? CreatedAtAction(nameof(Create), new { id = EventCategory.Id }, EventCategory) : BadRequest();
+            if (!res.Success) return BadRequest(res.Errors);
+
+            return CreatedAtAction(nameof(Create), new { id = res.Content?.Id }, res.Content);
         }
 
         /// <summary>
@@ -56,7 +60,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             var res = await _eventCategoryService.DeleteAsync(id);
 
-            return res ? Ok() : BadRequest();
+            if (!res.Success) return BadRequest(res.Errors);
+
+            return Ok(res.Content);
+
         }
 
         /// <summary>
@@ -70,9 +77,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
             var res = await _eventCategoryService.UpdateAsync(id, request.NewName, request.NewIcon);
-            if (res == null) return BadRequest();
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return Ok(res);
+            return Ok(res.Content);
         }
     }
 }

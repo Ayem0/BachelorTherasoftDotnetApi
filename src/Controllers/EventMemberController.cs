@@ -1,10 +1,8 @@
-using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
@@ -27,9 +25,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
         public async Task<ActionResult<EventMemberDto?>> GetById(string id)
         {
-            var EventMember = await _eventMemberService.GetByIdAsync(id);
+            var res = await _eventMemberService.GetByIdAsync(id);
 
-            return EventMember != null ? Ok(EventMember) : NotFound();
+            if (!res.Success) return NotFound(res.Errors);
+ 
+            return Ok(res.Content);
         }
 
         /// <summary>
@@ -42,9 +42,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var eventMember = await _eventMemberService.CreateAsync(request.EventId, request.MemberId);
+            var res = await _eventMemberService.CreateAsync(request.EventId, request.MemberId);
 
-            return eventMember != null ? CreatedAtAction(nameof(Create), eventMember) : BadRequest();
+            if (!res.Success) return BadRequest(res.Errors);
+ 
+            return CreatedAtAction(nameof(Create), res.Content);
         }
 
         /// <summary>
@@ -56,8 +58,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             var res = await _eventMemberService.DeleteAsync(id);
+            
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return res ? Ok() : BadRequest();
+            return Ok(res.Content);
         }
 
         /// <summary>
@@ -72,7 +76,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
 
             var res = await _eventMemberService.UpdateAsync(id, request.NewStatus);
 
-            return res != null ? Ok() : BadRequest();
+            if (!res.Success) return BadRequest(res.Errors);
+
+            return Ok(res.Content);
         }
     }
 }

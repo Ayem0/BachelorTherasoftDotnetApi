@@ -1,11 +1,8 @@
-using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
-using BachelorTherasoftDotnetApi.src.Interfaces;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
@@ -28,10 +25,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ParticipantCategoryDto?>> GetById(string id)
         {
-            var ParticipantCategory = await _participantCategoryService.GetByIdAsync(id);
-            if (ParticipantCategory == null) return NotFound();
+            var res = await _participantCategoryService.GetByIdAsync(id);
+            if (!res.Success) return NotFound(res.Errors);
 
-            return Ok(ParticipantCategory);
+            return Ok(res.Content);
         }
 
         /// <summary>
@@ -44,10 +41,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var ParticipantCategory = await _participantCategoryService.CreateAsync(request.WorkspaceId, request.Name, request.Icon);
-            if (ParticipantCategory == null) return BadRequest();
+            var res = await _participantCategoryService.CreateAsync(request.WorkspaceId, request.Name, request.Icon);
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return CreatedAtAction(nameof(Create), new { id = ParticipantCategory.Id }, ParticipantCategory);
+            return CreatedAtAction(nameof(Create),res.Content);
         }
 
         /// <summary>
@@ -59,9 +56,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             var res = await _participantCategoryService.DeleteAsync(id);
-            if (!res) return BadRequest();
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return Ok();
+            return Ok(res.Content);
         }
 
         /// <summary>
@@ -75,9 +72,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
             var res = await _participantCategoryService.UpdateAsync(id, request.NewName, request.NewIcon);
-            if (res == null) return BadRequest();
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return Ok(res);
+            return Ok(res.Content);
         }
     }
 }

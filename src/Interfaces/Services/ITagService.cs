@@ -1,12 +1,15 @@
+using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Dtos;
+using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
+using BachelorTherasoftDotnetApi.src.Dtos.Update;
 
 namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 
 public interface ITagService
 {
-    Task<TagDto?> GetByIdAsync(string id);
-    Task<TagDto?> CreateAsync(string workspaceId, string name, string icon, string? description);
-    Task<bool> DeleteAsync(string id);
-    Task<TagDto?> UpdateAsync(string id, string? newName, string? newIcon, string? newDescription);
+    Task<Response<TagDto?>> GetByIdAsync(string id);
+    Task<Response<TagDto?>> CreateAsync(CreateTagRequest request);
+    Task<Response<string>> DeleteAsync(string id);
+    Task<Response<TagDto?>> UpdateAsync(string id, UpdateTagRequest request);
 }

@@ -17,7 +17,7 @@ public class Response<T>
         Errors = errors;
         Content = default;
     }
-    public required bool Success { get; set; }
+    public bool Success { get; set; }
     public List<string>? Errors { get; set; }
     public T? Content { get; set; }
 }

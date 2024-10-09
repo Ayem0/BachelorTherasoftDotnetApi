@@ -1,5 +1,7 @@
-using BachelorTherasoftDotnetApi.src.Dtos;
+using BachelorTherasoftDotnetApi.src.Base;
+using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
+using BachelorTherasoftDotnetApi.src.Dtos.Update;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
@@ -16,43 +18,45 @@ public class RoomService : IRoomService
         _roomRepository = roomRepository;
     }
 
-    public async Task<RoomDto?> CreateAsync(string name, string areaId, string? description)
+    public async Task<Response<RoomDto?>> CreateAsync(CreateRoomRequest request)
     {
-        var area = await _areaRepository.GetByIdAsync(areaId);
-        if (area == null) return null;
+        var area = await _areaRepository.GetByIdAsync(request.AreaId);
+        if (area == null) return new Response<RoomDto?>(success: false, errors: ["Area not found."]);
 
-        var room = new Room(area, name, description) { Area = area };
+        var room = new Room(area, request.Name, request.Description) { Area = area };
         await _roomRepository.CreateAsync(room);
 
-        return new RoomDto(room);
+        return new Response<RoomDto?>(success: true, content: new RoomDto(room));
     }
 
-    public async Task<bool> DeleteAsync(string id)
+    public async Task<Response<string>> DeleteAsync(string id)
     {
         var room = await _roomRepository.GetByIdAsync(id);
-        if (room == null) return false;
+        if (room == null) return new Response<string>(success: false, errors: ["Room not found."]);
 
         await _roomRepository.DeleteAsync(room);
-        return true;
+        return new Response<string>(success: true, content: "Room successfully deleted.");
     }
 
-    public async Task<RoomDto?> GetByIdAsync(string id)
+    public async Task<Response<RoomDto?>> GetByIdAsync(string id)
     {
         var room = await _roomRepository.GetByIdAsync(id);
-        if (room == null) return null;
+        if (room == null) return new Response<RoomDto?>(success: false, errors: ["Room not found."]);
 
-        return new RoomDto(room);
+        return new Response<RoomDto?>(success: true, content: new RoomDto(room));
     }
 
-    public async Task<RoomDto?> UpdateAsync(string id, string? newName, string? newDescription)
+    public async Task<Response<RoomDto?>> UpdateAsync(string id, UpdateRoomRequest request)
     {
+        if (request.NewName == null && request.NewDescription == null) return new Response<RoomDto?>(success: false, errors: ["At least one field is required."]);
+        
         var room = await _roomRepository.GetByIdAsync(id);
-        if (room == null || (newName == null && newDescription == null)) return null;
+        if (room == null) return new Response<RoomDto?>(success: false, errors: ["Room not found."]);
 
-        room.Name = newName ?? room.Name;
-        room.Description = newDescription ?? room.Description;
+        room.Name = request.NewName ?? room.Name;
+        room.Description = request.NewDescription ?? room.Description;
 
         await _roomRepository.UpdateAsync(room);
-        return new RoomDto(room);
+        return new Response<RoomDto?>(success: true, content: new RoomDto(room));
     }
 }

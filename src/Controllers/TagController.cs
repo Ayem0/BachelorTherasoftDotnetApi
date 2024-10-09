@@ -1,8 +1,6 @@
-using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
-using BachelorTherasoftDotnetApi.src.Interfaces;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,10 +25,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
         public async Task<ActionResult<TagDto?>> GetById(string id)
         {
-            var Tag = await _tagService.GetByIdAsync(id);
-            if (Tag == null) return NotFound();
+            var res = await _tagService.GetByIdAsync(id);
+            if (!res.Success) return NotFound(res.Errors);
 
-            return Ok(Tag);
+            return Ok(res.Content);
         }
 
         /// <summary>
@@ -43,10 +41,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var Tag = await _tagService.CreateAsync(request.WorkspaceId, request.Name, request.Icon, request.Description);
-            if (Tag == null) return BadRequest();
+            var res = await _tagService.CreateAsync(request);
+            if (!res.Success) return NotFound(res.Errors);
 
-            return CreatedAtAction(nameof(Create), new { id = Tag.Id }, Tag);
+            return CreatedAtAction(nameof(Create), res.Content);
         }
 
         /// <summary>
@@ -58,9 +56,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             var res = await _tagService.DeleteAsync(id);
-            if (!res) return BadRequest();
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return Ok();
+            return Ok(res.Content);
         }
 
         /// <summary>
@@ -73,10 +71,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _tagService.UpdateAsync(id, request.NewName, request.NewIcon, request.NewDescription);
-            if (res == null) return BadRequest();
+            var res = await _tagService.UpdateAsync(id, request);
+           if (!res.Success) return BadRequest(res.Errors);
 
-            return Ok(res);
+            return Ok(res.Content);
         }
     }
 }

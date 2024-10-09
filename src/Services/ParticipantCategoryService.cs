@@ -1,4 +1,4 @@
-using BachelorTherasoftDotnetApi.src.Dtos;
+using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
@@ -17,43 +17,46 @@ public class ParticipantCategoryService : IParticipantCategoryService
         _workspaceRepository = workspaceRepository;
     }
 
-    public async Task<ParticipantCategoryDto?> CreateAsync(string workspaceId, string name, string icon)
+    public async Task<Response<ParticipantCategoryDto?>> CreateAsync(string workspaceId, string name, string icon)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
-        if (workspace == null) return null;
+        if (workspace == null) return new Response<ParticipantCategoryDto?>(success: false, errors: ["Workspace not found."]);
 
         var participantCategory = new ParticipantCategory(workspace, name, icon) { Workspace = workspace };
         await _participantCategoryRepository.CreateAsync(participantCategory);
 
-        return new ParticipantCategoryDto(participantCategory);
+        return new Response<ParticipantCategoryDto?>(success: true, content: new ParticipantCategoryDto(participantCategory));
     }
 
-    public async Task<bool> DeleteAsync(string id)
+    public async Task<Response<string>> DeleteAsync(string id)
     {
         var participantCategory = await _participantCategoryRepository.GetByIdAsync(id);
-        if (participantCategory == null) return false;
+        if (participantCategory == null) return new Response<string>(success: false, errors: ["Participant category not found."]);
 
         await _participantCategoryRepository.DeleteAsync(participantCategory);
-        return true;
+        
+        return new Response<string>(success: true, content: "Participant category successfully deleted.");
     }
 
-    public async Task<ParticipantCategoryDto?> GetByIdAsync(string id)
+    public async Task<Response<ParticipantCategoryDto?>> GetByIdAsync(string id)
     {
         var participantCategory = await _participantCategoryRepository.GetByIdAsync(id);
-        if (participantCategory == null) return null;
+        if (participantCategory == null) return new Response<ParticipantCategoryDto?>(success: false, errors: ["Participant category not found."]);
 
-        return new ParticipantCategoryDto(participantCategory);
+        return new Response<ParticipantCategoryDto?>(success: true, content: new ParticipantCategoryDto(participantCategory));
     }
 
-    public async Task<ParticipantCategoryDto?> UpdateAsync(string id, string? newName, string? newIcon)
+    public async Task<Response<ParticipantCategoryDto?>> UpdateAsync(string id, string? newName, string? newIcon)
     {
+        if (newName == null && newIcon == null) return new Response<ParticipantCategoryDto?>(success: false, errors: ["At least one field is required."]);
         var participantCategory = await _participantCategoryRepository.GetByIdAsync(id);
-        if (participantCategory == null || (newName == null && newIcon == null)) return null;
+        if (participantCategory == null ) return new Response<ParticipantCategoryDto?>(success: false, errors: ["Participant category not found."]);
 
         participantCategory.Name = newName ?? participantCategory.Name;
         participantCategory.Icon = newIcon ?? participantCategory.Icon;
 
         await _participantCategoryRepository.UpdateAsync(participantCategory);
-        return new ParticipantCategoryDto(participantCategory);
+        
+        return new Response<ParticipantCategoryDto?>(success: true, content: new ParticipantCategoryDto(participantCategory));
     }
 }

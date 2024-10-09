@@ -29,9 +29,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
         public async Task<ActionResult<MemberDto?>> GetById(string id)
         {
-            var member = await _memberService.GetByIdAsync(id);
-
-            return member != null ? Ok(member) : NotFound();
+            var res = await _memberService.GetByIdAsync(id);
+            if (!res.Success) return NotFound(res.Errors);
+            
+            return Ok(res.Content);
         }
 
         /// <summary>
@@ -44,9 +45,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var member = await _memberService.CreateAsync(request.WorkspaceId, request.UserId);
+            var res = await _memberService.CreateAsync(request.WorkspaceId, request.UserId);
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return member != null ? CreatedAtAction(nameof(Create), new { id = member.Id }, member) : BadRequest();
+            return CreatedAtAction(nameof(Create), res.Content);
         }
 
         /// <summary>
@@ -58,8 +60,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             var res = await _memberService.DeleteAsync(id);
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return res ? Ok() : BadRequest();
+            return Ok(res.Content);
         }
 
         /// <summary>
@@ -73,8 +76,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
             var res = await _memberService.UpdateAsync(id, request.NewStatus);
-
-            return res != null ? Ok() : BadRequest();
+            if (!res.Success) return BadRequest(res.Errors);
+            return Ok(res.Content);
         }
     }
 }

@@ -26,10 +26,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
         public async Task<ActionResult<EventDto?>> GetById(string id)
         {
-            var Event = await _eventService.GetByIdAsync(id);
-            if (Event == null) return NotFound();
+            var res = await _eventService.GetByIdAsync(id);
+            if (!res.Success) return NotFound(res.Errors);
 
-            return Ok(Event);
+            return Ok(res.Content);
         }
 
         /// <summary>
@@ -42,10 +42,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var Event = await _eventService.CreateAsync(request.Description, request.RoomId, request.EventCategoryId, request.StartDate, request.EndDate, request.ParticipantIds, request.TagIds);
-            if (Event == null) return BadRequest();
+            var res = await _eventService.CreateAsync(request.Description, request.RoomId, request.EventCategoryId, request.StartDate, request.EndDate, request.ParticipantIds, request.TagIds);
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return CreatedAtAction(nameof(Create), new { id = Event.Id }, Event);
+            return CreatedAtAction(nameof(Create), res.Content);
         }
 
         /// <summary>
@@ -57,9 +57,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             var res = await _eventService.DeleteAsync(id);
-            if (!res) return BadRequest();
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return Ok();
+            return Ok(res.Content);
         }
 
         /// <summary>
@@ -88,10 +88,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var @event = await _eventService.CreateWithRepetitionAsync(request);
-            if (@event == null) return BadRequest();
+            var res = await _eventService.CreateWithRepetitionAsync(request);
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return CreatedAtAction(nameof(Create), @event);
+            return CreatedAtAction(nameof(Create), res.Content);
         }
     }
 }

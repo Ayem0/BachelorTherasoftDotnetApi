@@ -142,8 +142,8 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<string>("MainEventId")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<DateTime?>("RepetitionEndDate")
-                        .HasColumnType("datetime(6)");
+                    b.Property<DateOnly?>("RepetitionEndDate")
+                        .HasColumnType("date");
 
                     b.Property<int?>("RepetitionInterval")
                         .HasColumnType("int");
@@ -483,9 +483,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("Days")
-                        .HasColumnType("longtext");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
@@ -495,10 +492,16 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<TimeOnly>("EndTime")
                         .HasColumnType("time(6)");
 
-                    b.Property<int?>("Interval")
+                    b.Property<string>("MainSlotId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateOnly?>("RepetitionEndDate")
+                        .HasColumnType("date");
+
+                    b.Property<int?>("RepetitionInterval")
                         .HasColumnType("int");
 
-                    b.Property<int?>("IntervalDelay")
+                    b.Property<int?>("RepetitionNumber")
                         .HasColumnType("int");
 
                     b.Property<DateOnly>("StartDate")
@@ -515,6 +518,8 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MainSlotId");
 
                     b.HasIndex("WorkspaceId");
 
@@ -1047,11 +1052,17 @@ namespace BachelorTherasoftDotnetApi.Migrations
 
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Slot", b =>
                 {
+                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.Slot", "MainSlot")
+                        .WithMany()
+                        .HasForeignKey("MainSlotId");
+
                     b.HasOne("BachelorTherasoftDotnetApi.src.Models.Workspace", "Workspace")
                         .WithMany("Slots")
                         .HasForeignKey("WorkspaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("MainSlot");
 
                     b.Navigation("Workspace");
                 });

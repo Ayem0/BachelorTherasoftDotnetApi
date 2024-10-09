@@ -1,3 +1,4 @@
+using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
@@ -16,10 +17,10 @@ public class AreaService : IAreaService
         _locationRepository = locationRepository;
     }
 
-    public async Task<AreaDto?> CreateAsync(string locationId, string name, string? description)
+    public async Task<Response<AreaDto?>> CreateAsync(string locationId, string name, string? description)
     {
         var location = await _locationRepository.GetByIdAsync(locationId);
-        if (location == null) return null;
+        if (location == null) return new Response<AreaDto?>(success: false, errors: ["Location not found."]);
 
         var area = new Area(location, name, description)
         {
@@ -27,35 +28,35 @@ public class AreaService : IAreaService
         };
         await _areaRepository.CreateAsync(area);
 
-        return new AreaDto(area);
+        return new Response<AreaDto?>(success: true, content: new AreaDto(area));
     }
 
-    public async Task<bool> DeleteAsync(string id)
+    public async Task<Response<string>> DeleteAsync(string id)
     {
         var area = await _areaRepository.GetByIdAsync(id);
-        if (area == null) return false;
+        if (area == null) return new Response<string>(success: false, errors: ["Area not found."]);
 
         await _areaRepository.DeleteAsync(area);
-        return true;
+        return new Response<string>(success: true, content: "Area successfully deleted.");
     }
 
-    public async Task<AreaDto?> GetByIdAsync(string id)
+    public async Task<Response<AreaDto?>> GetByIdAsync(string id)
     {
         var area = await _areaRepository.GetByIdAsync(id);
-        if (area == null) return null;
+        if (area == null) return new Response<AreaDto?>(success: false, errors: ["Area not found."]);
 
-        return new AreaDto(area);
+        return new Response<AreaDto?>(success: true, content: new AreaDto(area));
     }
 
-    public async Task<AreaDto?> UpdateAsync(string id, string? newName, string? newDescription)
+    public async Task<Response<AreaDto?>> UpdateAsync(string id, string? newName, string? newDescription)
     {
         var area = await _areaRepository.GetByIdAsync(id);
-        if (area == null || (newName == null && newDescription == null)) return null;
+        if (area == null || (newName == null && newDescription == null)) return new Response<AreaDto?>(success: false, errors: ["Area not found."]);
 
         area.Name = newName ?? area.Name;
         area.Description = newDescription ?? area.Description;
 
         await _areaRepository.UpdateAsync(area);
-        return new AreaDto(area);
+        return new Response<AreaDto?>(success: true, content: new AreaDto(area));
     }
 }

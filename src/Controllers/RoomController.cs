@@ -31,10 +31,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
         public async Task<ActionResult<RoomDto?>> GetById(string id)
         {
-            var room = await _roomService.GetByIdAsync(id);
-            if (room == null) return NotFound();
+            var res = await _roomService.GetByIdAsync(id);
+            if (!res.Success) return NotFound(res.Errors);
 
-            return Ok(room);
+            return Ok(res.Content);
         }
 
         /// <summary>
@@ -47,10 +47,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var room = await _roomService.CreateAsync(request.Name, request.AreaId, request.Description);
-            if (room == null) return BadRequest();
+            var res = await _roomService.CreateAsync(request);
+            if (!res.Success) return NotFound(res.Errors);
 
-            return CreatedAtAction(nameof(Create), new { id = room.Id }, room);
+            return CreatedAtAction(nameof(Create), res.Content);
         }
 
         /// <summary>
@@ -62,9 +62,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             var res = await _roomService.DeleteAsync(id);
-            if (!res) return BadRequest();
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return Ok();
+            return Ok(res.Content);
         }
 
         /// <summary>
@@ -77,10 +77,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _roomService.UpdateAsync(id, request.NewName, request.NewDescription);
-            if (res == null) return BadRequest();
+            var res = await _roomService.UpdateAsync(id, request);
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return Ok(res);
+            return Ok(res.Content);
         }
     }
 }

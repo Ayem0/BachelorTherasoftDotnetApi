@@ -1,6 +1,9 @@
 
+using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Dtos;
+using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
+using BachelorTherasoftDotnetApi.src.Dtos.Update;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
@@ -17,47 +20,50 @@ public class TagService : ITagService
         _workspaceRepository = workspaceRepository;
     }
 
-    public async Task<TagDto?> CreateAsync(string workspaceId, string name, string icon, string? description)
+    public async Task<Response<TagDto?>> CreateAsync(CreateTagRequest request)
     {
-        var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
-        if (workspace == null) return null;
+        var workspace = await _workspaceRepository.GetByIdAsync(request.WorkspaceId);
+        if (workspace == null) return new Response<TagDto?>(success: false, errors: ["Workspace not found."]);
 
-        var tag = new Tag(workspace, name, icon, description)
+        var tag = new Tag(workspace, request.Name, request.Icon, request.Description)
         {
             Workspace = workspace
         };
         await _tagRepository.CreateAsync(tag);
 
-        return new TagDto(tag);
+        return new Response<TagDto?>(success: true, content: new TagDto(tag));
     }
 
-    public async Task<bool> DeleteAsync(string id)
+    public async Task<Response<string>> DeleteAsync(string id)
     {
         var Tag = await _tagRepository.GetByIdAsync(id);
-        if (Tag == null) return false;
+        if (Tag == null) return new Response<string>(success: false, errors: ["Tag not found."]);
 
         await _tagRepository.DeleteAsync(Tag);
-        return true;
+        return new Response<string>(success: true, content: "Tag successfully deleted.");
     }
 
-    public async Task<TagDto?> GetByIdAsync(string id)
+    public async Task<Response<TagDto?>> GetByIdAsync(string id)
     {
-        var Tag = await _tagRepository.GetByIdAsync(id);
-        if (Tag == null) return null;
+        var tag = await _tagRepository.GetByIdAsync(id);
+        if (tag == null) return new Response<TagDto?>(success: false, errors: ["Tag not found."]);
 
-        return new TagDto(Tag);
+        return new Response<TagDto?>(success: true, content: new TagDto(tag));
     }
 
-    public async Task<TagDto?> UpdateAsync(string id, string? newName, string? newIcon, string? newDescription)
+    public async Task<Response<TagDto?>> UpdateAsync(string id, UpdateTagRequest request)
     {
-        var Tag = await _tagRepository.GetByIdAsync(id);
-        if (Tag == null || (newName == null && newIcon == null)) return null;
+        if (request.NewName == null && request.NewDescription == null && request.NewDescription == null) 
+            return new Response<TagDto?>(success: false, errors: ["At least one field is required."]);
 
-        Tag.Name = newName ?? Tag.Name;
-        Tag.Icon = newIcon ?? Tag.Icon;
-        Tag.Description = newDescription ?? Tag.Description;
+        var tag = await _tagRepository.GetByIdAsync(id);
+        if (tag == null) return new Response<TagDto?>(success: false, errors: ["Tag not found."]);
 
-        await _tagRepository.UpdateAsync(Tag);
-        return new TagDto(Tag);
+        tag.Name = request.NewName ?? tag.Name;
+        tag.Icon = request.NewIcon ?? tag.Icon;
+        tag.Description = request.NewDescription ?? tag.Description;
+
+        await _tagRepository.UpdateAsync(tag);
+        return new Response<TagDto?>(success: true, content: new TagDto(tag));
     }
 }

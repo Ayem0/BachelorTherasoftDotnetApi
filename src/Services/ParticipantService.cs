@@ -1,5 +1,8 @@
+using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Dtos;
+using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
+using BachelorTherasoftDotnetApi.src.Dtos.Update;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
@@ -18,68 +21,70 @@ public class ParticipantService : IParticipantService
         _participantCategoryRepository = participantCategoryRepository;
     }
 
-    public async Task<ParticipantDto?> CreateAsync(string workspaceId, string participantCategoryId, string firstName, string lastName, string? email,
-        string? phoneNumber, string? description, string? address, string? city, string? country, DateTime? dateOfBirth)
+    public async Task<Response<ParticipantDto?>> CreateAsync(CreateParticipantRequest request)
     {
-        var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
-        if (workspace == null) return null;
+        var workspace = await _workspaceRepository.GetByIdAsync(request.WorkspaceId);
+        if (workspace == null) return new Response<ParticipantDto?>(success: false, errors: ["Participant not found."]);
 
-        var participantCategory = await _participantCategoryRepository.GetByIdAsync(participantCategoryId);
-        if (participantCategory == null) return null;
+        var participantCategory = await _participantCategoryRepository.GetByIdAsync(request.ParticipantCategoryId);
+        if (participantCategory == null) return new Response<ParticipantDto?>(success: false, errors: ["Participant category not found."]);
 
-        var participant = new Participant(workspace, participantCategory, firstName, lastName, description, email, phoneNumber, address, city, country, dateOfBirth)
+        var participant = new Participant(workspace, participantCategory, request.FirstName, request.LastName, request.Description, request.Email, request.PhoneNumber, request.Address, request.City, request.Country, request.DateOfBirth)
         {
             ParticipantCategory = participantCategory,
             Workspace = workspace
         };
         await _participantRepository.CreateAsync(participant);
 
-        return new ParticipantDto(participant);
+        return new Response<ParticipantDto?>(success: true, content: new ParticipantDto(participant));
     }
 
-    public async Task<bool> DeleteAsync(string id)
+    public async Task<Response<string>> DeleteAsync(string id)
     {
         var participant = await _participantRepository.GetByIdAsync(id);
-        if (participant == null) return false;
+        if (participant == null) return new Response<string>(success: false, errors: ["Participant not found."]);
 
         await _participantRepository.DeleteAsync(participant);
-        return true;
+        return new Response<string>(success: true, content: "Participant successfully deleted.");
     }
 
-    public async Task<ParticipantDto?> GetByIdAsync(string id)
+    public async Task<Response<ParticipantDto?>> GetByIdAsync(string id)
     {
         var participant = await _participantRepository.GetByIdAsync(id);
-        if (participant == null) return null;
+        if (participant == null) return new Response<ParticipantDto?>(success: false, errors: ["Participant not found."]);
 
-        return new ParticipantDto(participant);
+        return new Response<ParticipantDto?>(success: true, content: new ParticipantDto(participant));
     }
 
-    public async Task<ParticipantDto?> UpdateAsync(string id, string? newParticipantCategoryId, string? newFirstName, string? newLastName, string? newEmail,
-        string? newDescription, string? newAddress, string? newCity, string? newCountry, DateTime? newDateOfBirth)
+    public async Task<Response<ParticipantDto?>> UpdateAsync(string id, UpdateParticipantRequest request)
     {
+        if (request.NewParticipantCategoryId == null && request.NewFirstName == null && request.NewLastName == null && request.NewEmail == null &&
+            request.NewDescription == null && request.NewAddress == null && request.NewCity == null && request.NewCountry == null && request.NewDateOfBirth == null) 
+            return new Response<ParticipantDto?>(success: false, errors: ["At least one field is required."]);
+            
         var participant = await _participantRepository.GetByIdAsync(id);
-        if (participant == null || (newParticipantCategoryId == null && newFirstName == null && newLastName == null && newEmail == null &&
-            newDescription == null && newAddress == null && newCity == null && newCountry == null && newDateOfBirth == null)) return null;
+        if (participant == null) return new Response<ParticipantDto?>(success: false, errors: ["Participant not found."]);
 
-        if (newParticipantCategoryId != null)
+        if (request.NewParticipantCategoryId != null)
         {
-            var participantCategory = await _participantCategoryRepository.GetByIdAsync(newParticipantCategoryId);
-            if (participantCategory == null) return null;
+            var participantCategory = await _participantCategoryRepository.GetByIdAsync(request.NewParticipantCategoryId);
+            if (participantCategory == null) return new Response<ParticipantDto?>(success: false, errors: ["Participant category not found."]);
 
             participant.ParticipantCategory = participantCategory;
             participant.ParticipantCategoryId = participantCategory.Id;
         }
 
-        participant.FirstName = newFirstName ?? participant.FirstName;
-        participant.LastName = newLastName ?? participant.LastName;
-        participant.Email = newEmail ?? participant.Email;
-        participant.Description = newDescription ?? participant.Description;
-        participant.Address = newAddress ?? participant.Address;
-        participant.City = newCity ?? participant.City;
-        participant.Country = newCountry ?? participant.Country;
-        participant.DateOfBirth = newDateOfBirth ?? participant.DateOfBirth;
+        participant.FirstName = request.NewFirstName ?? participant.FirstName;
+        participant.LastName = request.NewLastName ?? participant.LastName;
+        participant.Email = request.NewEmail ?? participant.Email;
+        participant.Description = request.NewDescription ?? participant.Description;
+        participant.Address = request.NewAddress ?? participant.Address;
+        participant.City = request.NewCity ?? participant.City;
+        participant.Country = request.NewCountry ?? participant.Country;
+        participant.DateOfBirth = request.NewDateOfBirth ?? participant.DateOfBirth;
 
         await _participantRepository.UpdateAsync(participant);
-        return new ParticipantDto(participant);
+
+        return new Response<ParticipantDto?>(success: true, content: new ParticipantDto(participant));
     }
 }

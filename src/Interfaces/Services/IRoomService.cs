@@ -1,13 +1,16 @@
 
+using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Dtos;
+using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
+using BachelorTherasoftDotnetApi.src.Dtos.Update;
 
 namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 
 public interface IRoomService
 {
-    Task<RoomDto?> GetByIdAsync(string id);
-    Task<RoomDto?> CreateAsync(string name, string areaId, string? Description);
-    Task<bool> DeleteAsync(string id);
-    Task<RoomDto?> UpdateAsync(string id, string? newName, string? newDescription);
+    Task<Response<RoomDto?>> GetByIdAsync(string id);
+    Task<Response<RoomDto?>> CreateAsync(CreateRoomRequest request);
+    Task<Response<string>> DeleteAsync(string id);
+    Task<Response<RoomDto?>> UpdateAsync(string id, UpdateRoomRequest request);
 }

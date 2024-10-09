@@ -1,3 +1,4 @@
+using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Enums;
@@ -19,12 +20,13 @@ public class MemberService : IMemberService
         _workspaceRepository = workspaceRepository;
         _userManager = userManager;
     }
-    public async Task<MemberDto?> CreateAsync(string workspaceId, string userId)
+    public async Task<Response<MemberDto?>> CreateAsync(string workspaceId, string userId)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
-        if (workspace == null) return null;
+        if (workspace == null) return new Response<MemberDto?>(success: false, errors: ["Workspace not found."]);
+
         var user = await _userManager.FindByIdAsync(userId);
-        if (user == null) return null;
+        if (user == null) return new Response<MemberDto?>(success: false, errors: ["User not found."]);
 
         var member = new Member(user, workspace) {
             Workspace = workspace,
@@ -32,31 +34,33 @@ public class MemberService : IMemberService
         };
 
         await _memberRepository.CreateAsync(member);
-        return new MemberDto(member);
+        return new Response<MemberDto?>(success: true, content: new MemberDto(member));
     }
 
-    public async Task<bool> DeleteAsync(string id)
+    public async Task<Response<string>> DeleteAsync(string id)
     {
         var member = await _memberRepository.GetByIdAsync(id);
-        if (member == null) return false;
+        if (member == null) return new Response<string>(success: false, errors: ["Member not found."]);
 
         await _memberRepository.DeleteAsync(member);
-        return true;
+        return new Response<string>(success: true, content: "Member successfully deleted.");
     }
 
-    public async Task<MemberDto?> GetByIdAsync(string id)
+    public async Task<Response<MemberDto?>> GetByIdAsync(string id)
     {
-        var member = await _memberRepository.GetByIdAsync(id);
-        return member != null ? new MemberDto(member) : null;
+        var res = await _memberRepository.GetByIdAsync(id);
+        if (res == null) return new Response<MemberDto?>(success: false, errors: ["Member not found."]);
+
+        return new Response<MemberDto?>(success: true, content: new MemberDto(res));
     }
 
-    public async Task<MemberDto?> UpdateAsync(string id, Status? newStatus)
+    public async Task<Response<MemberDto?>> UpdateAsync(string id, Status? newStatus)
     {
         var member = await _memberRepository.GetByIdAsync(id);  
-        if (member == null || newStatus == null) return null;
+        if (member == null || newStatus == null) return new Response<MemberDto?>(success: false, errors: ["Member not found."]);
 
         member.Status = (Status)newStatus;
         await _memberRepository.UpdateAsync(member);
-        return new MemberDto(member);
+        return new Response<MemberDto?>(success: true, content: new MemberDto(member));
     }
 }

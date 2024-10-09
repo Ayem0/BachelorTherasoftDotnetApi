@@ -29,10 +29,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
         public async Task<ActionResult<LocationDto?>> GetById(string id)
         {
-            var location = await _locationService.GetByIdAsync(id);
-            if (location == null) return NotFound();
+            var res = await _locationService.GetByIdAsync(id);
+            if (!res.Success) return NotFound(res.Errors);
 
-            return Ok(location);
+            return Ok(res.Content);
         }
 
         /// <summary>
@@ -45,10 +45,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var location = await _locationService.CreateAsync(request.WorkspaceId, request.Name, request.Description, request.Address, request.City, request.Country);
-            if (location == null) return BadRequest();
+            var res = await _locationService.CreateAsync(request.WorkspaceId, request.Name, request.Description, request.Address, request.City, request.Country);
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return CreatedAtAction(nameof(Create), new { id = location.Id }, location);
+            return CreatedAtAction(nameof(Create), res.Content);
         }
 
         /// <summary>
@@ -60,9 +60,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             var res = await _locationService.DeleteAsync(id);
-            if (!res) return BadRequest();
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return Ok();
+            return Ok(res.Content);
         }
 
         /// <summary>
@@ -76,9 +76,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
             var res = await _locationService.UpdateAsync(id, request.NewName, request.NewDescription, request.NewAddress, request.NewCity, request.NewCountry);
-            if (res == null) return BadRequest();
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return Ok();
+            return Ok(res.Content);
         }
     }
 }
