@@ -32,7 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="src\Dtos\Create\" />
     <Folder Include="src\Dtos\Models\" />
     <Folder Include="src\Dtos\Update\" />
   </ItemGroup>

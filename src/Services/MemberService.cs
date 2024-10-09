@@ -24,7 +24,7 @@ public class MemberService : IMemberService
         var existingMember = await _memberRepository.GetByUserWorkspaceIds(userId, workspaceId);
         if (existingMember != null) return new Response<MemberDto?>(
             success: false, 
-            errors: existingMember.Status == Status.Accepted ? ["User is already a member."] : ["User is already invited."]);
+            errors: ["User is already a member."]);
 
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
         if (workspace == null) return new Response<MemberDto?>(success: false, errors: ["Workspace not found."]);
@@ -56,17 +56,5 @@ public class MemberService : IMemberService
         if (res == null) return new Response<MemberDto?>(success: false, errors: ["Member not found."]);
 
         return new Response<MemberDto?>(success: true, content: new MemberDto(res));
-    }
-
-    public async Task<Response<MemberDto?>> UpdateAsync(string id, Status? newStatus)
-    {
-        var member = await _memberRepository.GetByIdAsync(id);  
-        if (member == null) return new Response<MemberDto?>(success: false, errors: ["Member not found."]);
-
-        if (newStatus == null) return new Response<MemberDto?>(success: false, errors: ["At least one field is required."]);
-
-        member.Status = (Status)newStatus;
-        await _memberRepository.UpdateAsync(member);
-        return new Response<MemberDto?>(success: true, content: new MemberDto(member));
     }
 }

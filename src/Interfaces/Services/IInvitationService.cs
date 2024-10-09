@@ -1,14 +1,15 @@
-using System;
-using BachelorTherasoftDotnetApi.src.Base;
-using BachelorTherasoftDotnetApi.src.Dtos.Models;
+using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 
 public interface IInvitationService
 {
-    Task<Response<InvitationDto?>> GetByIdAsync(string id);
-    Task<Response<string>> DeleteAsync(string id);
-    Task<Response<InvitationDto?>> CreateAsync();
+    Task<IActionResult> CancelAsync(string id, User user);
+    Task<IActionResult> AcceptAsync(string id, User user);
+    Task<IActionResult> CreateEventInvitationAsync(string senderId, string receiverId, string eventId);
+    Task<IActionResult> CreateWorkspaceInvitationAsync(string senderId, string receiverId, string workspaceId);
+    Task<IActionResult> GetByReceiverUserAsync(User user);
 
 }

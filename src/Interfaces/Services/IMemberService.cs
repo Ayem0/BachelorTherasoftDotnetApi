@@ -11,5 +11,4 @@ public interface IMemberService
     Task<Response<MemberDto?>> GetByIdAsync(string id);
     Task<Response<MemberDto?>> CreateAsync(string workspaceId, string userId);
     Task<Response<string>> DeleteAsync(string id);
-    Task<Response<MemberDto?>> UpdateAsync(string id, Status? newStatus);
 }

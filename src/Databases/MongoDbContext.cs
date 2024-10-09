@@ -9,6 +9,7 @@ public class MongoDbContext : DbContext
     {
     }
     public DbSet<Conversation> Conversation { get; set; }
+    public DbSet<Invitation> Invitation { get; set; }
 
     // public IMongoCollection<Conversation> Conversations => _database.GetCollection<Conversation>("Conversations");
     // public IMongoCollection<Message> Messages => _database.GetCollection<Message>("Messages");

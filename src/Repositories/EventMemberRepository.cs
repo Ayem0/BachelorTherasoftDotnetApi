@@ -18,4 +18,11 @@ public class EventMemberRepository : BaseMySqlRepository<EventMember>, IEventMem
     {
         return _context.EventMember.Where(x => x.EventId == eventId && x.MemberId == memberId).FirstOrDefaultAsync();
     }
+
+    public Task<EventMember?> GetByUserEventIds(string userId, string eventId)
+    {
+        return _context.EventMember
+            .Include(x => x.Member)
+            .Where(x => x.EventId == eventId && x.Member.UserId == userId).FirstOrDefaultAsync();
+    }
 }

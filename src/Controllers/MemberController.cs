@@ -65,19 +65,19 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             return Ok(res.Content);
         }
 
-        /// <summary>
-        /// Updates a Member.
-        /// </summary>
-        [HttpPut("{id}")]
-        [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update(string id, [FromBody] UpdateMemberRequest request)
-        {
-            if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
+        // /// <summary>
+        // /// Updates a Member.
+        // /// </summary>
+        // [HttpPut("{id}")]
+        // [Authorize]
+        // [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
+        // public async Task<IActionResult> Update(string id, [FromBody] UpdateMemberRequest request)
+        // {
+        //     if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _memberService.UpdateAsync(id, request.NewStatus);
-            if (!res.Success) return BadRequest(res.Errors);
-            return Ok(res.Content);
-        }
+        //     var res = await _memberService.UpdateAsync(id, request.NewStatus);
+        //     if (!res.Success) return BadRequest(res.Errors);
+        //     return Ok(res.Content);
+        // }
     }
 }
