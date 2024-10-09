@@ -5,5 +5,5 @@ public class UpdateWorkspaceRoleRequest
 {
     [Required]
     public string? NewName { get; set; }
-    public string? Description { get; set; }
+    public string? NewDescription { get; set; }
 }

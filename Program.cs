@@ -101,6 +101,7 @@ builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
 builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 builder.Services.AddScoped<ISlotRepository, SlotRepository>();
 builder.Services.AddScoped<IEventMemberRepository, EventMemberRepository>();
+builder.Services.AddScoped<IInvitationRepository, InvitationRepository>();
 
 
 // Custom Services

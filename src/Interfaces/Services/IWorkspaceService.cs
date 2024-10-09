@@ -1,14 +1,17 @@
+using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Dtos;
+using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
+using BachelorTherasoftDotnetApi.src.Dtos.Update;
 
 namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 
 public interface IWorkspaceService
 {
-    Task<WorkspaceDto?> GetByIdAsync(string id);
-    Task<WorkspaceDto?> CreateAsync(string userId, string name, string? description);
-    Task<bool> AddMemberAsync(string id, string userID);
-    Task<bool> RemoveMemberAsync(string id, string userID);
-    Task<bool> DeleteAsync(string id);
-    Task<WorkspaceDto?> UpdateAsync(string id, string? newName, string? description);
+    Task<Response<WorkspaceDto?>> GetByIdAsync(string id);
+    Task<Response<WorkspaceDto?>> CreateAsync(string userId, CreateWorkspaceRequest request);
+    Task<Response<string>> AddMemberAsync(string id, string userID);
+    Task<Response<string>> RemoveMemberAsync(string id, string userID);
+    Task<Response<string>> DeleteAsync(string id);
+    Task<Response<WorkspaceDto?>> UpdateAsync(string id, UpdateWorkspaceRequest request);
 }

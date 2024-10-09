@@ -1,8 +1,6 @@
-using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
-using BachelorTherasoftDotnetApi.src.Interfaces;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,10 +28,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var workspaceRole = await _workspaceRoleService.CreateAsync(request.WorkspaceId, request.Name, request.Description);
-            if (workspaceRole == null) return BadRequest();
+            var res = await _workspaceRoleService.CreateAsync(request);
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return CreatedAtAction(nameof(Create), new { id = workspaceRole.Id }, workspaceRole);
+            return CreatedAtAction(nameof(Create), res.Content);
         }
 
         /// <summary>
@@ -45,37 +43,37 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<ActionResult> Delete(string id)
         {
             var res = await _workspaceRoleService.DeleteAsync(id);
-            if (!res) return BadRequest();
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return Ok();
+            return Ok(res.Content);
         }
 
         /// <summary>
         /// Adds a workspace role to a member.
         /// </summary>
-        [HttpPost("{id}/AddRoleToMember/{userId}")]
+        [HttpPost("{id}/AddToMember/{userId}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> AddRoleToMember(string id, string userId)
         {
             var res = await _workspaceRoleService.AddRoleToMemberAsync(id, userId);
-            if (!res) return BadRequest();
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return Ok();
+            return Ok(res.Content);
         }
 
         /// <summary>
         /// Reomves a workspace role from a member.
         /// </summary>
-        [HttpDelete("{id}/RemoveRoleFromMember/{userId}")]
+        [HttpDelete("{id}/RemoveFromMember/{userId}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> RemoveRoleFromMember(string id, string userId)
         {
             var res = await _workspaceRoleService.AddRoleToMemberAsync(id, userId);
-            if (!res) return BadRequest();
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return Ok();
+            return Ok(res.Content);
         }
 
         /// <summary>
@@ -88,10 +86,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _workspaceRoleService.UpdateAsync(id, request.NewName, request.Description);
-            if (res == null) return BadRequest();
+            var res = await _workspaceRoleService.UpdateAsync(id, request);
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return Ok(res);
+            return Ok(res.Content);
         }
 
         /// <summary>
@@ -102,10 +100,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
         public async Task<ActionResult<WorkspaceRoleDto?>> GetById(string id)
         {
-            var role = await _workspaceRoleService.GetByIdAsync(id);
-            if (role == null) return NotFound();
+            var res = await _workspaceRoleService.GetByIdAsync(id);
+            if (!res.Success) return BadRequest(res.Errors);
 
-            return Ok(role);
+            return Ok(res.Content);
         }
     }
 }

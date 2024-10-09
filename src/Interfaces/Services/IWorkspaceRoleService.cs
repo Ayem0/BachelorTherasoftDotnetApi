@@ -1,14 +1,17 @@
+using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Dtos;
+using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
+using BachelorTherasoftDotnetApi.src.Dtos.Update;
 
 namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 
 public interface IWorkspaceRoleService
 {
-    Task<WorkspaceRoleDto?> GetByIdAsync(string id);
-    Task<WorkspaceRoleDto?> CreateAsync(string workspaceId, string name, string? description);
-    Task<bool> AddRoleToMemberAsync(string id, string userID);
-    Task<bool> RemoveRoleFromMemberAsync(string id, string userID);
-    Task<bool> DeleteAsync(string id);
-    Task<WorkspaceRoleDto?> UpdateAsync(string id, string? newName, string? newDescription);
+    Task<Response<WorkspaceRoleDto?>> GetByIdAsync(string id);
+    Task<Response<WorkspaceRoleDto?>> CreateAsync(CreateWorkspaceRoleRequest request);
+    Task<Response<string>> AddRoleToMemberAsync(string id, string userId);
+    Task<Response<string>> RemoveRoleFromMemberAsync(string id, string userId);
+    Task<Response<string>> DeleteAsync(string id);
+    Task<Response<WorkspaceRoleDto?>> UpdateAsync(string id, UpdateWorkspaceRoleRequest request);
 }

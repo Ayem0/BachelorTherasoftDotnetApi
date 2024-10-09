@@ -17,7 +17,6 @@ public class BaseMySqlRepository<T> : IBaseRepository<T> where T : BaseModel
     public async Task<T?> GetByIdAsync(string id)
     {
         IQueryable<T> query = _dbSet;
-        // Charger toutes les relations (propriétés de navigation)
         var navigations = _context.Model.FindEntityType(typeof(T))!.GetNavigations();
         foreach (var navigation in navigations)
         {
@@ -49,6 +48,10 @@ public class BaseMySqlRepository<T> : IBaseRepository<T> where T : BaseModel
 
     public async Task CreateMultipleAsync(List<T> entities)
     {
+        foreach (var entity in entities)
+        {
+            entity.CreatedAt = DateTime.Now;
+        }
         _dbSet.AddRange(entities);
         await _context.SaveChangesAsync();
     }

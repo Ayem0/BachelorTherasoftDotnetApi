@@ -1,5 +1,7 @@
-using BachelorTherasoftDotnetApi.src.Dtos;
+using BachelorTherasoftDotnetApi.src.Base;
+using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
+using BachelorTherasoftDotnetApi.src.Dtos.Update;
 using BachelorTherasoftDotnetApi.src.Enums;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
@@ -20,21 +22,21 @@ public class WorkspaceService : IWorkspaceService
         _memberRepository = memberRepository;
     }
 
-    public async Task<WorkspaceDto?> GetByIdAsync(string id)
+    public async Task<Response<WorkspaceDto?>> GetByIdAsync(string id)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(id);
-        if (workspace == null) return null;
+        if (workspace == null) return new Response<WorkspaceDto?>(success: false, errors: ["Workspace not found."]);
 
-        return new WorkspaceDto(workspace);
+        return new Response<WorkspaceDto?>(success: true, content: new WorkspaceDto(workspace));
     }
 
-    public async Task<WorkspaceDto?> CreateAsync(string userId, string name, string? description)
+    public async Task<Response<WorkspaceDto?>> CreateAsync(string userId, CreateWorkspaceRequest request)
     {
         var user = await _userManager.FindByIdAsync(userId);
-        if (user == null) return null;
+        if (user == null) return new Response<WorkspaceDto?>(success: false, errors: ["User not found."]);
 
-        var workspace = new Workspace(name, description);
-        var member = new Member(user, workspace, Status.Accepeted) {
+        var workspace = new Workspace(request.Name, request.Description);
+        var member = new Member(user, workspace, Status.Accepted) {
             User = user,
             Workspace = workspace
         };
@@ -42,58 +44,68 @@ public class WorkspaceService : IWorkspaceService
         workspace.Members.Add(member);
         await _workspaceRepository.CreateAsync(workspace);
 
-        return new WorkspaceDto(workspace);
+        return new Response<WorkspaceDto?>(success: true, content: new WorkspaceDto(workspace));
     }
 
-    public async Task<bool> RemoveMemberAsync(string id, string memberId)
+    public async Task<Response<string>> RemoveMemberAsync(string id, string memberId)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(id);
-        if (workspace == null) return false;
+        if (workspace == null) return new Response<string>(success: false, errors: ["Workspace not found."]);
 
         var member = await _memberRepository.GetByIdAsync(memberId);
-        if (member == null) return false;
+        if (member == null) return new Response<string>(success: false, errors: ["Member not found."]);
 
         var isContained = workspace.Members.Remove(member);
-        if (isContained) await _workspaceRepository.UpdateAsync(workspace);
+        if (isContained) {
+            await _workspaceRepository.UpdateAsync(workspace);
+            return new Response<string>(success: true, content: "Successfully removed member.");
+        }
 
-        return isContained;
+        return new Response<string>(success: false, errors: ["Workspace does not contain this member."]);
     }
 
-    public async Task<bool> AddMemberAsync(string id, string memberId)
+    public async Task<Response<string>> AddMemberAsync(string id, string memberId)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(id);
-        if (workspace == null) return false;
+        if (workspace == null) return new Response<string>(success: false, errors: ["Workspace not found."]);
 
         var member = await _memberRepository.GetByIdAsync(memberId);
-        if (member == null) return false;
+        if (member == null) return new Response<string>(success: false, errors: ["Member not found."]);
 
         var isContained = workspace.Members.Contains(member);
         if (!isContained)
         {
             workspace.Members.Add(member);
             await _workspaceRepository.UpdateAsync(workspace);
+            return new Response<string>(success: true, content: "Successfully invited member.");
         }
-        return !isContained;
+
+        return new Response<string>(
+            success: false, 
+            errors: member.Status == Status.Accepted ? ["User is already a member of this workspace."] : ["Already invited this member"]
+        );
     }
 
-    public async Task<bool> DeleteAsync(string id)
+    public async Task<Response<string>> DeleteAsync(string id)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(id);
-        if (workspace == null) return false;
+        if (workspace == null) return new Response<string>(success: false, errors: ["Workspace not found."]);
 
         await _workspaceRepository.DeleteAsync(workspace);
-        return true;
+        return new Response<string>(success: true, content: "Successfully removed member.");
     }
 
-    public async Task<WorkspaceDto?> UpdateAsync(string id, string? newName, string? newDescription)
+    public async Task<Response<WorkspaceDto?>> UpdateAsync(string id, UpdateWorkspaceRequest request)
     {
+        if (request.NewName == null && request.NewDescription == null) return new Response<WorkspaceDto?>(success: false, errors: ["At least one field is required."]);
+        
         var workspace = await _workspaceRepository.GetByIdAsync(id);
-        if (workspace == null || (newDescription == null && newName == null)) return null;
+        if (workspace == null ) return new Response<WorkspaceDto?>(success: false, errors: ["Workspace not found."]);
 
-        workspace.Name = newName ?? workspace.Name;
-        workspace.Description = newDescription ?? workspace.Description;
+        workspace.Name = request.NewName ?? workspace.Name;
+        workspace.Description = request.NewDescription ?? workspace.Description;
 
         await _workspaceRepository.UpdateAsync(workspace);
-        return new WorkspaceDto(workspace);
+        return new Response<WorkspaceDto?>(success: true, content: new WorkspaceDto(workspace));
     }
 }

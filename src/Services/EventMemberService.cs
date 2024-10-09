@@ -1,5 +1,4 @@
 using BachelorTherasoftDotnetApi.src.Base;
-using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Enums;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
@@ -22,6 +21,10 @@ public class EventMemberService : IEventMemberService
 
     public async Task<Response<EventMemberDto?>> CreateAsync(string eventId, string memberId)
     {
+
+        var existingEventMember = await _eventMemberRepository.GetByEventMemberIds(eventId, memberId);
+        if (existingEventMember != null) return new Response<EventMemberDto?>(success: false, errors: ["Event already contains this member."]);
+
         var eventToGet = await _eventRepository.GetByIdJoinWorkspaceAsync(eventId);
         if(eventToGet == null) return new Response<EventMemberDto?>(success: false, errors: ["Event not found."]);
 
@@ -31,9 +34,6 @@ public class EventMemberService : IEventMemberService
         if (eventToGet.Room.Area.Location.WorkspaceId != member.WorkspaceId) 
             return new Response<EventMemberDto?>(success: false, errors: ["Workspace does not contain this member."]);
             
-        if (eventToGet.Members.Exists(x => x.MemberId == member.Id)) 
-            return new Response<EventMemberDto?>(success: false, errors: ["Event already contains this member."]);
-
         var eventMember = new EventMember(member, eventToGet) {
             Member = member,
             Event = eventToGet

@@ -1,5 +1,4 @@
 using BachelorTherasoftDotnetApi.src.Base;
-using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Enums;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
@@ -21,7 +20,12 @@ public class MemberService : IMemberService
         _userManager = userManager;
     }
     public async Task<Response<MemberDto?>> CreateAsync(string workspaceId, string userId)
-    {
+    {   
+        var existingMember = await _memberRepository.GetByUserWorkspaceIds(userId, workspaceId);
+        if (existingMember != null) return new Response<MemberDto?>(
+            success: false, 
+            errors: existingMember.Status == Status.Accepted ? ["User is already a member."] : ["User is already invited."]);
+
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
         if (workspace == null) return new Response<MemberDto?>(success: false, errors: ["Workspace not found."]);
 
@@ -57,7 +61,9 @@ public class MemberService : IMemberService
     public async Task<Response<MemberDto?>> UpdateAsync(string id, Status? newStatus)
     {
         var member = await _memberRepository.GetByIdAsync(id);  
-        if (member == null || newStatus == null) return new Response<MemberDto?>(success: false, errors: ["Member not found."]);
+        if (member == null) return new Response<MemberDto?>(success: false, errors: ["Member not found."]);
+
+        if (newStatus == null) return new Response<MemberDto?>(success: false, errors: ["At least one field is required."]);
 
         member.Status = (Status)newStatus;
         await _memberRepository.UpdateAsync(member);

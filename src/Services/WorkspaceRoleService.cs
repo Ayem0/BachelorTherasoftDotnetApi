@@ -1,7 +1,7 @@
 using BachelorTherasoftDotnetApi.src.Base;
-using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
+using BachelorTherasoftDotnetApi.src.Dtos.Update;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
@@ -65,31 +65,34 @@ public class WorkspaceRoleService : IWorkspaceRoleService
 
         return new Response<WorkspaceRoleDto?>(success: true, content: new WorkspaceRoleDto(workspaceRole));
     }
-        zazazazazaza
+
     public async Task<Response<string>> RemoveRoleFromMemberAsync(string id, string memberId)
     {
         var workspaceRole = await _workspaceRoleRepository.GetByIdAsync(id);
-        if (workspaceRole == null) return new Response<string>(success: true, errors: ["Workspace role not found."]);
+        if (workspaceRole == null) return new Response<string>(success: false, errors: ["Workspace role not found."]);
 
         var member = await _memberRepository.GetByIdAsync(memberId);
-        if (member == null) return new Response<string>(success: true, errors: ["Member not found."]);
+        if (member == null) return new Response<string>(success: false, errors: ["Member not found."]);
 
         var isContained = workspaceRole.Members.Remove(member);
-        if (isContained) await _workspaceRoleRepository.UpdateAsync(workspaceRole);
-        if ()
-
-        return isContained;
+        if (isContained) {
+            await _workspaceRoleRepository.UpdateAsync(workspaceRole);
+            return new Response<string>(success: true, content: "Successfully removed role from member.");
+        }
+        return new Response<string>(success: false, errors: ["Member does not have this role."]);
     }
 
-    public async Task<WorkspaceRoleDto?> UpdateAsync(string id, string? newName, string? newDescription)
+    public async Task<Response<WorkspaceRoleDto?>> UpdateAsync(string id, UpdateWorkspaceRoleRequest request)
     {
-        var workspaceRole = await _workspaceRoleRepository.GetByIdAsync(id);
-        if (workspaceRole == null || (newName == null && newDescription == null)) return null;
+        if (request.NewName == null && request.NewDescription == null) return new Response<WorkspaceRoleDto?>(success: false, errors: ["At least one field is required."]);
 
-        workspaceRole.Name = newName ?? workspaceRole.Name;
-        workspaceRole.Description = newDescription ?? workspaceRole.Description;
+        var workspaceRole = await _workspaceRoleRepository.GetByIdAsync(id);
+        if (workspaceRole == null ) return new Response<WorkspaceRoleDto?>(success: false, errors: ["Member not found."]);
+
+        workspaceRole.Name = request.NewName ?? workspaceRole.Name;
+        workspaceRole.Description = request.NewDescription ?? workspaceRole.Description;
 
         await _workspaceRoleRepository.UpdateAsync(workspaceRole);
-        return new WorkspaceRoleDto(workspaceRole);
+        return new Response<WorkspaceRoleDto?>(success: true, content: new WorkspaceRoleDto(workspaceRole));
     }
 }

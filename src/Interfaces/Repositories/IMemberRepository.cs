@@ -6,5 +6,5 @@ namespace BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 
 public interface IMemberRepository : IBaseRepository<Member>
 {
-
+    Task<Member?> GetByUserWorkspaceIds(string userId, string workspaceId);
 }
