@@ -95,7 +95,7 @@ public class EventService : IEventService
 
     public async Task<ActionResult<EventDto>> GetByIdAsync(string id)
     {
-        var eventToGet = await _eventRepository.GetByIdWithRelationsAsync(id);
+        var eventToGet = await _eventRepository.GetByIdJoinRelationsAsync(id);
         if (eventToGet == null) return new NotFoundObjectResult(new { errors = new List<string>(["Event not found."]), content = id });
 
         return new  OkObjectResult(GetEventDto(eventToGet));
@@ -107,7 +107,7 @@ public class EventService : IEventService
         if (newStartDate == null && newEndDate == null && newRoomId == null && newDescription == null && newEventCategoryId == null && newParticipantIds == null && newTagIds == null)
             return new BadRequestObjectResult(new { errors = new List<string>(["At least one field is required not found."]) });
             
-        var eventToUpdate = await _eventRepository.GetByIdWithRelationsAsync(id);
+        var eventToUpdate = await _eventRepository.GetByIdJoinRelationsAsync(id);
         if (eventToUpdate == null) return new NotFoundObjectResult(new { errors = new List<string>(["Event not found."]), content = id });
 
 

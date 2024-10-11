@@ -1,3 +1,4 @@
+using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
@@ -23,10 +24,7 @@ public class TagService : ITagService
         var workspace = await _workspaceRepository.GetByIdAsync(request.WorkspaceId);
         if (workspace == null) return new NotFoundObjectResult("Workspace not found.");
 
-        var tag = new Tag(workspace, request.Name, request.Icon, request.Description)
-        {
-            Workspace = workspace
-        };
+        var tag = new Tag(workspace, request.Name, request.Icon, request.Description){ Workspace = workspace };
         
         await _tagRepository.CreateAsync(tag);
 
@@ -41,10 +39,16 @@ public class TagService : ITagService
     public async Task<ActionResult> DeleteAsync(string id)
     {
         var tag = await _tagRepository.GetByIdAsync(id);
-        if (tag == null) return new NotFoundObjectResult("Tag not found.");
-
+        if (tag == null) 
+            return new NotFoundObjectResult(new ProblemDetails
+            {
+                Status = StatusCodes.Status404NotFound,
+                Title = "Resource not found",
+                Detail = $"Tag with ID '{id}' was not found.",
+            });
+        
         await _tagRepository.DeleteAsync(tag);
-        return new OkObjectResult("Tag successfully deleted.");
+        return new OkObjectResult(new SuccessResponse("Successfully deleted tag."));
     }
 
     public async Task<ActionResult<TagDto>> GetByIdAsync(string id)

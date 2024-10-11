@@ -1,3 +1,5 @@
+using Amazon.Runtime.Internal;
+using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
@@ -22,7 +24,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<TagDto>> GetById([FromQuery] string id)
         {
             return await _tagService.GetByIdAsync(id);
@@ -33,7 +36,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPost("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status201Created / StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(TagDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse<string>), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<TagDto>> Create([FromBody] CreateTagRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
@@ -46,7 +50,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpDelete("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Delete([FromQuery] string id)
         {
             return await _tagService.DeleteAsync(id);
@@ -57,7 +62,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPut("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<TagDto>> Update([FromQuery] string id, [FromBody] UpdateTagRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());

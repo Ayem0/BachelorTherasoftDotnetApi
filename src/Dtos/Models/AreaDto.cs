@@ -17,3 +17,12 @@ public class AreaDto
     public string Name { get; set; }
     public string? Description { get; set; }
 }
+
+public class AreaWithRoomsDto : AreaDto
+{
+    public AreaWithRoomsDto(Area area) : base(area)
+    {
+        Rooms = area.Rooms.Select(x => new RoomDto(x)).ToList();
+    }
+    public List<RoomDto> Rooms { get; set; }
+}

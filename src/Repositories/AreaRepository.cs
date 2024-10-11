@@ -15,9 +15,16 @@ public class AreaRepository : BaseMySqlRepository<Area>, IAreaRepository
     public async new Task<Area?> GetByIdAsync(string id)
     {
         return await _context.Area
+            .Where(w => w.Id == id && w.DeletedAt == null && w.Location.DeletedAt == null && w.Location.Workspace.DeletedAt == null)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<Area?> GetByIdJoinRoomsAsync(string id)
+    {
+        return await _context.Area
             .Include(w => w.Rooms)
-            .Include(w => w.Location)
-            .Where(w => w.Id == id && w.DeletedAt == null && w.Location.DeletedAt == null && w.Rooms.All(r => r.DeletedAt == null))
+            .Where(w => w.Id == id && w.DeletedAt == null && w.Location.DeletedAt == null && w.Location.Workspace.DeletedAt == null
+                && w.Rooms.All(x => x.DeletedAt == null))
             .FirstOrDefaultAsync();
     }
 }

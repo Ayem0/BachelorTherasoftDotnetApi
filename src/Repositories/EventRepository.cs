@@ -11,8 +11,13 @@ public class EventRepository : BaseMySqlRepository<Event>, IEventRepository
     public EventRepository(MySqlDbContext context) : base(context)
     {
     }
-
-    public async Task<Event?> GetByIdWithRelationsAsync(string id)
+    public async new Task<Event?> GetByIdAsync(string id)
+    {
+        return await _context.Event.Where(x => x.DeletedAt == null && x.Id == id && x.Room.DeletedAt == null && x.Room.Area.DeletedAt == null 
+            && x.Room.Area.Location.DeletedAt == null && x.Room.Area.Location.Workspace.DeletedAt == null)
+            .FirstOrDefaultAsync();
+    }
+    public async Task<Event?> GetByIdJoinRelationsAsync(string id)
     {
         return await _context.Event
             .Include(e => e.Room)
@@ -31,9 +36,9 @@ public class EventRepository : BaseMySqlRepository<Event>, IEventRepository
             .Include(e => e.Room)
                 .ThenInclude(r => r.Area)
                     .ThenInclude(a => a.Location)
-            .Include(e => e.Members)
+                        .ThenInclude(l => l.Workspace)
             .Where(e => e.Id == id && e.DeletedAt == null && e.Room.DeletedAt == null && e.Room.Area.DeletedAt == null && 
-                e.Room.Area.Location.DeletedAt == null && e.Members.All(m => m.DeletedAt == null))
+                e.Room.Area.Location.DeletedAt == null)
             .FirstOrDefaultAsync();
     }
 }
