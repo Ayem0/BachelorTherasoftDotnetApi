@@ -1,9 +1,8 @@
-using BachelorTherasoftDotnetApi.src.Dtos;
+using System.Security.Claims;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
@@ -21,10 +20,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Get a Conversation by id.
         /// </summary>
-        [HttpGet("{id}")]
+        [HttpGet("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ConversationDto?>> GetById(string id)
+        public async Task<ActionResult<ConversationDto?>> GetById([FromQuery] string id)
         {
             var conversation = await _conversationService.GetByIdAsync(id);
 
@@ -34,12 +33,15 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Get Conversations by user id.
         /// </summary>
-        [HttpGet("User/{id}")]
+        [HttpGet("Me")]
         // [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<ConversationDto>?>> GetByUserId(string id)
+        public async Task<ActionResult<List<ConversationDto>?>> GetByUser()
         {
-            var conversations = await _conversationService.GetByUserIdAsync(id);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+            var conversations = await _conversationService.GetByUserIdAsync(userId);
 
             return conversations != null ? Ok(conversations) : NotFound();
         }

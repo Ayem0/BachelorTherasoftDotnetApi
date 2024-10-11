@@ -1,14 +1,14 @@
-using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Enums;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
+// TODO ajouter le websocketservice qui n'existe pas encore
 public class InvitationService : IInvitationService
 {
     private readonly IInvitationRepository _invitationRepository;
@@ -16,15 +16,18 @@ public class InvitationService : IInvitationService
     private readonly IEventRepository _eventRepository;
     private readonly IEventMemberRepository _eventMemberRepository;
     private readonly IMemberRepository _memberRepository;
-    public InvitationService(IInvitationRepository invitationRepository, IWorkspaceRepository workspaceRepository, IEventRepository eventRepository, IEventMemberRepository eventMemberRepository, IMemberRepository memberRepository)
+    private readonly UserManager<User> _userManager;
+    public InvitationService(IInvitationRepository invitationRepository, IWorkspaceRepository workspaceRepository, IEventRepository eventRepository, 
+        IEventMemberRepository eventMemberRepository, IMemberRepository memberRepository, UserManager<User> userManager)
     {
         _invitationRepository = invitationRepository;
         _workspaceRepository = workspaceRepository;
         _eventRepository = eventRepository;
         _eventMemberRepository = eventMemberRepository;
         _memberRepository = memberRepository;
+        _userManager = userManager;
     }
-    public async Task<IActionResult> AcceptAsync(string id, User user)
+    public async Task<ActionResult> AcceptAsync(string id, User user)
     {
         var invitation = await _invitationRepository.GetByIdAsync(id);
         if (invitation == null) return new NotFoundObjectResult("Invitation not found.");
@@ -60,13 +63,12 @@ public class InvitationService : IInvitationService
         return new BadRequestObjectResult("Workspace or event must be provided.");
     }
    
-    // TODO
-    public async Task<IActionResult> CancelAsync(string id, User user)
+    public async Task<ActionResult> CancelAsync(string id, User user)
     {
         var invitation = await _invitationRepository.GetByIdAsync(id);
         if (invitation == null) return new NotFoundObjectResult("Invitation not found.");
 
-        if (invitation.SenderUserId != user.Id) return new UnauthorizedResult();
+        if (invitation.SenderUserId != user.Id) return new UnauthorizedResult(); // TODO a changer par le droit
 
         if (invitation.InvitationType == InvitationType.Event) {
             if (invitation.EventId == null) return new BadRequestResult();
@@ -80,15 +82,55 @@ public class InvitationService : IInvitationService
 
         return new OkObjectResult("Successfully canceled invitation.");
     }
-    // TODO
-    public Task<IActionResult> CreateEventInvitationAsync(string senderId, string receiverId, string eventId)
+ 
+    public async Task<ActionResult<InvitationDto>> CreateEventInvitationAsync(string senderId, string receiverId, string eventId)
     {
-        throw new NotImplementedException();
+        var sender = await _userManager.FindByIdAsync(senderId);
+        if (sender == null) return new UnauthorizedResult();
+
+        var receiver = await _userManager.FindByIdAsync(receiverId);
+        if (receiver == null) return new NotFoundObjectResult("User not found.");
+
+        var @event = await _eventRepository.GetByIdAsync(eventId);
+        if (@event == null) return new NotFoundObjectResult("Workspace not found.");
+
+        var existingInvitation = await _invitationRepository.GetByIdAsync(eventId + "_" + receiverId);
+        if (existingInvitation == null) return new BadRequestObjectResult("User already invited.");
+
+        var invitation = new Invitation(eventId + "_" + receiverId, InvitationType.Event, null, eventId, senderId, receiverId);
+        await _invitationRepository.CreateAsync(invitation);
+
+        return new CreatedAtActionResult(
+            actionName: "Create", 
+            controllerName: "Invitation", 
+            routeValues: new { id = invitation.Id }, 
+            value: new InvitationDto(invitation)
+        );  
     }
-    // TODO
-    public Task<IActionResult> CreateWorkspaceInvitationAsync(string senderId, string receiverId, string workspaceId)
+ 
+    public async Task<ActionResult<InvitationDto>> CreateWorkspaceInvitationAsync(string senderId, string receiverId, string workspaceId)
     {
-        throw new NotImplementedException();
+        var sender = await _userManager.FindByIdAsync(senderId);
+        if (sender == null) return new UnauthorizedResult();
+
+        var receiver = await _userManager.FindByIdAsync(receiverId);
+        if (receiver == null) return new NotFoundObjectResult("User not found.");
+
+        var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
+        if (workspace == null) return new NotFoundObjectResult("Workspace not found.");
+
+        var existingInvitation = await _invitationRepository.GetByIdAsync(workspaceId + "_" + receiverId);
+        if (existingInvitation == null) return new BadRequestObjectResult("User already invited.");
+
+        var invitation = new Invitation(workspaceId + "_" + receiverId, InvitationType.Workspace, workspaceId, null, senderId, receiverId);
+        await _invitationRepository.CreateAsync(invitation);
+
+        return new CreatedAtActionResult(
+            actionName: "Create", 
+            controllerName: "Invitation", 
+            routeValues: new { id = invitation.Id }, 
+            value: new InvitationDto(invitation)
+        );      
     }
 
     // public async Task<IActionResult> GetByIdAsync(string id)
@@ -99,7 +141,7 @@ public class InvitationService : IInvitationService
     //     return new OkObjectResult(new InvitationDto(invitation));
     // }
 
-    public async Task<IActionResult> GetByReceiverUserAsync(User user)
+    public async Task<ActionResult<List<InvitationDto>>> GetByReceiverUserAsync(User user)
     {
         var invitations = await _invitationRepository.GetByReceiverUserIdAsync(user.Id);
 

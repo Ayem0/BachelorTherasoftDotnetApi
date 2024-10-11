@@ -328,7 +328,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     WorkspaceId = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Status = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BachelorTherasoftDotnetApi.Migrations
 {
     [DbContext(typeof(MySqlDbContext))]
-    [Migration("20241009062317_Initial")]
+    [Migration("20241010170729_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -297,9 +297,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");

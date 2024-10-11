@@ -20,15 +20,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Get a ParticipantCategory by id.
         /// </summary>
-        [HttpGet("{id}")]
+        [HttpGet("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ParticipantCategoryDto?>> GetById(string id)
+        public async Task<ActionResult<ParticipantCategoryDto>> GetById([FromQuery] string id)
         {
-            var res = await _participantCategoryService.GetByIdAsync(id);
-            if (!res.Success) return NotFound(res.Errors);
-
-            return Ok(res.Content);
+            return await _participantCategoryService.GetByIdAsync(id);
         }
 
         /// <summary>
@@ -41,40 +38,31 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _participantCategoryService.CreateAsync(request.WorkspaceId, request.Name, request.Icon);
-            if (!res.Success) return BadRequest(res.Errors);
-
-            return CreatedAtAction(nameof(Create),res.Content);
+            return await _participantCategoryService.CreateAsync(request.WorkspaceId, request.Name, request.Icon);
         }
 
         /// <summary>
         /// Deletes a ParticipantCategory.
         /// </summary>
-        [HttpDelete("{id}")]
+        [HttpDelete("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<ActionResult> Delete([FromQuery] string id)
         {
-            var res = await _participantCategoryService.DeleteAsync(id);
-            if (!res.Success) return BadRequest(res.Errors);
-
-            return Ok(res.Content);
+            return await _participantCategoryService.DeleteAsync(id);
         }
 
         /// <summary>
         /// Updates a ParticipantCategory.
         /// </summary>
-        [HttpPut("{id}")]
+        [HttpPut("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update(string id, [FromBody] UpdateParticipantCategoryRequest request)
+        public async Task<ActionResult<ParticipantCategoryDto>> Update([FromQuery] string id, [FromBody] UpdateParticipantCategoryRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _participantCategoryService.UpdateAsync(id, request.NewName, request.NewIcon);
-            if (!res.Success) return BadRequest(res.Errors);
-
-            return Ok(res.Content);
+            return await _participantCategoryService.UpdateAsync(id, request.NewName, request.NewIcon);
         }
     }
 }

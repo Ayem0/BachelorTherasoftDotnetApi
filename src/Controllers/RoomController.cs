@@ -1,8 +1,6 @@
-using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
-using BachelorTherasoftDotnetApi.src.Interfaces;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,25 +14,20 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
     public class RoomController : ControllerBase
     {
         private readonly IRoomService _roomService;
-        private readonly IWorkspaceService _workspaceService;
-        public RoomController(IRoomService roomService, IWorkspaceService workspaceService)
+        public RoomController(IRoomService roomService)
         {
             _roomService = roomService;
-            _workspaceService = workspaceService;
         }
 
         /// <summary>
         /// Get a Room by id.
         /// </summary>
-        [HttpGet("{id}")]
+        [HttpGet("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<RoomDto?>> GetById(string id)
+        public async Task<ActionResult<RoomDto>> GetById([FromQuery] string id)
         {
-            var res = await _roomService.GetByIdAsync(id);
-            if (!res.Success) return NotFound(res.Errors);
-
-            return Ok(res.Content);
+            return await _roomService.GetByIdAsync(id);
         }
 
         /// <summary>
@@ -47,40 +40,31 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _roomService.CreateAsync(request);
-            if (!res.Success) return NotFound(res.Errors);
-
-            return CreatedAtAction(nameof(Create), res.Content);
+            return await _roomService.CreateAsync(request);
         }
 
         /// <summary>
         /// Deletes a Room.
         /// </summary>
-        [HttpDelete("{id}")]
+        [HttpDelete("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<ActionResult> Delete([FromQuery] string id)
         {
-            var res = await _roomService.DeleteAsync(id);
-            if (!res.Success) return BadRequest(res.Errors);
-
-            return Ok(res.Content);
+            return await _roomService.DeleteAsync(id);
         }
 
         /// <summary>
         /// Updates a Room.
         /// </summary>
-        [HttpPut("{id}")]
+        [HttpPut("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update(string id, [FromBody] UpdateRoomRequest request)
+        public async Task<ActionResult<RoomDto>> Update([FromQuery] string id, [FromBody] UpdateRoomRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _roomService.UpdateAsync(id, request);
-            if (!res.Success) return BadRequest(res.Errors);
-
-            return Ok(res.Content);
+            return await _roomService.UpdateAsync(id, request);
         }
     }
 }

@@ -1,9 +1,9 @@
 using BachelorTherasoftDotnetApi.src.Base;
-using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 // TODO voir si mettre les areas dans le LocationDto
@@ -17,41 +17,46 @@ public class LocationService : ILocationService
         _workspaceRepository = workspaceRepository;
     }
 
-    public async Task<Response<LocationDto?>> GetByIdAsync(string id)
+    public async Task<ActionResult<LocationDto>> GetByIdAsync(string id)
     {
         var location = await _locationRepository.GetByIdAsync(id);
-        if (location == null) return new Response<LocationDto?>(success: false, errors: ["Location not found."]);
+        if (location == null) return new NotFoundObjectResult("Location not found.");
 
-        return new Response<LocationDto?>(success: true, content: new LocationDto(location));
+        return new OkObjectResult(new LocationDto(location));
     }
 
-    public async Task<Response<string>> DeleteAsync(string id)
+    public async Task<ActionResult> DeleteAsync(string id)
     {
         var location = await _locationRepository.GetByIdAsync(id);
-        if (location == null) return new Response<string>(success: false, errors: ["Location not found."]);
+        if (location == null) return new NotFoundObjectResult("Location not found.");
 
         await _locationRepository.DeleteAsync(location);
-        return new Response<string>(success: true, errors: ["Location successfully deleted."]);
+        return new OkObjectResult("Location successfully deleted.");
     }
 
-    public async Task<Response<LocationDto?>> CreateAsync(string workspaceId, string name, string? description, string? address, string? city, string? country)
+    public async Task<ActionResult<LocationDto>> CreateAsync(string workspaceId, string name, string? description, string? address, string? city, string? country)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
-        if (workspace == null) return new Response<LocationDto?>(success: false, errors: ["Workspace not found."]);
+        if (workspace == null) return new NotFoundObjectResult("Location not found.");
 
         var location = new Location(workspace, name, description, address, city, country) { Workspace = workspace };
         await _locationRepository.CreateAsync(location);
 
-        return new Response<LocationDto?>(success: true, content: new LocationDto(location));
+        return new CreatedAtActionResult(
+            actionName: "Create", 
+            controllerName: "Location", 
+            routeValues: new { id = location.Id }, 
+            value: new LocationDto(location)
+        );  
     }
 
-    public async Task<Response<LocationDto?>> UpdateAsync(string id, string? newName, string? newDescription, string? newAddress, string? newCity, string? newCountry)
+    public async Task<ActionResult<LocationDto>> UpdateAsync(string id, string? newName, string? newDescription, string? newAddress, string? newCity, string? newCountry)
     {
         if (newName == null && newDescription == null && newAddress == null && newCity == null && newCountry == null) 
-            return new Response<LocationDto?>(success: false, errors: ["At least one field is required."]);
+            return new NotFoundObjectResult("At least one field is required.");
             
         var location = await _locationRepository.GetByIdAsync(id);
-        if (location == null ) return new Response<LocationDto?>(success: false, errors: ["Location not found."]);
+        if (location == null ) return new NotFoundObjectResult("Location not found.");
 
         location.Name = newName ?? location.Name;
         location.Description = newDescription ?? location.Description;
@@ -60,6 +65,6 @@ public class LocationService : ILocationService
         location.Country = newCountry ?? location.Country;
 
         await _locationRepository.UpdateAsync(location);
-        return new Response<LocationDto?>(success: true, content: new LocationDto(location));
+        return new OkObjectResult(new LocationDto(location));
     }
 }

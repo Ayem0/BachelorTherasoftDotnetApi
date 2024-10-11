@@ -1,12 +1,10 @@
-using System;
 using BachelorTherasoftDotnetApi.src.Enums;
-using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
-public class RepetitionService : IRepetitionService
+public static class StaticRepetitionService
 {
-    public DateTime IncrementDateTime(DateTime date, Interval repetitionInterval, int repetitionNumber)
+    public static DateTime IncrementDateTime(DateTime date, Interval repetitionInterval, int repetitionNumber)
     {
         return repetitionInterval switch
         {
@@ -16,7 +14,7 @@ public class RepetitionService : IRepetitionService
             _ => date.AddYears(repetitionNumber),
         };
     }
-    public DateOnly IncrementDateOnly(DateOnly date, Interval repetitionInterval, int repetitionNumber)
+    public static DateOnly IncrementDateOnly(DateOnly date, Interval repetitionInterval, int repetitionNumber)
     {
         return repetitionInterval switch
         {

@@ -1,4 +1,3 @@
-using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
@@ -20,15 +19,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Get a Slot by id.
         /// </summary>
-        [HttpGet("{id}")]
+        [HttpGet("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<SlotDto?>> GetById(string id)
+        public async Task<ActionResult<SlotDto>> GetById([FromQuery] string id)
         {
-            var res = await _SlotService.GetByIdAsync(id);
-            if (!res.Success) return NotFound(res.Errors);
-
-            return Ok(res.Content);
+            return await _SlotService.GetByIdAsync(id);
         }
 
         /// <summary>
@@ -41,24 +37,18 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _SlotService.CreateAsync(request);
-            if (!res.Success) return BadRequest(res.Errors);
-
-            return CreatedAtAction(nameof(Create), res.Content);
+            return await _SlotService.CreateAsync(request);
         }
 
         /// <summary>
         /// Deletes a Slot.
         /// </summary>
-        [HttpDelete("{id}")]
+        [HttpDelete("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete([FromQuery] string id)
         {
-            var res = await _SlotService.DeleteAsync(id);
-            if (!res.Success) return BadRequest(res.Errors);
-
-            return Ok(res.Content);
+            return await _SlotService.DeleteAsync(id);
         }
 
 
@@ -68,42 +58,36 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [HttpPost("WithRepetition")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created / StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<SlotDto>> CreateWithRepetition([FromBody] CreateSlotWithRepetitionRequest request)
+        public async Task<ActionResult<List<SlotDto>>> CreateWithRepetition([FromBody] CreateSlotWithRepetitionRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _SlotService.CreateWithRepetitionAsync(request);
-            if (!res.Success) return BadRequest(res.Errors);
-
-            return CreatedAtAction(nameof(Create), res.Content);
+            return await _SlotService.CreateWithRepetitionAsync(request);
         }
 
         /// <summary>
         /// Add a Slot to a Room.
         /// </summary>
-        [HttpPost("AddSlot/{id}/ToRoom/{roomId}")]
+        [HttpPost("Room")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddSlotToRoom(string id, string roomId)
+        public async Task<IActionResult> AddSlotToRoom([FromQuery] string slotId,[FromQuery] string roomId)
         {
-            var res = await _SlotService.AddSlotToRoom(id, roomId);
-            if (!res.Success) return BadRequest(res.Errors);
-
-            return Ok(res.Content);
+            return await _SlotService.AddSlotToRoom(slotId, roomId);
         }
 
         // TODO faire le update d'un slot / super chiant a faire car faut check pour chaque salle du créneaux si cela pose probleme
         // /// <summary>
         // /// Updates a Slot.
         // /// </summary>
-        // [HttpPut("{id}")]
+        // [HttpPut("")]
         // [Authorize]
         // [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         // public async Task<IActionResult> Update(string id, [FromBody] UpdateSlotRequest request)
         // {
         //     if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-        //     var res = await _SlotService.UpdateAsync(id, request.NewName, request.NewIcon, request.NewDescription);
+        //     return await _SlotService.UpdateAsync(id, request.NewName, request.NewIcon, request.NewDescription);
         //     if (res == null) return BadRequest();
 
         //     return Ok(res);

@@ -116,13 +116,13 @@ builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IParticipantService, ParticipantService>();
 builder.Services.AddScoped<IParticipantCategoryService, ParticipantCategoryService>();
 builder.Services.AddScoped<IConversationService, ConversationService>();
-builder.Services.AddScoped<IMemberService, MemberService>();
+// builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddScoped<ISlotService, SlotService>();
-builder.Services.AddScoped<IEventMemberService, EventMemberService>();
+// builder.Services.AddScoped<IEventMemberService, EventMemberService>();
 
 
 // Utils Services
-builder.Services.AddScoped<IRepetitionService, RepetitionService>();
+// builder.Services.AddScoped<IRepetitionService, RepetitionService>();
 
 var app = builder.Build();
 

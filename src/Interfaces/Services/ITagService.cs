@@ -3,13 +3,14 @@ using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 
 public interface ITagService
 {
-    Task<Response<TagDto?>> GetByIdAsync(string id);
-    Task<Response<TagDto?>> CreateAsync(CreateTagRequest request);
-    Task<Response<string>> DeleteAsync(string id);
-    Task<Response<TagDto?>> UpdateAsync(string id, UpdateTagRequest request);
+    Task<ActionResult<TagDto>> GetByIdAsync(string id);
+    Task<ActionResult<TagDto>> CreateAsync(CreateTagRequest request);
+    Task<ActionResult> DeleteAsync(string id);
+    Task<ActionResult<TagDto>> UpdateAsync(string id, UpdateTagRequest request);
 }

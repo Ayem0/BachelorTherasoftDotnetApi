@@ -24,16 +24,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Get a Area by id.
         /// </summary>
-        [HttpGet("{id}")]
+        [HttpGet("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<AreaDto?>> GetById(string id)
+        public async Task<ActionResult<AreaDto>> GetById([FromQuery] string id)
         {
-            var area = await _areaService.GetByIdAsync(id);
-
-            if (!area.Success) return NotFound(area.Errors);
-            
-            return Ok(area.Content);
+            return await _areaService.GetByIdAsync(id);
         }
 
         /// <summary>
@@ -46,43 +42,31 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var area = await _areaService.CreateAsync(request.LocationId, request.Name, request.Description);
-
-            if (!area.Success) return BadRequest(area.Errors);
-            
-            return CreatedAtAction(nameof(Create), new { id = area.Content?.Id }, area.Content);
+            return await _areaService.CreateAsync(request.LocationId, request.Name, request.Description);
         }
 
         /// <summary>
         /// Deletes a Area.
         /// </summary>
-        [HttpDelete("{id}")]
+        [HttpDelete("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<ActionResult> Delete([FromQuery] string id)
         {
-            var res = await _areaService.DeleteAsync(id);
-
-            if (!res.Success) return BadRequest(res.Errors);
-            
-            return Ok(res.Content);
+            return await _areaService.DeleteAsync(id);
         }
 
         /// <summary>
         /// Updates a Area.
         /// </summary>
-        [HttpPut("{id}")]
+        [HttpPut("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update(string id, [FromBody] UpdateAreaRequest request)
+        public async Task<ActionResult<AreaDto>> Update([FromQuery] string id, [FromBody] UpdateAreaRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _areaService.UpdateAsync(id, request.NewName, request.NewDescription);
-
-            if (!res.Success) return BadRequest(res.Errors);
-            
-            return Ok(res.Content);
+            return await _areaService.UpdateAsync(id, request.NewName, request.NewDescription);
         }
     }
 }

@@ -4,6 +4,7 @@ using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
@@ -13,29 +14,27 @@ public class SlotService : ISlotService
     private readonly IWorkspaceRepository _workspaceRepository;
     private readonly IEventCategoryRepository _eventCategoryRepository;
     private readonly IRoomRepository _roomRepository;
-    private readonly IRepetitionService _repetitionService;
-    public SlotService(ISlotRepository slotRepository, IWorkspaceRepository workspaceRepository, IRoomRepository roomRepository, IEventCategoryRepository eventCategoryRepository,
-        IRepetitionService repetitionService)
+
+    public SlotService(ISlotRepository slotRepository, IWorkspaceRepository workspaceRepository, IRoomRepository roomRepository, IEventCategoryRepository eventCategoryRepository)
     {
         _slotRepository = slotRepository;
         _workspaceRepository = workspaceRepository;
         _roomRepository = roomRepository;
         _eventCategoryRepository = eventCategoryRepository;
-        _repetitionService = repetitionService;
     }
 
-    public async Task<Response<SlotDto?>> GetByIdAsync(string id)
+    public async Task<ActionResult<SlotDto>> GetByIdAsync(string id)
     {
         var slot = await _slotRepository.GetByIdAsync(id);
-        if (slot == null) return new Response<SlotDto?>(success: false, errors: ["Slot not found."]);
+        if (slot == null) return new NotFoundObjectResult("Slot not found.");
 
-        return new Response<SlotDto?>(success: true, content: new SlotDto(slot));
+        return new OkObjectResult(new SlotDto(slot));
     }
 
-    public async Task<Response<SlotDto?>> CreateAsync(CreateSlotRequest request)
+    public async Task<ActionResult<SlotDto>> CreateAsync(CreateSlotRequest request)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(request.WorkspaceId);
-        if (workspace == null) return new Response<SlotDto?>(success: false, errors: ["Workspace not found."]);
+        if (workspace == null) return new NotFoundObjectResult("Workspace not found.");
 
         List<EventCategory> eventCategories = [];
         if (request.EventCategoryIds != null)
@@ -43,7 +42,10 @@ public class SlotService : ISlotService
             foreach (var eventCategoryId in request.EventCategoryIds)
             {
                 var eventCategory = await _eventCategoryRepository.GetByIdAsync(eventCategoryId);
-                if (eventCategory == null) return new Response<SlotDto?>(success: false, errors: ["Event category not found."]); // TODO ajouter l'id de la catégorie qui fail
+
+                // TODO return la catégorie qui fail actuellement je peux pas car je n'ai pas le name de la catégorie
+                if (eventCategory == null) return new NotFoundObjectResult("Event category not found."); 
+
                 eventCategories.Add(eventCategory);
             }
         }
@@ -54,7 +56,12 @@ public class SlotService : ISlotService
         };
         await _slotRepository.CreateAsync(slot);
 
-        return new Response<SlotDto?>(success: true, content: new SlotDto(slot));
+        return new CreatedAtActionResult(
+            actionName: "Create", 
+            controllerName: "Slot", 
+            routeValues: new { id = slot.Id }, 
+            value: new SlotDto(slot)
+        );  
     }
 
     // public async Task<SlotDto?> UpdateAsync(string id, UpdateSlotRequest request)
@@ -71,23 +78,23 @@ public class SlotService : ISlotService
     //     return new SlotDto(slot);
     // }
 
-    public async Task<Response<string>> DeleteAsync(string id)
+    public async Task<ActionResult> DeleteAsync(string id)
     {
         var slot = await _slotRepository.GetByIdAsync(id);
-        if (slot == null) return new Response<string>(success: false, errors: ["Slot not found."]);
+        if (slot == null) return new NotFoundObjectResult("Slot not found.");
 
         await _slotRepository.DeleteAsync(slot);
 
-       return new Response<string>(success: true, content: "Slot successfully deleted.");
+       return new OkObjectResult("Successfully deleted slot.");
     }
     // TODO voir si faire AddRoomToSlot plutot
-    public async Task<Response<string>> AddSlotToRoom(string slotId, string roomId)
+    public async Task<ActionResult> AddSlotToRoom(string slotId, string roomId)
     {
         var room = await _roomRepository.GetByIdAsync(roomId);
-        if (room == null) return new Response<string>(success: false, errors: ["Room not found."]);
+        if (room == null) return new NotFoundObjectResult(new { Error = "Room not found."});
 
         var slot = await _slotRepository.GetByIdAsync(slotId);
-        if (slot == null) return new Response<string>(success: false, errors: ["Slot not found."]);
+        if (slot == null) return new NotFoundObjectResult("Slot not found.");
 
         List<Slot> slots = [slot];
 
@@ -100,45 +107,36 @@ public class SlotService : ISlotService
         foreach (var slotToAdd in slots)
         {
             var canAdd = CanAddSlotToRoom(room, slotToAdd);
-            if (!canAdd) return new Response<string>(success: false, errors: ["TODO"]);
+            if (canAdd != null) return new BadRequestObjectResult(new { Error = "Slot is not compatible with existing slots.", Slots = canAdd.Select(x => new SlotDto(x)).ToList()});
         }
 
         room.Slots.AddRange(slots);
         await _roomRepository.UpdateAsync(room);
             
-        return new Response<string>(success: true, errors: ["Slot successfully added to room."]);
+        return new OkObjectResult(new { Message = "Successfully added slot to room."});
     }
 
-    private static bool CanAddSlotToRoom(Room room, Slot slot)
+    private static List<Slot>? CanAddSlotToRoom(Room room, Slot slot)
     {
-        // TODO si garder ce fonctionnement refactoriser cette partie
+        // TODO si garder ce fonctionnement refactoriser cette partie et return qu'elle slot ou evenement pose probleme
         var roomSlots = room.Slots.Where(existingSlot => existingSlot.DeletedAt == null &&
-            (existingSlot.StartDate <= slot.StartDate && existingSlot.EndDate >= slot.EndDate ||
+            (existingSlot.StartDate <= slot.StartDate && existingSlot.EndDate >= slot.EndDate && existingSlot.StartTime <= slot.StartTime && existingSlot.EndTime >= slot.EndTime ||
 
-            existingSlot.StartDate > slot.StartDate && existingSlot.EndDate < slot.EndDate ||
+            existingSlot.StartDate > slot.StartDate && existingSlot.EndDate < slot.EndDate && existingSlot.StartTime > slot.StartTime && existingSlot.EndTime < slot.EndTime ||
 
-            existingSlot.StartDate < slot.StartDate && existingSlot.EndDate > slot.StartDate && existingSlot.EndDate < slot.EndDate ||
+            existingSlot.StartDate < slot.StartDate && existingSlot.EndDate > slot.StartDate && existingSlot.EndDate < slot.EndDate  && existingSlot.StartTime < slot.StartTime && existingSlot.EndTime > slot.StartTime && existingSlot.EndTime < slot.EndTime ||
 
-            existingSlot.EndDate < slot.EndDate && existingSlot.StartDate > slot.StartDate && existingSlot.StartDate < slot.EndDate)).ToList();
+            existingSlot.EndDate < slot.EndDate && existingSlot.StartDate > slot.StartDate && existingSlot.StartDate < slot.EndDate && existingSlot.EndTime < slot.EndTime && existingSlot.StartTime > slot.StartTime && existingSlot.StartTime < slot.EndTime)).ToList();
 
-        if (roomSlots.Count == 0) return true;
-        var roomSlotHours = roomSlots.Where(existingSlot => existingSlot.DeletedAt == null &&
-            (existingSlot.StartTime <= slot.StartTime && existingSlot.EndTime >= slot.EndTime ||
-
-            existingSlot.StartTime > slot.StartTime && existingSlot.EndTime < slot.EndTime ||
-
-            existingSlot.StartTime < slot.StartTime && existingSlot.EndTime > slot.StartTime && existingSlot.EndTime < slot.EndTime ||
-
-            existingSlot.EndTime < slot.EndTime && existingSlot.StartTime > slot.StartTime && existingSlot.StartTime < slot.EndTime)).ToList();
-        if (roomSlotHours.Count == 0) return true;
+        if (roomSlots.Count != 0) return roomSlots;
         // TODO faire le check si il y a déja des rendez vous entre les dates et qui n'ont pas au moins une des catégories
-        return false;
+        return null;
     }
 
-    public async Task<Response<List<SlotDto>?>> CreateWithRepetitionAsync(CreateSlotWithRepetitionRequest request)
+    public async Task<ActionResult<List<SlotDto>>> CreateWithRepetitionAsync(CreateSlotWithRepetitionRequest request)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(request.WorkspaceId);
-        if (workspace == null) return new Response<List<SlotDto>?>(success: false, errors: ["Workspace not found."]);
+        if (workspace == null) return new NotFoundObjectResult(new { Error = "Workspace not found."});
 
         List<EventCategory> eventCategories = [];
         if (request.EventCategoryIds != null)
@@ -146,7 +144,7 @@ public class SlotService : ISlotService
             foreach (var eventCategoryId in request.EventCategoryIds)
             {
                 var eventCategory = await _eventCategoryRepository.GetByIdAsync(eventCategoryId);
-                if (eventCategory == null) return new Response<List<SlotDto>?>(success: false, errors: ["Event category not found."]); // TODO ajouter l'id de la catégorie
+                if (eventCategory == null) return new NotFoundObjectResult(new { Error = "Event category not found.", EventCategoryId = eventCategoryId}); // TODO ajouter l'id de la catégorie
                 eventCategories.Add(eventCategory);
             }
         }
@@ -158,8 +156,8 @@ public class SlotService : ISlotService
         };
 
         List<Slot> slots = [mainSlot];
-        var repetitionStartDate = _repetitionService.IncrementDateOnly(request.StartDate, request.RepetitionInterval, request.RepetitionNumber);
-        var repetitionEndDate = _repetitionService.IncrementDateOnly(request.EndDate, request.RepetitionInterval, request.RepetitionNumber);
+        var repetitionStartDate = StaticRepetitionService.IncrementDateOnly(request.StartDate, request.RepetitionInterval, request.RepetitionNumber);
+        var repetitionEndDate = StaticRepetitionService.IncrementDateOnly(request.EndDate, request.RepetitionInterval, request.RepetitionNumber);
 
         while (repetitionStartDate < request.RepetitionEndDate)
         {
@@ -169,11 +167,16 @@ public class SlotService : ISlotService
             };
             slots.Add(slot);
 
-            repetitionStartDate = _repetitionService.IncrementDateOnly(request.StartDate, request.RepetitionInterval, request.RepetitionNumber);
-            repetitionEndDate = _repetitionService.IncrementDateOnly(request.EndDate, request.RepetitionInterval, request.RepetitionNumber);
+            repetitionStartDate = StaticRepetitionService.IncrementDateOnly(request.StartDate, request.RepetitionInterval, request.RepetitionNumber);
+            repetitionEndDate = StaticRepetitionService.IncrementDateOnly(request.EndDate, request.RepetitionInterval, request.RepetitionNumber);
         }
         await _slotRepository.CreateMultipleAsync(slots);
 
-        return new Response<List<SlotDto>?>(success: true, content: slots.Select(x => new SlotDto(x)).ToList());
+        return new CreatedAtActionResult(
+            actionName: "CreateWithRepetition", 
+            controllerName: "Slot", 
+            routeValues: null, 
+            value: slots.Select(x => new SlotDto(x)).ToList()
+        );  
     }
 }

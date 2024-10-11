@@ -3,15 +3,16 @@ using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 
 public interface ISlotService
 {
-    Task<Response<SlotDto?>> GetByIdAsync(string id);
-    Task<Response<SlotDto?>> CreateAsync(CreateSlotRequest request);
-    // Task<Response<SlotDto?>> UpdateAsync(string id, DateOnly? newStartDate, DateOnly? newEndDate, TimeOnly? newStartTime, TimeOnly? newEndTime);
-    Task<Response<string>> DeleteAsync(string id);
-    Task<Response<string>> AddSlotToRoom(string slotId, string roomId);
-    Task<Response<List<SlotDto>?>> CreateWithRepetitionAsync(CreateSlotWithRepetitionRequest request);
+    Task<ActionResult<SlotDto>> GetByIdAsync(string id);
+    Task<ActionResult<SlotDto>> CreateAsync(CreateSlotRequest request);
+    // Task<ActionResult<SlotDto>> UpdateAsync(string id, DateOnly? newStartDate, DateOnly? newEndDate, TimeOnly? newStartTime, TimeOnly? newEndTime);
+    Task<ActionResult> DeleteAsync(string id);
+    Task<ActionResult> AddSlotToRoom(string slotId, string roomId);
+    Task<ActionResult<List<SlotDto>>> CreateWithRepetitionAsync(CreateSlotWithRepetitionRequest request);
 }

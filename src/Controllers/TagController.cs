@@ -20,15 +20,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Get a Tag by id.
         /// </summary>
-        [HttpGet("{id}")]
+        [HttpGet("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<TagDto?>> GetById(string id)
+        public async Task<ActionResult<TagDto>> GetById([FromQuery] string id)
         {
-            var res = await _tagService.GetByIdAsync(id);
-            if (!res.Success) return NotFound(res.Errors);
-
-            return Ok(res.Content);
+            return await _tagService.GetByIdAsync(id);
         }
 
         /// <summary>
@@ -41,40 +38,31 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _tagService.CreateAsync(request);
-            if (!res.Success) return NotFound(res.Errors);
-
-            return CreatedAtAction(nameof(Create), res.Content);
+            return await _tagService.CreateAsync(request);
         }
 
         /// <summary>
         /// Deletes a Tag.
         /// </summary>
-        [HttpDelete("{id}")]
+        [HttpDelete("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete([FromQuery] string id)
         {
-            var res = await _tagService.DeleteAsync(id);
-            if (!res.Success) return BadRequest(res.Errors);
-
-            return Ok(res.Content);
+            return await _tagService.DeleteAsync(id);
         }
 
         /// <summary>
         /// Updates a Tag.
         /// </summary>
-        [HttpPut("{id}")]
+        [HttpPut("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update(string id, [FromBody] UpdateTagRequest request)
+        public async Task<ActionResult<TagDto>> Update([FromQuery] string id, [FromBody] UpdateTagRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _tagService.UpdateAsync(id, request);
-           if (!res.Success) return BadRequest(res.Errors);
-
-            return Ok(res.Content);
+            return await _tagService.UpdateAsync(id, request);
         }
     }
 }

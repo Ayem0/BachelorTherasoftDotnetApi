@@ -1,12 +1,11 @@
-using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
-using BachelorTherasoftDotnetApi.src.Enums;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
@@ -22,21 +21,21 @@ public class WorkspaceService : IWorkspaceService
         _memberRepository = memberRepository;
     }
 
-    public async Task<Response<WorkspaceDto?>> GetByIdAsync(string id)
+    public async Task<ActionResult<WorkspaceDto>> GetByIdAsync(string id)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(id);
-        if (workspace == null) return new Response<WorkspaceDto?>(success: false, errors: ["Workspace not found."]);
+        if (workspace == null) return new NotFoundObjectResult("Workspace not found.");
 
-        return new Response<WorkspaceDto?>(success: true, content: new WorkspaceDto(workspace));
+        return new OkObjectResult(new WorkspaceDto(workspace));
     }
 
-    public async Task<Response<WorkspaceDto?>> CreateAsync(string userId, CreateWorkspaceRequest request)
+    public async Task<ActionResult<WorkspaceDto>> CreateAsync(string userId, CreateWorkspaceRequest request)
     {
         var user = await _userManager.FindByIdAsync(userId);
-        if (user == null) return new Response<WorkspaceDto?>(success: false, errors: ["User not found."]);
+        if (user == null) return new NotFoundObjectResult("User not found.");
 
         var workspace = new Workspace(request.Name, request.Description);
-        var member = new Member(user, workspace, Status.Accepted) {
+        var member = new Member(user, workspace) {
             User = user,
             Workspace = workspace
         };
@@ -44,68 +43,52 @@ public class WorkspaceService : IWorkspaceService
         workspace.Members.Add(member);
         await _workspaceRepository.CreateAsync(workspace);
 
-        return new Response<WorkspaceDto?>(success: true, content: new WorkspaceDto(workspace));
+        return new CreatedAtActionResult(
+            actionName: "Create", 
+            controllerName: "Workspace", 
+            routeValues: new { id = workspace.Id }, 
+            value: new WorkspaceDto(workspace)
+        );    
     }
 
-    public async Task<Response<string>> RemoveMemberAsync(string id, string memberId)
+    public async Task<ActionResult> RemoveMemberAsync(string id, string memberId)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(id);
-        if (workspace == null) return new Response<string>(success: false, errors: ["Workspace not found."]);
+        if (workspace == null) return new NotFoundObjectResult("Workspace not found.");
 
         var member = await _memberRepository.GetByIdAsync(memberId);
-        if (member == null) return new Response<string>(success: false, errors: ["Member not found."]);
+        if (member == null) return new NotFoundObjectResult("Member not found.");
 
         var isContained = workspace.Members.Remove(member);
         if (isContained) {
             await _workspaceRepository.UpdateAsync(workspace);
-            return new Response<string>(success: true, content: "Successfully removed member.");
+            return new OkObjectResult("Successfully removed member.");
         }
 
-        return new Response<string>(success: false, errors: ["Workspace does not contain this member."]);
+        return new NotFoundObjectResult("Member not found.");
     }
 
-    public async Task<Response<string>> AddMemberAsync(string id, string memberId)
+    public async Task<ActionResult> DeleteAsync(string id)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(id);
-        if (workspace == null) return new Response<string>(success: false, errors: ["Workspace not found."]);
-
-        var member = await _memberRepository.GetByIdAsync(memberId);
-        if (member == null) return new Response<string>(success: false, errors: ["Member not found."]);
-
-        var isContained = workspace.Members.Contains(member);
-        if (!isContained)
-        {
-            workspace.Members.Add(member);
-            await _workspaceRepository.UpdateAsync(workspace);
-            return new Response<string>(success: true, content: "Successfully invited member.");
-        }
-
-        return new Response<string>(
-            success: false, 
-            errors: member.Status == Status.Accepted ? ["User is already a member of this workspace."] : ["Already invited this member"]
-        );
-    }
-
-    public async Task<Response<string>> DeleteAsync(string id)
-    {
-        var workspace = await _workspaceRepository.GetByIdAsync(id);
-        if (workspace == null) return new Response<string>(success: false, errors: ["Workspace not found."]);
+        if (workspace == null) return new NotFoundObjectResult("Workspace not found.");
 
         await _workspaceRepository.DeleteAsync(workspace);
-        return new Response<string>(success: true, content: "Successfully removed member.");
+        return new OkObjectResult("Successfully deleted workspace.");
+
     }
 
-    public async Task<Response<WorkspaceDto?>> UpdateAsync(string id, UpdateWorkspaceRequest request)
+    public async Task<ActionResult<WorkspaceDto>> UpdateAsync(string id, UpdateWorkspaceRequest request)
     {
-        if (request.NewName == null && request.NewDescription == null) return new Response<WorkspaceDto?>(success: false, errors: ["At least one field is required."]);
+        if (request.NewName == null && request.NewDescription == null) return new BadRequestObjectResult("At least one field is required.");
         
         var workspace = await _workspaceRepository.GetByIdAsync(id);
-        if (workspace == null ) return new Response<WorkspaceDto?>(success: false, errors: ["Workspace not found."]);
+        if (workspace == null ) return new NotFoundObjectResult("Workspace not found.");
 
         workspace.Name = request.NewName ?? workspace.Name;
         workspace.Description = request.NewDescription ?? workspace.Description;
 
         await _workspaceRepository.UpdateAsync(workspace);
-        return new Response<WorkspaceDto?>(success: true, content: new WorkspaceDto(workspace));
+        return new OkObjectResult(new WorkspaceDto(workspace));
     }
 }

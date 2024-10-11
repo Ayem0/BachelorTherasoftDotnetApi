@@ -20,15 +20,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Get a Participant by id.
         /// </summary>
-        [HttpGet("{id}")]
+        [HttpGet("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ParticipantDto?>> GetById(string id)
+        public async Task<ActionResult<ParticipantDto>> GetById([FromQuery] string id)
         {
-            var res = await _participantService.GetByIdAsync(id);
-            if (!res.Success) return NotFound(res.Errors);
-
-            return Ok(res.Content);
+            return await _participantService.GetByIdAsync(id);
         }
 
         /// <summary>
@@ -41,41 +38,31 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _participantService.CreateAsync(request);
-            if (!res.Success) return BadRequest(res.Errors);
-
-            return CreatedAtAction(nameof(Create), res.Content);
+            return await _participantService.CreateAsync(request);
         }
 
         /// <summary>
         /// Deletes a Participant.
         /// </summary>
-        [HttpDelete("{id}")]
+        [HttpDelete("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete([FromQuery] string id)
         {
-            var res = await _participantService.DeleteAsync(id);
-            if (!res.Success) return BadRequest(res.Errors);
-
-            return Ok(res.Content);
+            return await _participantService.DeleteAsync(id);
         }
 
         /// <summary>
         /// Updates a Participant.
         /// </summary>
-        [HttpPut("{id}")]
+        [HttpPut("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update(string id, [FromBody] UpdateParticipantRequest request)
+        public async Task<ActionResult<ParticipantDto>> Update([FromQuery] string id, [FromBody] UpdateParticipantRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _participantService.UpdateAsync(id, request);
-
-            if (!res.Success) return BadRequest(res.Errors);
-
-            return Ok(res.Content);
+            return await _participantService.UpdateAsync(id, request);
         }
     }
 }

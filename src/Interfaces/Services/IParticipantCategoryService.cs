@@ -1,14 +1,12 @@
-using System;
-using BachelorTherasoftDotnetApi.src.Base;
-using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 
 public interface IParticipantCategoryService
 {
-    Task<Response<ParticipantCategoryDto?>> GetByIdAsync(string id);
-    Task<Response<ParticipantCategoryDto?>> CreateAsync(string workspaceId, string name, string icon);
-    Task<Response<string>> DeleteAsync(string id);
-    Task<Response<ParticipantCategoryDto?>> UpdateAsync(string id, string? newName, string? newIcon);
+    Task<ActionResult<ParticipantCategoryDto>> GetByIdAsync(string id);
+    Task<ActionResult<ParticipantCategoryDto>> CreateAsync(string workspaceId, string name, string icon);
+    Task<ActionResult> DeleteAsync(string id);
+    Task<ActionResult<ParticipantCategoryDto>> UpdateAsync(string id, string? newName, string? newIcon);
 }

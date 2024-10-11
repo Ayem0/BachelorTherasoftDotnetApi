@@ -6,9 +6,9 @@ using BachelorTherasoftDotnetApi.src.Enums;
 
 namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 
-public interface IMemberService
-{
-    Task<Response<MemberDto?>> GetByIdAsync(string id);
-    Task<Response<MemberDto?>> CreateAsync(string workspaceId, string userId);
-    Task<Response<string>> DeleteAsync(string id);
-}
+// public interface IMemberService
+// {
+//     Task<Response<MemberDto?>> GetByIdAsync(string id);
+//     Task<Response<MemberDto?>> CreateAsync(string workspaceId, string userId);
+//     Task<Response<string>> DeleteAsync(string id);
+// }

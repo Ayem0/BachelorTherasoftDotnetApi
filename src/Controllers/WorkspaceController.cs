@@ -21,15 +21,13 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Get a workspace by id.
         /// </summary>
-        [HttpGet("{id}")]
+        [HttpGet("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<WorkspaceDto>> GetById(string id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<WorkspaceDto>> GetById([FromQuery] string id)
         {
-            var res = await _workspaceService.GetByIdAsync(id);
-            if (!res.Success) return NotFound(res.Errors);
-
-            return Ok(res.Content);
+            return await _workspaceService.GetByIdAsync(id);
         }
 
         /// <summary>
@@ -45,68 +43,53 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return Unauthorized();
 
-            var res = await _workspaceService.CreateAsync(userId, request);
-            if (!res.Success) return BadRequest(res.Errors);
-
-            return CreatedAtAction(nameof(Create), res.Content);
+            return await _workspaceService.CreateAsync(userId, request);
         }
 
         /// <summary>
         /// Removes a member from a workspace.
         /// </summary>
-        [HttpDelete("{id}/RemoveMember/{memberId}")]
+        [HttpDelete("Member")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> RemoveMember(string id, string memberId)
+        public async Task<ActionResult> RemoveMember([FromQuery] string workspaceId, [FromQuery] string memberId)
         {
-            var res = await _workspaceService.RemoveMemberAsync(id, memberId);
-            if (!res.Success) return BadRequest(res.Errors);
-
-            return Ok(res.Content);
+            return await _workspaceService.RemoveMemberAsync(workspaceId, memberId);
         }
 
-        /// <summary>
-        /// Adds a member to a workspace.
-        /// </summary>
-        [HttpPost("{id}/AddMember/{memberId}")]
-        [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddMember(string id, string memberId)
-        {
-            var res = await _workspaceService.AddMemberAsync(id, memberId);
-            if (!res.Success) return BadRequest(res.Errors);
-
-            return Ok(res.Content);
-        }
+        // /// <summary>
+        // /// Adds a member to a workspace.
+        // /// </summary>
+        // [HttpPost("{id}/AddMember/{memberId}")]
+        // [Authorize]
+        // [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
+        // public async Task<IActionResult> AddMember(string id, string memberId)
+        // {
+        //     return await _workspaceService.AddMemberAsync(id, memberId);
+        // }
 
         /// <summary>
         /// Deletes a workspace.
         /// </summary>
-        [HttpDelete("{id}")]
+        [HttpDelete("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<ActionResult> Delete([FromQuery] string id)
         {
-            var res = await _workspaceService.DeleteAsync(id);
-            if (!res.Success) return BadRequest(res.Errors);
-
-            return Ok(res.Content);
+            return await _workspaceService.DeleteAsync(id);
         }
 
         /// <summary>
         /// Updates a workspace.
         /// </summary>
-        [HttpPut("{id}")]
+        [HttpPut("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update(string id, [FromBody] UpdateWorkspaceRequest request)
+        public async Task<ActionResult<WorkspaceDto>> Update([FromQuery] string id, [FromBody] UpdateWorkspaceRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _workspaceService.UpdateAsync(id, request);
-            if (!res.Success) return BadRequest(res.Errors);
-
-            return Ok(res.Content);
+            return await _workspaceService.UpdateAsync(id, request);
         }
     }
 }
