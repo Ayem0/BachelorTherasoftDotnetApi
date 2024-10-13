@@ -1,32 +1,44 @@
 using System.ComponentModel.DataAnnotations;
-using BachelorTherasoftDotnetApi.src.Models;
 
 namespace BachelorTherasoftDotnetApi.src.Dtos.Models;
 
 public class EventDto
 {
-    public EventDto(Event baseEvent, RoomDto roomDto, EventCategoryDto eventCategoryDto, List<ParticipantDto>? participantDtos, List<TagDto>? tagDtos)
-    {
-        Id = baseEvent.Id;
-        StartDate = baseEvent.StartDate;
-        EndDate = baseEvent.EndDate;
-        Description = baseEvent.Description;
-        Room = roomDto;
-        EventCategory = eventCategoryDto;
-        Participants = participantDtos;
-        Tags = tagDtos;
-    }
     [Required]
-    public string Id { get; set; }
+    public string Id { get; set; } = string.Empty;
     [Required]
     public DateTime StartDate { get; set; }
     [Required]
     public DateTime EndDate { get; set; }
     public string? Description { get; set; }
+}
+
+public class EventWithRoomDto : EventDto
+{
     [Required]
-    public RoomDto Room { get; set; }
+    public RoomDto Room { get; set; } = new();
+}
+
+public class EventWithEventCategoryDto : EventDto
+{    
+    public EventCategoryDto EventCategory { get; set; } = new();
+}
+
+public class EventWithParticipantsDto : EventDto
+{    
+    public List<ParticipantDto> Participants { get; set; } = [];
+}
+
+public class EventWithTagsDto : EventDto
+{    
+    public List<TagDto> Tags { get; set; } = [];
+}
+
+public class EventDetailsDto : EventDto 
+{    
+    public List<TagDto> Tags { get; set; } = [];
+    public List<ParticipantDto> Participants { get; set; } = [];
+    public EventCategoryDto EventCategory { get; set; } = new();
     [Required]
-    public EventCategoryDto EventCategory { get; set; }
-    public List<ParticipantDto>? Participants { get; set; }
-    public List<TagDto>? Tags { get; set; }
+    public RoomDto Room { get; set; } = new();
 }

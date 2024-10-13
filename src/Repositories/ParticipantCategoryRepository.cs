@@ -1,3 +1,4 @@
+using AutoMapper;
 using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Databases;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
@@ -7,7 +8,7 @@ namespace BachelorTherasoftDotnetApi.src.Repositories;
 
 public class ParticipantCategoryRepository : BaseMySqlRepository<ParticipantCategory>, IParticipantCategoryRepository
 {
-    public ParticipantCategoryRepository(MySqlDbContext context) : base(context)
+    public ParticipantCategoryRepository(MySqlDbContext context, IMapper mapper) : base(context, mapper)
     {
     }
 }

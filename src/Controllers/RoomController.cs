@@ -24,7 +24,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<RoomDto>> GetById([FromQuery] string id)
         {
             return await _roomService.GetByIdAsync(id);
@@ -35,7 +36,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPost("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status201Created / StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<RoomDto>> Create([FromBody] CreateRoomRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
@@ -48,7 +50,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpDelete("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Delete([FromQuery] string id)
         {
             return await _roomService.DeleteAsync(id);
@@ -59,7 +62,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPut("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<RoomDto>> Update([FromQuery] string id, [FromBody] UpdateRoomRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());

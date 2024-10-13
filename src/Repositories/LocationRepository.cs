@@ -1,3 +1,4 @@
+using AutoMapper;
 using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Databases;
 using BachelorTherasoftDotnetApi.src.Interfaces;
@@ -10,16 +11,7 @@ namespace BachelorTherasoftDotnetApi.src.Repositories;
 
 public class LocationRepository : BaseMySqlRepository<Location>, ILocationRepository
 {
-    public LocationRepository(MySqlDbContext context) : base(context)
+    public LocationRepository(MySqlDbContext context, IMapper mapper) : base(context, mapper)
     {
-    }
-
-    public async new Task<Location?> GetByIdAsync(string id)
-    {
-        return await _context.Location
-            .Include(l => l.Areas)
-            .Include(l => l.Workspace)
-            .Where(l => l.Id == id && l.DeletedAt == null && l.Areas.All(a => a.DeletedAt == null) && l.Workspace.DeletedAt == null)
-            .FirstOrDefaultAsync();
     }
 }

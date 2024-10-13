@@ -1,8 +1,9 @@
-using BachelorTherasoftDotnetApi.src.Base;
+using AutoMapper;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
+using BachelorTherasoftDotnetApi.src.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
@@ -10,59 +11,59 @@ namespace BachelorTherasoftDotnetApi.src.Services;
 public class ParticipantCategoryService : IParticipantCategoryService
 {
     private readonly IParticipantCategoryRepository _participantCategoryRepository;
-
     private readonly IWorkspaceRepository _workspaceRepository;
-    public ParticipantCategoryService(IParticipantCategoryRepository participantCategoryRepository, IWorkspaceRepository workspaceRepository)
+    private readonly IMapper _mapper;
+    public ParticipantCategoryService(IParticipantCategoryRepository participantCategoryRepository, IWorkspaceRepository workspaceRepository, IMapper mapper)
     {
         _participantCategoryRepository = participantCategoryRepository;
         _workspaceRepository = workspaceRepository;
+        _mapper = mapper;
     }
 
     public async Task<ActionResult<ParticipantCategoryDto>> CreateAsync(string workspaceId, string name, string icon)
     {
-        var workspace = await _workspaceRepository.GetByIdAsync(workspaceId);
-        if (workspace == null) return new NotFoundObjectResult("Workspace not found.");
+        var res = await _workspaceRepository.GetEntityByIdAsync(workspaceId);
+        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
+        if (res.Data == null) return Response.NotFound(workspaceId, "Workspace not found.");
 
-        var participantCategory = new ParticipantCategory(workspace, name, icon) { Workspace = workspace };
-        await _participantCategoryRepository.CreateAsync(participantCategory);
+        var participantCategory = new ParticipantCategory(res.Data, name, icon) { Workspace = res.Data };
 
-        return new CreatedAtActionResult(
-            actionName: "Create", 
-            controllerName: "ParticipantCategory", 
-            routeValues: new { id = participantCategory.Id }, 
-            value: new ParticipantCategoryDto(participantCategory)
-        );  
+        var res2 = await _participantCategoryRepository.CreateAsync(participantCategory);
+        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
+        
+        return Response.Ok(_mapper.Map<ParticipantCategoryDto>(participantCategory)); 
     }
 
     public async Task<ActionResult> DeleteAsync(string id)
     {
-        var participantCategory = await _participantCategoryRepository.GetByIdAsync(id);
-        if (participantCategory == null) return new NotFoundObjectResult("Participant category not found.");
+        var res = await _participantCategoryRepository.DeleteAsync(id);
+        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
 
-        await _participantCategoryRepository.DeleteAsync(participantCategory);
-        
-        return new OkObjectResult("Participant category successfully deleted.");
+        return Response.NoContent();
     }
 
     public async Task<ActionResult<ParticipantCategoryDto>> GetByIdAsync(string id)
     {
-        var participantCategory = await _participantCategoryRepository.GetByIdAsync(id);
-        if (participantCategory == null) return new NotFoundObjectResult("Participant category not found.");
+        var participantCategory = await _participantCategoryRepository.GetByIdAsync<ParticipantCategoryDto>(id);
+        if (participantCategory == null) return Response.NotFound(id, "Participant category not found.");
 
-        return new OkObjectResult(new ParticipantCategoryDto(participantCategory));
+        return Response.Ok(participantCategory);
     }
 
     public async Task<ActionResult<ParticipantCategoryDto>> UpdateAsync(string id, string? newName, string? newIcon)
     {
         if (newName == null && newIcon == null) return new BadRequestObjectResult("At least one field is required.");
-        var participantCategory = await _participantCategoryRepository.GetByIdAsync(id);
-        if (participantCategory == null ) return new NotFoundObjectResult("Participant category not found.");
 
-        participantCategory.Name = newName ?? participantCategory.Name;
-        participantCategory.Icon = newIcon ?? participantCategory.Icon;
+        var res = await _participantCategoryRepository.GetEntityByIdAsync(id);
+        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
+        if (res.Data == null ) return Response.NotFound(id, "Participant category not found.");
 
-        await _participantCategoryRepository.UpdateAsync(participantCategory);
-        
-        return new OkObjectResult(new ParticipantCategoryDto(participantCategory));
+        res.Data.Name = newName ?? res.Data.Name;
+        res.Data.Icon = newIcon ?? res.Data.Icon;
+
+        var res2 = await _participantCategoryRepository.UpdateAsync(res.Data);
+        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
+
+        return Response.Ok(_mapper.Map<ParticipantCategoryDto>(res.Data));
     }
 }

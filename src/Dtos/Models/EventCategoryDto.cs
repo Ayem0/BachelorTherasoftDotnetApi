@@ -5,16 +5,10 @@ namespace BachelorTherasoftDotnetApi.src.Dtos.Models;
 
 public class EventCategoryDto
 {
-    public EventCategoryDto(EventCategory eventCategory)
-    {
-        Id = eventCategory.Id;
-        Name = eventCategory.Name;
-        Icon = eventCategory.Icon;
-    }
     [Required]
-    public string Id { get; set; }
+    public string Id { get; set; } = string.Empty;
     [Required]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     [Required]
-    public string Icon { get; set; }
+    public string Icon { get; set; } = string.Empty;
 }

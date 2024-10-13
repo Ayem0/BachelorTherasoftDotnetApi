@@ -1,4 +1,5 @@
 
+using AutoMapper;
 using BachelorTherasoftDotnetApi.src.Databases;
 using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
@@ -6,6 +7,7 @@ using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
 using BachelorTherasoftDotnetApi.src.Repositories;
 using BachelorTherasoftDotnetApi.src.Services;
+using BachelorTherasoftDotnetApi.src.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -97,10 +99,10 @@ builder.Services.AddScoped<IEventCategoryRepository, EventCategoryRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IParticipantRepository, ParticipantRepository>();
 builder.Services.AddScoped<IParticipantCategoryRepository, ParticipantCategoryRepository>();
-builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
-builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+// builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
+// builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 builder.Services.AddScoped<ISlotRepository, SlotRepository>();
-builder.Services.AddScoped<IEventMemberRepository, EventMemberRepository>();
+// builder.Services.AddScoped<IEventMemberRepository, EventMemberRepository>();
 builder.Services.AddScoped<IInvitationRepository, InvitationRepository>();
 
 
@@ -115,7 +117,7 @@ builder.Services.AddScoped<IEventCategoryService, EventCategoryService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IParticipantService, ParticipantService>();
 builder.Services.AddScoped<IParticipantCategoryService, ParticipantCategoryService>();
-builder.Services.AddScoped<IConversationService, ConversationService>();
+// builder.Services.AddScoped<IConversationService, ConversationService>();
 // builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddScoped<ISlotService, SlotService>();
 // builder.Services.AddScoped<IEventMemberService, EventMemberService>();
@@ -123,6 +125,7 @@ builder.Services.AddScoped<ISlotService, SlotService>();
 
 // Utils Services
 // builder.Services.AddScoped<IRepetitionService, RepetitionService>();
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 var app = builder.Build();
 

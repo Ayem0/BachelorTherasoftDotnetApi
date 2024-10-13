@@ -1,10 +1,11 @@
-using BachelorTherasoftDotnetApi.src.Base;
+using AutoMapper;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
+using BachelorTherasoftDotnetApi.src.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
@@ -13,56 +14,58 @@ public class RoomService : IRoomService
 {
     private readonly IAreaRepository _areaRepository;
     private readonly IRoomRepository _roomRepository;
-    public RoomService(IAreaRepository areaRepository, IRoomRepository roomRepository)
+    private readonly IMapper _mapper;
+    public RoomService(IAreaRepository areaRepository, IRoomRepository roomRepository, IMapper mapper)
     {
         _areaRepository = areaRepository;
         _roomRepository = roomRepository;
+        _mapper = mapper;
     }
 
     public async Task<ActionResult<RoomDto>> CreateAsync(CreateRoomRequest request)
     {
-        var area = await _areaRepository.GetByIdAsync(request.AreaId);
-        if (area == null) return new NotFoundObjectResult("Area not found.");
+        var res = await _areaRepository.GetEntityByIdAsync(request.AreaId);
+        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
+        if (res.Data == null) return Response.NotFound(request.AreaId, nameof(res.Data));
 
-        var room = new Room(area, request.Name, request.Description) { Area = area };
-        await _roomRepository.CreateAsync(room);
+        var room = new Room(res.Data, request.Name, request.Description) { Area = res.Data };
 
-        return new CreatedAtActionResult(
-            actionName: "Create", 
-            controllerName: "Room", 
-            routeValues: new { id = room.Id }, 
-            value: new RoomDto(room)
-        );  
+        var res2 = await _roomRepository.CreateAsync(room);
+        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
+
+        return Response.CreatedAt(_mapper.Map<RoomDto>(room));
     }
 
     public async Task<ActionResult> DeleteAsync(string id)
     {
-        var room = await _roomRepository.GetByIdAsync(id);
-        if (room == null) return new NotFoundObjectResult("Room not found.");
+        var res = await _roomRepository.DeleteAsync(id);
+        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
 
-        await _roomRepository.DeleteAsync(room);
-        return new OkObjectResult("Successfully deleted room.");
+        return Response.NoContent();
     }
 
     public async Task<ActionResult<RoomDto>> GetByIdAsync(string id)
     {
-        var room = await _roomRepository.GetByIdAsync(id);
-        if (room == null) return new NotFoundObjectResult("Room not found.");
+        var room = await _roomRepository.GetByIdAsync<RoomDto>(id);
+        if (room == null) return Response.NotFound(id, nameof(room));
 
-        return new OkObjectResult(new RoomDto(room));
+        return Response.Ok(room);
     }
 
     public async Task<ActionResult<RoomDto>> UpdateAsync(string id, UpdateRoomRequest request)
     {
-        if (request.NewName == null && request.NewDescription == null) return new BadRequestObjectResult("At least one field is required.");
+        if (request.NewName == null && request.NewDescription == null) return Response.BadRequest("At least one field is required.", null);
 
-        var room = await _roomRepository.GetByIdAsync(id);
-        if (room == null) return  new NotFoundObjectResult("Room not found.");
+        var res = await _roomRepository.GetEntityByIdAsync(id);
+        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
+        if (res.Data == null) return Response.NotFound(id, nameof(res.Data));
 
-        room.Name = request.NewName ?? room.Name;
-        room.Description = request.NewDescription ?? room.Description;
+        res.Data.Name = request.NewName ?? res.Data.Name;
+        res.Data.Description = request.NewDescription ?? res.Data.Description;
 
-        await _roomRepository.UpdateAsync(room);
-        return new OkObjectResult(new RoomDto(room));
+        var res2 = await _roomRepository.UpdateAsync(res.Data);
+        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
+        
+        return Response.Ok(_mapper.Map<RoomDto>(res.Data));
     }
 }

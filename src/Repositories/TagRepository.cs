@@ -1,3 +1,4 @@
+using AutoMapper;
 using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Databases;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
@@ -9,15 +10,8 @@ namespace BachelorTherasoftDotnetApi.src.Repositories;
 
 public class TagRepository : BaseMySqlRepository<Tag>, ITagRepository
 {
-    public TagRepository(MySqlDbContext context) : base(context)
+    public TagRepository(MySqlDbContext context, IMapper mapper) : base(context, mapper)
     {
-    }
-
-    public async new Task<Tag?> GetByIdAsync(string id)
-    {
-        return await _context.Tag
-            .Where(x => x.Id == id && x.DeletedAt == null && x.Workspace.DeletedAt == null)
-            .FirstOrDefaultAsync();
     }
 
     public async Task<Tag?> GetByIdJoinWorkspaceAsync(string id)

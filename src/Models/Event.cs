@@ -55,7 +55,7 @@ public class Event : BaseModel
 
 
     public List<Participant> Participants { get; set; } = [];
-    public List<EventMember> Members { get; set; } = [];
+    public List<EventUser> Users { get; set; } = [];
     public List<Tag> Tags { get; set; } = [];
 }
 

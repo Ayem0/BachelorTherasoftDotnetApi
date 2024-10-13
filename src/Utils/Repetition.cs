@@ -1,8 +1,8 @@
 using BachelorTherasoftDotnetApi.src.Enums;
 
-namespace BachelorTherasoftDotnetApi.src.Services;
+namespace BachelorTherasoftDotnetApi.Utils;
 
-public static class StaticRepetitionService
+public static class Repetition
 {
     public static DateTime IncrementDateTime(DateTime date, Interval repetitionInterval, int repetitionNumber)
     {

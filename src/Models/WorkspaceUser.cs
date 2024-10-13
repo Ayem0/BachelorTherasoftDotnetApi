@@ -1,17 +1,17 @@
-using BachelorTherasoftDotnetApi.src.Base;
+using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
-
-public class Member : BaseModel
+[Keyless]
+public class WorkspaceUser
 {
-    public Member(User user, Workspace workspace)
+    public WorkspaceUser(User user, Workspace workspace)
     {
         User = user;
         Workspace = workspace;
         UserId = user.Id;
         WorkspaceId = workspace.Id;
     }
-    public Member(string userId, string workspaceId)
+    public WorkspaceUser(string userId, string workspaceId)
     {
         UserId = userId;
         WorkspaceId = workspaceId;
@@ -22,7 +22,7 @@ public class Member : BaseModel
     public string WorkspaceId { get; set; }
     public required Workspace Workspace { get; set; }
 
-    public List<WorkspaceRole> Roles { get; set; } = [];
-    public List<EventMember> Events { get; set; } = [];
-    // TODO ajouter le json des horaires de travail
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTime? UpdatedAt { get; set; }
+    public DateTime? DeletedAt { get; set; }
 }

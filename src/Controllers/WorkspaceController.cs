@@ -30,12 +30,26 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             return await _workspaceService.GetByIdAsync(id);
         }
 
+         /// <summary>
+        /// Get a workspace with details by id.
+        /// </summary>
+        [HttpGet("Details")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<WorkspaceDetailsDto>> GetDetailsById([FromQuery] string id)
+        {
+            return await _workspaceService.GetDetailsByIdAsync(id);
+        }
+
         /// <summary>
         /// Creates a workspace.
         /// </summary>
         [HttpPost("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status201Created / StatusCodes.Status400BadRequest / StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<WorkspaceDto>> Create([FromBody] CreateWorkspaceRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());

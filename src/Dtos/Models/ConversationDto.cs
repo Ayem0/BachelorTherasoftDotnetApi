@@ -5,13 +5,11 @@ namespace BachelorTherasoftDotnetApi.src.Dtos.Models;
 
 public class ConversationDto
 {
-    public ConversationDto(Conversation conversation)
-    {
-        Id = conversation.Id;
-        Name = conversation.Name;
-        UserIds = conversation.UserIds;
-    }
-    public string Id { get; set;}
+    public string Id { get; set;} = string.Empty;
     public string? Name { get; set;}
-    public List<string> UserIds { get; set;}
+}
+
+public class ConversationWithUsersDto : ConversationDto
+{
+    public List<UserDto> Users { get; set;} = [];
 }

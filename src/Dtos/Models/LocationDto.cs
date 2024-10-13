@@ -5,19 +5,10 @@ namespace BachelorTherasoftDotnetApi.src.Dtos.Models;
 
 public class LocationDto
 {
-    public LocationDto(Location location)
-    {
-        Id = location.Id;
-        Name = location.Name;
-        Description = location.Description;
-        Address = location.Address;
-        City = location.City;
-        Country = location.Country;
-    }
     [Required]
-    public string Id { get; set; }
+    public string Id { get; set; } = string.Empty;
     [Required]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string? Address { get; set; }
     public string? City { get; set; }

@@ -1,24 +1,24 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
-using BachelorTherasoftDotnetApi.src.Models;
 
 namespace BachelorTherasoftDotnetApi.src.Dtos.Models;
 
+public class WorkspaceDetailsDto : WorkspaceDto
+{
+    public List<LocationDto> Locations { get; set; } = [];
+    public List<SlotDto> Slots { get; set; } = [];
+    public List<EventCategoryDto> EventCategories { get; set; } = [];
+    public List<ParticipantDto> Participants { get; set; } = [];
+    public List<ParticipantCategoryDto> ParticipantCategories { get; set; } = [];
+    public List<WorkspaceRoleDto> WorkspaceRoles { get; set; } = [];
+    public List<TagDto> Tags { get; set; } = [];
+    public List<UserDto> Users { get; set; } = [];
+}
+
 public class WorkspaceDto
 {
-    public WorkspaceDto(Workspace workspace)
-    {
-        Id = workspace.Id;
-        Name = workspace.Name;
-        Description = workspace.Description;
-    }
     [Required]
-    public string Id { get; set; }
+    public string Id { get; set; } = string.Empty;
     [Required]
-    public string Name { get; set; }
-
+    public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
-    
-    // [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    // public List<UserDto>? Users { get; set; }
 }
