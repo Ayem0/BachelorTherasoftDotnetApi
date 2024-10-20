@@ -11,7 +11,7 @@ namespace BachelorTherasoftDotnetApi.src.Repositories;
 
 public class SlotRepository : BaseMySqlRepository<Slot>, ISlotRepository
 {
-    public SlotRepository(MySqlDbContext context, IMapper mapper) : base(context, mapper)
+    public SlotRepository(MySqlDbContext context) : base(context)
     {   
     }
 

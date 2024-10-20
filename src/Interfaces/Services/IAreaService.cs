@@ -1,14 +1,13 @@
-using BachelorTherasoftDotnetApi.src.Base;
-using BachelorTherasoftDotnetApi.src.Dtos;
+using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
-using Microsoft.AspNetCore.Mvc;
+using BachelorTherasoftDotnetApi.src.Dtos.Update;
 
 namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 
 public interface IAreaService
 {
-    Task<ActionResult<AreaDto>> GetByIdAsync(string id);
-    Task<ActionResult<AreaDto>> CreateAsync(string locationId, string name, string? description);
-    Task<ActionResult> DeleteAsync(string id);
-    Task<ActionResult<AreaDto>> UpdateAsync(string id, string? newName, string? newDescription);
+    Task<AreaDto> GetByIdAsync(string id);
+    Task<AreaDto> CreateAsync(CreateAreaRequest request);
+    Task<bool> DeleteAsync(string id);
+    Task<AreaDto> UpdateAsync(string id, UpdateAreaRequest request);
 }

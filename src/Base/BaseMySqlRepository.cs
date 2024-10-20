@@ -1,8 +1,6 @@
-using AutoMapper;
 using BachelorTherasoftDotnetApi.src.Databases;
-using BachelorTherasoftDotnetApi.src.Models;
-using BachelorTherasoftDotnetApi.src.Utils;
-using Microsoft.AspNetCore.Mvc;
+using BachelorTherasoftDotnetApi.src.Enums;
+using BachelorTherasoftDotnetApi.src.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.src.Base;
@@ -11,110 +9,98 @@ public class BaseMySqlRepository<T> : IBaseRepository<T> where T : BaseModel
 {
     protected readonly MySqlDbContext _context;
     private readonly DbSet<T> _dbSet;
-    protected readonly IMapper _mapper;
 
-    public BaseMySqlRepository(MySqlDbContext context, IMapper mapper)
+    public BaseMySqlRepository(MySqlDbContext context)
     {
         _context = context;
         _dbSet = _context.Set<T>();
-        _mapper = mapper;
     }
 
-    public async Task<DbResponse<T>> GetEntityByIdAsync(string id)
+    public async Task<T?> GetEntityByIdAsync(string id)
     {
         try
         {
-            var res = await _dbSet.Where(x => x.Id == id && x.DeletedAt == null).FirstOrDefaultAsync();
-
-            return new(res);
+            return await _dbSet.FirstOrDefaultAsync(x => x.Id == id && x.DeletedAt == null);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error getting {nameof(T)} with ID '{id}' : {ex.Message}");
-            return new($"Error getting {nameof(T)} with ID '{id}'.", ex.Message);
+            throw new DbException(DbAction.Read, nameof(T), id);
         }
     }
     
-    public async Task<TDto?> GetByIdAsync<TDto>(string id)
-    {
-        IQueryable<T> query = _dbSet;
+    // public async Task<TDto?> GetByIdAsync<TDto>(string id)
+    // {
+    //     IQueryable<T> query = _dbSet;
 
-        var navigations = _context.Model.FindEntityType(typeof(T))?.GetNavigations();
+    //     var navigations = _context.Model.FindEntityType(typeof(T))?.GetNavigations();
         
-        if (navigations != null)
-        {
-            var properties = typeof(TDto).GetProperties().Select(p => p.Name).ToHashSet();
+    //     if (navigations != null)
+    //     {
+    //         var properties = typeof(TDto).GetProperties().Select(p => p.Name).ToHashSet();
             
-            foreach (var property in properties)
-            {
-                if (navigations.Select(x => x.Name).Contains(property))
-                {                    
-                    query = query.Include(property);
-                }
-            }
-        }
+    //         foreach (var property in properties)
+    //         {
+    //             if (navigations.Select(x => x.Name).Contains(property))
+    //             {                 
+    //                 query = query.Include(property);
+    //             }
+    //         }
+    //     }
 
-        T? entity = await query.Where(x => x.Id == id && x.DeletedAt == null).FirstOrDefaultAsync();
+    //     T? entity = await query.Where(x => x.Id == id && x.DeletedAt == null).FirstOrDefaultAsync();
 
-        return entity == null ? default :_mapper.Map<TDto>(entity);
-    }
+    //     return entity == null ? default :_mapper.Map<TDto>(entity);
+    // }
 
-    public async Task<DbResponse<T>> CreateAsync(T entity)
+    public async Task CreateAsync(T entity)
     {
         try
         {
             entity.CreatedAt = DateTime.Now;
             _dbSet.Add(entity);
-            var res = await _context.SaveChangesAsync();
 
-            if (res > 0) return new();
-
-            return new($"Error creating {nameof(T)}.");
+            await _context.SaveChangesAsync();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error creating {nameof(T)} : {ex.Message}");
-            return new($"Error creating {nameof(T)}.", ex.Message);
+            throw new DbException(DbAction.Create, nameof(T));
         }
     }
 
-    public async Task<DbResponse<T>> UpdateAsync(T entity)
+    public async Task UpdateAsync(T entity)
     {
         try
         {
             entity.UpdatedAt = DateTime.Now;
             _dbSet.Update(entity);
-            var res = await _context.SaveChangesAsync();
 
-            if (res > 0) return new();
-
-            return new($"Error updating {nameof(T)} with ID '{entity.Id}'.");
+            await _context.SaveChangesAsync();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error updating {nameof(T)} with ID '{entity.Id}' : {ex.Message}");
-            return new($"Error updating {nameof(T)} with ID '{entity.Id}'.", ex.Message);
+            Console.WriteLine($"Error updating {nameof(entity)} with ID '{entity.Id}' : {ex.Message}");
+            throw new DbException(DbAction.Update, nameof(entity), entity.Id);
         }
     }
 
-    public async Task<DbResponse<T>> DeleteAsync(string id)
+    public async Task<bool> DeleteAsync(string id)
     {
         try
         {
             var res = await _dbSet.Where(x => x.Id == id && x.DeletedAt == null).ExecuteUpdateAsync(x => x.SetProperty(x => x.DeletedAt, DateTime.Now));
+            return res > 0;
 
-            if (res > 0) return new();
-
-            return new($"{nameof(T)} with ID '{id}' already deleted.");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error deleting {nameof(T)} with ID '{id}' : {ex.Message}");
-            return new($"Error deleting {nameof(T)} with ID '{id}'.", ex.Message);
+            throw new DbException(DbAction.Delete, nameof(T), id);
         }
     }
 
-    public async Task<DbResponse<T>> CreateMultipleAsync(List<T> entities)
+    public async Task CreateMultipleAsync(List<T> entities)
     {
         try
         {
@@ -122,18 +108,17 @@ public class BaseMySqlRepository<T> : IBaseRepository<T> where T : BaseModel
             {
                 entity.CreatedAt = DateTime.Now;
             }
+
             _dbSet.AddRange(entities);
 
-            var res = await _context.SaveChangesAsync();
-            
-            if (res > 0) return new();
+            await _context.SaveChangesAsync();
 
-            return new($"Error creating mutliple {nameof(T)}.");
+           
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error creating mutliple {nameof(T)} : {ex.Message}");
-            return new($"Error creating mutliple {nameof(T)}.", ex.Message);
+            throw new DbException(DbAction.Create, nameof(T));
         }
     }
 }

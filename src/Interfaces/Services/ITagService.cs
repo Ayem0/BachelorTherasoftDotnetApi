@@ -9,8 +9,8 @@ namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 
 public interface ITagService
 {
-    Task<ActionResult<TagDto>> GetByIdAsync(string id);
-    Task<ActionResult<TagDto>> CreateAsync(CreateTagRequest request);
-    Task<ActionResult> DeleteAsync(string id);
-    Task<ActionResult<TagDto>> UpdateAsync(string id, UpdateTagRequest request);
+    Task<TagDto> GetByIdAsync(string id);
+    Task<TagDto> CreateAsync(CreateTagRequest request);
+    Task<bool> DeleteAsync(string id);
+    Task<TagDto> UpdateAsync(string id, UpdateTagRequest request);
 }

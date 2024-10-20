@@ -11,7 +11,7 @@ namespace BachelorTherasoftDotnetApi.src.Repositories;
 
 public class LocationRepository : BaseMySqlRepository<Location>, ILocationRepository
 {
-    public LocationRepository(MySqlDbContext context, IMapper mapper) : base(context, mapper)
+    public LocationRepository(MySqlDbContext context) : base(context)
     {
     }
 }

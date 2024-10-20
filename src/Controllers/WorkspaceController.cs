@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
-using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -25,9 +24,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<WorkspaceDto>> GetById([FromQuery] string id)
+        public async Task<IActionResult> GetById([FromQuery] string id)
         {
-            return await _workspaceService.GetByIdAsync(id);
+            var res = await _workspaceService.GetByIdAsync(id);
+            return Ok(res);
         }
 
          /// <summary>
@@ -37,9 +37,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<WorkspaceDetailsDto>> GetDetailsById([FromQuery] string id)
+        public async Task<IActionResult> GetDetailsById([FromQuery] string id)
         {
-            return await _workspaceService.GetDetailsByIdAsync(id);
+            var res = await _workspaceService.GetDetailsByIdAsync(id);
+            return Ok(res);
         }
 
         /// <summary>
@@ -49,27 +50,28 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<WorkspaceDto>> Create([FromBody] CreateWorkspaceRequest request)
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> Create([FromBody] CreateWorkspaceRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null) return Unauthorized();
+            if (userId == null) return Forbid();
 
-            return await _workspaceService.CreateAsync(userId, request);
+            var res = await _workspaceService.CreateAsync(userId, request);
+            return CreatedAtAction(null, res);
         }
 
-        /// <summary>
-        /// Removes a member from a workspace.
-        /// </summary>
-        [HttpDelete("Member")]
-        [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> RemoveMember([FromQuery] string workspaceId, [FromQuery] string memberId)
-        {
-            return await _workspaceService.RemoveMemberAsync(workspaceId, memberId);
-        }
+        // /// <summary>
+        // /// Removes a member from a workspace.
+        // /// </summary>
+        // [HttpDelete("Member")]
+        // [Authorize]
+        // [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
+        // public async Task<ActionResult> RemoveMember([FromQuery] string workspaceId, [FromQuery] string memberId)
+        // {
+        //     return await _workspaceService.RemoveMemberAsync(workspaceId, memberId);
+        // }
 
         // /// <summary>
         // /// Adds a member to a workspace.
@@ -87,10 +89,13 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpDelete("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> Delete([FromQuery] string id)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]        
+        public async Task<IActionResult> Delete([FromQuery] string id)
         {
-            return await _workspaceService.DeleteAsync(id);
+            var res = await _workspaceService.DeleteAsync(id);
+
+            return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Workspace with id '{id} not found.'"});
         }
 
         /// <summary>
@@ -98,12 +103,15 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPut("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<WorkspaceDto>> Update([FromQuery] string id, [FromBody] UpdateWorkspaceRequest request)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateWorkspaceRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
+            if (request.NewName == null && request.NewDescription == null) return BadRequest(new ProblemDetails() { Title = "At least one field is required."});
 
-            return await _workspaceService.UpdateAsync(id, request);
+            var res = await _workspaceService.UpdateAsync(id, request);
+
+            return Ok(res);
         }
     }
 }

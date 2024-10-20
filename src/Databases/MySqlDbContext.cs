@@ -21,7 +21,6 @@ public class MySqlDbContext : IdentityDbContext<User, Role, string>
     public DbSet<Room> Room { get; set; }
     public DbSet<Slot> Slot { get; set; }
     public DbSet<Workspace> Workspace { get; set; }
-    public DbSet<WorkspaceUser> WorkspaceUser { get; set; }
     public DbSet<EventUser> EventUser { get; set; }
     public DbSet<WorkspaceRole> WorkspaceRole { get; set; }
     public DbSet<Invitation> Invitatition { get; set; }
@@ -36,19 +35,19 @@ public class MySqlDbContext : IdentityDbContext<User, Role, string>
         //     v => v == null ? null : JsonSerializer.Deserialize<List<DayOfWeek>>(v, JsonSerializerOptions) // Si la chaîne est null, retourner null
         // );
 
-        // WorkspaceUser
-        builder.Entity<WorkspaceUser>()
-            .HasKey(uw => new { uw.WorkspaceId, uw.UserId }); 
+        // // WorkspaceUser
+        // builder.Entity<WorkspaceUser>()
+        //     .HasKey(uw => new { uw.WorkspaceId, uw.UserId }); 
 
-        builder.Entity<WorkspaceUser>()
-            .HasOne(uw => uw.User)
-            .WithMany(u => u.Workspaces)
-            .HasForeignKey(uw => uw.UserId);
+        // builder.Entity<WorkspaceUser>()
+        //     .HasOne(uw => uw.User)
+        //     .WithMany(u => u.Workspaces)
+        //     .HasForeignKey(uw => uw.UserId);
 
-        builder.Entity<WorkspaceUser>()
-            .HasOne(uw => uw.Workspace)
-            .WithMany(u => u.Users)
-            .HasForeignKey(uw => uw.WorkspaceId);
+        // builder.Entity<WorkspaceUser>()
+        //     .HasOne(uw => uw.Workspace)
+        //     .WithMany(u => u.Users)
+        //     .HasForeignKey(uw => uw.WorkspaceId);
 
         // EventUser
         builder.Entity<EventUser>()

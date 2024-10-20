@@ -3,13 +3,12 @@ using BachelorTherasoftDotnetApi.src.Databases;
 using BachelorTherasoftDotnetApi.src.Base;
 using Microsoft.EntityFrameworkCore;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
-using AutoMapper;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
 
 public class AreaRepository : BaseMySqlRepository<Area>, IAreaRepository
 {
-    public AreaRepository(MySqlDbContext context, IMapper mapper) : base(context, mapper)
+    public AreaRepository(MySqlDbContext context) : base(context)
     {
     }
 

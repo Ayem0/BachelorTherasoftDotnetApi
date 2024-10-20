@@ -1,12 +1,12 @@
 using AutoMapper;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
+using BachelorTherasoftDotnetApi.src.Dtos.Update;
+using BachelorTherasoftDotnetApi.src.Exceptions;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
-using BachelorTherasoftDotnetApi.src.Utils;
 using BachelorTherasoftDotnetApi.Utils;
-using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver.Linq;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
@@ -30,110 +30,85 @@ public class EventService : IEventService
         _mapper = mapper;
     }
 
-    public async Task<ActionResult<EventDto>> CreateAsync(string? description, string roomId, string eventCategoryId, DateTime startDate, DateTime endDate,
-        List<string>? participantIds, List<string>? tagIds)
+    public async Task<EventDto?> CreateAsync(CreateEventRequest req)
     {
-        var res = await _roomRepository.GetEntityByIdAsync(roomId);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        if (res.Data == null) return Response.NotFound(roomId, "Room");
+        var room = await _roomRepository.GetEntityByIdAsync(req.RoomId) ?? throw new NotFoundException("Room", req.RoomId);
 
-        var res2 = await _eventCategoryRepository.GetEntityByIdAsync(eventCategoryId);
-        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
-        if (res2.Data == null) return Response.NotFound(eventCategoryId, "Event category");
+        var eventCategory = await _eventCategoryRepository.GetEntityByIdAsync(req.EventCategoryId) ?? throw new NotFoundException("EventCategory", req.EventCategoryId);
 
         List<Participant> participants = [];
         // TODO refactor ceci en une requete et voir tous ceux qui manque / si il y a des doublons et les renvoyé avec l'erreur
-        for (int i = 0; i < participantIds?.Count; i++)
+        for (int i = 0; i < req.ParticipantIds?.Count; i++)
         {
-            var res3 = await _participantRepository.GetEntityByIdAsync(participantIds[i]);
-            if (!res3.Success) return Response.BadRequest(res3.Message, res3.Details);
-            if (res3.Data == null) return Response.NotFound(participantIds[i], "Participant");
+            var participant = await _participantRepository.GetEntityByIdAsync(req.ParticipantIds[i]) ?? throw new NotFoundException("Participant", req.RoomId);
 
-            if (!participants.Contains(res3.Data)) participants.Add(res3.Data);
+            if (!participants.Contains(participant)) participants.Add(participant);
         }
 
         List<Tag> tags = [];
         // TODO refactor ceci en une requete et voir tous ceux qui manque / si il y a des doublons et les renvoyé avec l'erreur
-        for (int i = 0; i < tagIds?.Count; i++)
+        for (int i = 0; i < req.TagIds?.Count; i++)
         {
-            var res4 = await _tagRepository.GetEntityByIdAsync(tagIds[i]);
-            if (!res4.Success) return Response.BadRequest(res4.Message, res4.Details);
-            if (res4.Data == null) return Response.NotFound(tagIds[i],"Tag");
+            var tag = await _tagRepository.GetEntityByIdAsync(req.TagIds[i]) ?? throw new NotFoundException("Tag", req.TagIds[i]);
 
-            if (!tags.Contains(res4.Data)) tags.Add(res4.Data);
+            if (!tags.Contains(tag)) tags.Add(tag);
         }
 
-        var eventToAdd = new Event(description, startDate, endDate, res.Data, res2.Data, participants, tags, null, null, null, null)
+        var eventToAdd = new Event(req.Description, req.StartDate, req.EndDate, room, eventCategory, participants, tags, null, null, null, null)
         {
-            Room = res.Data,
-            EventCategory = res2.Data
+            Room = room,
+            EventCategory = eventCategory
         };
-        var canAdd = CanAddEvent(res.Data, eventToAdd);
+        var canAdd = CanAddEvent(room, eventToAdd);
         // TODO faire en sorte de retourner si c'est un probleme de slot ou un probleme d'event
-        if (!canAdd) return Response.BadRequest("Cant add event.", null);
+        if (!canAdd) return null;
 
         await _eventRepository.CreateAsync(eventToAdd);
 
-        return Response.CreatedAt(_mapper.Map<EventDto>(eventToAdd));   
+        return _mapper.Map<EventDto>(eventToAdd);   
     }
 
-    public async Task<ActionResult> DeleteAsync(string id)
+    public async Task<bool> DeleteAsync(string id)
     {
-        var res = await _eventRepository.DeleteAsync(id);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        
-        return Response.NoContent();
+        return await _eventRepository.DeleteAsync(id);
     }
 
-    public async Task<ActionResult<EventDto>> GetByIdAsync(string id)
+    public async Task<EventDto> GetByIdAsync(string id)
     {
-        var eventToGet = await _eventRepository.GetByIdAsync<EventDto>(id);
-        if (eventToGet == null) return Response.NotFound(id, "Event");
+        var eventToGet = await _eventRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Event", id);
 
-        return Response.Ok(eventToGet);
+        return _mapper.Map<EventDto>(eventToGet);
     }
 
-    public async Task<ActionResult<EventDto>> UpdateAsync(string id, DateTime? newStartDate, DateTime? newEndDate, string? newRoomId, string? newDescription,
-        string? newEventCategoryId, List<string>? newParticipantIds, List<string>? newTagIds)
-    {
-        if (newStartDate == null && newEndDate == null && newRoomId == null && newDescription == null && newEventCategoryId == null && newParticipantIds == null && newTagIds == null)
-            return new BadRequestObjectResult(new { errors = new List<string>(["At least one field is required"]) });
-            
-        var eventToUpdate = await _eventRepository.GetByIdJoinRelationsAsync(id);
-        if (eventToUpdate == null) return Response.NotFound(id, "Event");
+    public async Task<EventDto> UpdateAsync(string id, UpdateEventRequest req)
+    { 
+        var eventToUpdate = await _eventRepository.GetByIdJoinRelationsAsync(id) ?? throw new NotFoundException("Event", id);
 
-
-        if (newRoomId != null)
+        if (req.NewRoomId != null)
         {
-            var res = await _roomRepository.GetEntityByIdAsync(id);
-            if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-            if (res.Data == null) return Response.NotFound(id, "Room");
+            var room = await _roomRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Room", req.NewRoomId);
 
-            eventToUpdate.Room = res.Data;
-            eventToUpdate.RoomId = res.Data.Id;
+            eventToUpdate.Room = room;
+            eventToUpdate.RoomId = room.Id;
         }
 
-        if (newEventCategoryId != null)
+        if (req.NewEventCategoryId != null)
         {
-            var res2 = await _eventCategoryRepository.GetEntityByIdAsync(id);
-            if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
-            if (res2.Data == null) return Response.NotFound(newEventCategoryId, "Event category");
+            var eventCategory = await _eventCategoryRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("EventCategory", req.NewEventCategoryId);
 
-            eventToUpdate.EventCategory = res2.Data;
-            eventToUpdate.EventCategoryId = res2.Data.Id;
+            eventToUpdate.EventCategory = eventCategory;
+            eventToUpdate.EventCategoryId = eventCategory.Id;
         }
 
         List<Participant> participants = [];
         // TODO a refactor comme le create
-        for (int i = 0; i < newParticipantIds?.Count; i++)
+        for (int i = 0; i < req.NewParticipantIds?.Count; i++)
         {
-            var participantToAdd = eventToUpdate.Participants.Find(x => x.Id == newParticipantIds[i]);
+            var participantToAdd = eventToUpdate.Participants.Find(x => x.Id == req.NewParticipantIds[i]);
             if (participantToAdd == null)
             {
-                var res3 = await _participantRepository.GetEntityByIdAsync(newParticipantIds[i]);
-                if (!res3.Success) return Response.BadRequest(res3.Message, res3.Details);
-                if (res3.Data == null) return Response.NotFound(newParticipantIds[i], "Particpant");
-                participants.Add(res3.Data);
+                var participant = await _participantRepository.GetEntityByIdAsync(req.NewParticipantIds[i]) ?? throw new NotFoundException("Participant", req.NewParticipantIds[i]);
+                participants.Add(participant);
             }
             else
             {
@@ -143,15 +118,13 @@ public class EventService : IEventService
 
         List<Tag> tags = [];
         // TODO a refactor comme le create
-        for (int i = 0; i < newTagIds?.Count; i++)
+        for (int i = 0; i < req.NewTagIds?.Count; i++)
         {
-            var tagToAdd = eventToUpdate.Tags.Find(x => x.Id == newTagIds[i]);
+            var tagToAdd = eventToUpdate.Tags.Find(x => x.Id == req.NewTagIds[i]);
             if (tagToAdd == null)
             {
-                var res4 = await _tagRepository.GetEntityByIdAsync(newTagIds[i]);
-                if (!res4.Success) return Response.BadRequest(res4.Message, res4.Details);
-                if (res4.Data == null) return Response.NotFound(newTagIds[i], "Tag");
-                tags.Add(res4.Data);
+                var tag = await _tagRepository.GetEntityByIdAsync(req.NewTagIds[i]) ?? throw new NotFoundException("Tag", req.NewTagIds[i]);
+                tags.Add(tag);
             }
             else
             {
@@ -159,15 +132,15 @@ public class EventService : IEventService
             }
         }
 
-        eventToUpdate.StartDate = newStartDate ?? eventToUpdate.StartDate;
-        eventToUpdate.EndDate = newEndDate ?? eventToUpdate.EndDate;
-        eventToUpdate.Description = newDescription ?? eventToUpdate.Description;
+        eventToUpdate.StartDate = req.NewStartDate ?? eventToUpdate.StartDate;
+        eventToUpdate.EndDate = req.NewEndDate ?? eventToUpdate.EndDate;
+        eventToUpdate.Description = req.NewDescription ?? eventToUpdate.Description;
         eventToUpdate.Participants = participants.Count > 0 ? participants : eventToUpdate.Participants;
         eventToUpdate.Tags = tags.Count > 0 ? tags : eventToUpdate.Tags;
 
         await _eventRepository.UpdateAsync(eventToUpdate);
 
-        return Response.Ok(_mapper.Map<EventDto>(eventToUpdate));
+        return _mapper.Map<EventDto>(eventToUpdate);
     }
 
 
@@ -211,47 +184,43 @@ public class EventService : IEventService
 
     }
 
-    public async Task<ActionResult<List<EventDto>>> CreateWithRepetitionAsync(CreateEventWithRepetitionRequest request)
+    public async Task<List<EventDto>?> CreateWithRepetitionAsync(CreateEventWithRepetitionRequest request)
     {
-        var res = await _roomRepository.GetEntityByIdAsync(request.RoomId);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        if (res.Data == null) return Response.NotFound(request.RoomId, "Room");
+        var room = await _roomRepository.GetEntityByIdAsync(request.RoomId);
+        if (room == null) return null;
 
-        var res2 = await _eventCategoryRepository.GetEntityByIdAsync(request.EventCategoryId);
-        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
-        if (res2.Data == null) return Response.NotFound(request.EventCategoryId, "Event category");
+        var eventCategory = await _eventCategoryRepository.GetEntityByIdAsync(request.EventCategoryId);
+        if (eventCategory == null) return null;
 
         List<Participant> participants = [];
         // TODO refactor ceci en une requete et voir tous ceux qui manque / si il y a des doublons et les renvoyé avec l'erreur
         for (int i = 0; i < request.ParticipantIds?.Count; i++)
         {
-            var res3 = await _participantRepository.GetEntityByIdAsync(request.ParticipantIds[i]);
-            if (!res3.Success) return Response.BadRequest(res3.Message, res3.Details);
-            if (res3.Data == null) return Response.NotFound(request.ParticipantIds[i], "Participant");
+            var participant = await _participantRepository.GetEntityByIdAsync(request.ParticipantIds[i]);
+            if (participant == null) return null;
 
-            if (!participants.Contains(res3.Data)) participants.Add(res3.Data);
+            if (!participants.Contains(participant)) participants.Add(participant);
         }
 
         List<Tag> tags = [];
         for (int i = 0; i < request.TagIds?.Count; i++)
         {
-            var res4 = await _tagRepository.GetEntityByIdAsync(request.TagIds[i]);
-            if (!res4.Success) return Response.BadRequest(res4.Message, res4.Details);
-            if (res4.Data == null) return Response.NotFound(request.TagIds[i], "Tag");
+            var tag = await _tagRepository.GetEntityByIdAsync(request.TagIds[i]);
+            if (tag == null) return null;
 
-            if (!tags.Contains(res4.Data)) tags.Add(res4.Data);
+            if (!tags.Contains(tag)) tags.Add(tag);
         }
 
-        var mainEvent = new Event(request.Description, request.StartDate, request.EndDate, res.Data, res2.Data, participants, tags,
+        var mainEvent = new Event(request.Description, request.StartDate, request.EndDate, room, eventCategory, participants, tags,
             request.RepetitionInterval, request.RepetitionNumber, null, request.RepetitionEndDate)
         {
-            Room = res.Data,
-            EventCategory = res2.Data
+            Room = room,
+            EventCategory = eventCategory
         };
 
-        var canAdd = CanAddEvent(res.Data, mainEvent);
+        var canAdd = CanAddEvent(room, mainEvent);
         // TODO changer le type de response de canAdd et récupérer l'erreur en dessous a la place de todo
-        if (!canAdd) return new BadRequestObjectResult(new { errors = new List<string>(["Cant add event bcs of slot or event."])});
+        if (!canAdd) return null;
 
         List<Event> events = [mainEvent];
 
@@ -260,16 +229,16 @@ public class EventService : IEventService
 
         while (DateOnly.FromDateTime(repetitionStartDate) < request.RepetitionEndDate)
         {
-            var @event = new Event(request.Description, repetitionStartDate, repetitionEndDate, res.Data, res2.Data, participants, tags,
+            var @event = new Event(request.Description, repetitionStartDate, repetitionEndDate, room, eventCategory, participants, tags,
                 null, null, mainEvent, null)
             {
-                Room = res.Data,
-                EventCategory = res2.Data
+                Room = room,
+                EventCategory = eventCategory
             };
 
-            bool canAddEvent = CanAddEvent(res.Data, @event);
+            bool canAddEvent = CanAddEvent(room, @event);
             // TODO changer le type de response de canAdd et récupérer l'erreur en dessous a la place de todo
-            if (!canAddEvent) return new BadRequestObjectResult(new { errors = new List<string>(["Cant add event bcs of slot or event."])});
+            if (!canAddEvent) return null;
 
             events.Add(@event);
 
@@ -279,6 +248,6 @@ public class EventService : IEventService
 
         await _eventRepository.CreateMultipleAsync(events);
 
-        return Response.CreatedAt(events.Select(x => _mapper.Map<EventDto>(x)).ToList());  
+        return events.Select(x => _mapper.Map<EventDto>(x)).ToList();  
     }
 }

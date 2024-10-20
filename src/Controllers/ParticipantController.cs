@@ -22,10 +22,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ParticipantDto>> GetById([FromQuery] string id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById([FromQuery] string id)
         {
-            return await _participantService.GetByIdAsync(id);
+            var res =  await _participantService.GetByIdAsync(id);
+            return Ok(res);
         }
 
         /// <summary>
@@ -33,12 +35,14 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPost("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status201Created / StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<ParticipantDto>> Create([FromBody] CreateParticipantRequest request)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Create([FromBody] CreateParticipantRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            return await _participantService.CreateAsync(request);
+            var res = await _participantService.CreateAsync(request);
+            return CreatedAtAction(null, res);
         }
 
         /// <summary>
@@ -46,10 +50,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpDelete("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromQuery] string id)
         {
-            return await _participantService.DeleteAsync(id);
+            var res = await _participantService.DeleteAsync(id);
+            return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Participant with id '{id} not found.'"});
         }
 
         /// <summary>
@@ -57,12 +63,17 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPut("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<ParticipantDto>> Update([FromQuery] string id, [FromBody] UpdateParticipantRequest request)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateParticipantRequest req)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
+            if ( req.NewAddress == null && req.NewFirstName == null && req.NewLastName == null && req.NewCity == null && req.NewDateOfBirth == null 
+                && req.NewCountry == null && req.NewEmail == null && req.NewParticipantCategoryId == null && req.NewDescription == null)
+                return BadRequest(new ProblemDetails() { Title = "At least one field is required."});
 
-            return await _participantService.UpdateAsync(id, request);
+            var res = await _participantService.UpdateAsync(id, req);
+
+            return Ok(res);
         }
     }
 }

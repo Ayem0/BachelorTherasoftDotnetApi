@@ -9,7 +9,7 @@ namespace BachelorTherasoftDotnetApi.src.Repositories;
 
 public class RoomRepository : BaseMySqlRepository<Room>, IRoomRepository
 {
-    public RoomRepository(MySqlDbContext context, IMapper mapper) : base(context, mapper)
+    public RoomRepository(MySqlDbContext context) : base(context)
     {
     }
 }

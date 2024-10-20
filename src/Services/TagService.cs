@@ -2,11 +2,10 @@ using AutoMapper;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
+using BachelorTherasoftDotnetApi.src.Exceptions;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
-using BachelorTherasoftDotnetApi.src.Utils;
-using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
@@ -22,51 +21,39 @@ public class TagService : ITagService
         _mapper = mapper;
     }
 
-    public async Task<ActionResult<TagDto>> CreateAsync(CreateTagRequest request)
+    public async Task<TagDto> CreateAsync(CreateTagRequest request)
     {
-        var res = await _workspaceRepository.GetEntityByIdAsync(request.WorkspaceId);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        if (res.Data == null) return Response.NotFound(request.WorkspaceId, nameof(res.Data));
+        var workspace = await _workspaceRepository.GetEntityByIdAsync(request.WorkspaceId) ?? throw new NotFoundException("Workspace", request.WorkspaceId);
 
-        var tag = new Tag(res.Data, request.Name, request.Icon, request.Description){ Workspace = res.Data };
+        var tag = new Tag(workspace, request.Name, request.Icon, request.Description){ Workspace = workspace };
         
-        var res2 = await _tagRepository.CreateAsync(tag);
-        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
+        await _tagRepository.CreateAsync(tag);
 
-        return Response.CreatedAt(_mapper.Map<TagDto>(tag));
+        return _mapper.Map<TagDto>(tag);
     }
 
-    public async Task<ActionResult> DeleteAsync(string id)
+    public async Task<bool> DeleteAsync(string id)
     {
-        var res = await _tagRepository.DeleteAsync(id);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-
-        return Response.NoContent();
+        return await _tagRepository.DeleteAsync(id);
     }
 
-    public async Task<ActionResult<TagDto>> GetByIdAsync(string id)
+    public async Task<TagDto> GetByIdAsync(string id)
     {
-        var tag = await _tagRepository.GetByIdAsync<TagDto>(id);
-        if (tag == null) return Response.NotFound(id, nameof(tag));
-
-        return Response.Ok(tag);
+        var tag = await _tagRepository.GetEntityByIdAsync(id)?? throw new NotFoundException("Tag", id);
+        
+        return _mapper.Map<TagDto>(tag);
     }
 
-    public async Task<ActionResult<TagDto>> UpdateAsync(string id, UpdateTagRequest request)
+    public async Task<TagDto> UpdateAsync(string id, UpdateTagRequest req)
     {
-        if (request.NewName == null && request.NewDescription == null && request.NewDescription == null) 
-            return Response.BadRequest("At least one field is required.", null);
+        var tag = await _tagRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Tag", id);
+        
+        tag.Name = req.NewName ?? tag.Name;
+        tag.Icon = req.NewIcon ?? tag.Icon;
+        tag.Description = req.NewDescription ?? tag.Description;
 
-        var res = await _tagRepository.GetEntityByIdAsync(id);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        if (res.Data == null) return Response.NotFound(id, nameof(res.Data));
+        await _tagRepository.UpdateAsync(tag);
 
-        res.Data.Name = request.NewName ?? res.Data.Name;
-        res.Data.Icon = request.NewIcon ?? res.Data.Icon;
-        res.Data.Description = request.NewDescription ?? res.Data.Description;
-
-        await _tagRepository.UpdateAsync(res.Data);
-
-        return Response.Ok(_mapper.Map<TagDto>(res.Data));
+        return _mapper.Map<TagDto>(tag);
     }
 }

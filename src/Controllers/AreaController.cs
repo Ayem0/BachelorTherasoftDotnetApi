@@ -14,11 +14,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
     public class AreaController : ControllerBase
     {
         private readonly IAreaService _areaService;
-        private readonly IWorkspaceService _workspaceService;
-        public AreaController(IAreaService areaService, IWorkspaceService workspaceService)
+        public AreaController(IAreaService areaService)
         {
             _areaService = areaService;
-            _workspaceService = workspaceService;
         }
 
         /// <summary>
@@ -26,10 +24,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<AreaDto>> GetById([FromQuery] string id)
         {
-            return await _areaService.GetByIdAsync(id);
+            var res =  await _areaService.GetByIdAsync(id);
+            return Ok(res);
         }
 
         /// <summary>
@@ -37,12 +37,14 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPost("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status201Created / StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<AreaDto>> Create([FromBody] CreateAreaRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            return await _areaService.CreateAsync(request.LocationId, request.Name, request.Description);
+            var res = await _areaService.CreateAsync(request);
+
+            return CreatedAtAction(null, res);
         }
 
         /// <summary>
@@ -50,10 +52,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpDelete("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> Delete([FromQuery] string id)
         {
-            return await _areaService.DeleteAsync(id);
+            var res = await _areaService.DeleteAsync(id);
+            return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Area with id '{id} not found.'"});
         }
 
         /// <summary>
@@ -62,11 +66,15 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [HttpPut("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<AreaDto>> Update([FromQuery] string id, [FromBody] UpdateAreaRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            return await _areaService.UpdateAsync(id, request.NewName, request.NewDescription);
+            if (request.NewDescription == null && request.NewName == null) return BadRequest(new ProblemDetails() { Title = "At least one field is required."});
+
+            var res =  await _areaService.UpdateAsync(id, request);
+            return Ok(res);
         }
     }
 }

@@ -1,10 +1,11 @@
 using AutoMapper;
+using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
+using BachelorTherasoftDotnetApi.src.Dtos.Update;
+using BachelorTherasoftDotnetApi.src.Exceptions;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
-using BachelorTherasoftDotnetApi.src.Utils;
-using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
@@ -20,52 +21,38 @@ public class EventCategoryService : IEventCategoryService
         _mapper = mapper;
     }
 
-    public async Task<ActionResult<EventCategoryDto>> CreateAsync(string workspaceId, string name, string icon, string color)
+    public async Task<EventCategoryDto> CreateAsync(CreateEventCategoryRequest req)
     {
-        var res = await _workspaceRepository.GetEntityByIdAsync(workspaceId);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        if (res.Data == null) return Response.NotFound(workspaceId, "Workspace");
+        var workspace = await _workspaceRepository.GetEntityByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
 
-        var eventCategory = new EventCategory(res.Data, name, icon, color)
-        {
-            Workspace = res.Data
-        };
+        var eventCategory = new EventCategory(workspace, req.Name, req.Icon, req.Color){ Workspace = workspace };
 
-        var res2 = await _eventCategoryRepository.CreateAsync(eventCategory);
-        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
+        await _eventCategoryRepository.CreateAsync(eventCategory);
 
-        return Response.CreatedAt(_mapper.Map<EventCategoryDto>(eventCategory));  
+        return _mapper.Map<EventCategoryDto>(eventCategory);  
     }
 
-    public async Task<ActionResult> DeleteAsync(string id)
+    public async Task<bool> DeleteAsync(string id)
     {
-        var res = await _eventCategoryRepository.DeleteAsync(id);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        return Response.NoContent();
+        return await _eventCategoryRepository.DeleteAsync(id);
     }
 
-    public async Task<ActionResult<EventCategoryDto>> GetByIdAsync(string id)
+    public async Task<EventCategoryDto> GetByIdAsync(string id)
     {
-        var eventCategory = await _eventCategoryRepository.GetByIdAsync<EventCategoryDto>(id);
-        if (eventCategory == null) return Response.NotFound(id, "Event category");
+        var eventCategory = await _eventCategoryRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("EventCategory", id);
 
-        return Response.Ok(eventCategory);
+        return _mapper.Map<EventCategoryDto>(eventCategory);
     }
 
-    public async Task<ActionResult<EventCategoryDto>> UpdateAsync(string id, string? newName, string? newIcon)
+    public async Task<EventCategoryDto> UpdateAsync(string id, UpdateEventCategoryRequest req)
     {
-        if (newName == null && newIcon == null) return Response.BadRequest("At least one field is required.", null);
+        var eventCategory = await _eventCategoryRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("EventCategory", id);
 
-        var res = await _eventCategoryRepository.GetEntityByIdAsync(id);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        if (res.Data == null ) return Response.NotFound(id, "Event category");
+        eventCategory.Name = req.NewName ?? eventCategory.Name;
+        eventCategory.Icon = req.NewIcon ?? eventCategory.Icon;
 
-        res.Data.Name = newName ?? res.Data.Name;
-        res.Data.Icon = newIcon ?? res.Data.Icon;
+        await _eventCategoryRepository.UpdateAsync(eventCategory);
 
-        var res2 = await _eventCategoryRepository.UpdateAsync(res.Data);
-        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
-
-        return Response.Ok(_mapper.Map<EventCategoryDto>(res.Data));
+        return _mapper.Map<EventCategoryDto>(eventCategory);
     }
 }

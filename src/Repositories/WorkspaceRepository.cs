@@ -10,7 +10,7 @@ namespace BachelorTherasoftDotnetApi.src.Repositories;
 
 public class WorkspaceRepository : BaseMySqlRepository<Workspace>, IWorkspaceRepository
 {
-    public WorkspaceRepository(MySqlDbContext context, IMapper mapper) : base(context, mapper)
+    public WorkspaceRepository(MySqlDbContext context) : base(context)
     {
     }
 

@@ -1,10 +1,11 @@
 using AutoMapper;
+using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
+using BachelorTherasoftDotnetApi.src.Dtos.Update;
+using BachelorTherasoftDotnetApi.src.Exceptions;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
-using BachelorTherasoftDotnetApi.src.Utils;
-using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
@@ -20,54 +21,39 @@ public class AreaService : IAreaService
         _mapper = mapper;
     }
 
-    public async Task<ActionResult<AreaDto>> CreateAsync(string locationId, string name, string? description)
+    public async Task<AreaDto> CreateAsync(CreateAreaRequest request)
     {
-        var res = await _locationRepository.GetEntityByIdAsync(locationId);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        if (res.Data == null) return Response.NotFound(locationId, "Location not found.");
+        var location = await _locationRepository.GetEntityByIdAsync(request.LocationId) ?? throw new NotFoundException("Location", request.LocationId);
 
-        var area = new Area(res.Data, name, description)
-        {
-            Location = res.Data,
-        };
+        var area = new Area(location, request.Name, request.Description){ Location = location };
         
-        var res2 = await _areaRepository.CreateAsync(area);
-        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
+        await _areaRepository.CreateAsync(area);
         
-        return Response.CreatedAt(_mapper.Map<AreaDto>(area));
+        return _mapper.Map<AreaDto>(area);
     }
 
 
-    public async Task<ActionResult> DeleteAsync(string id)
+    public async Task<bool> DeleteAsync(string id)
     {
-        var res = await _areaRepository.DeleteAsync(id);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-
-        return Response.Ok("Area successfully deleted.");
+        return await _areaRepository.DeleteAsync(id);
     }
 
-    public async Task<ActionResult<AreaDto>> GetByIdAsync(string id)
+    public async Task<AreaDto> GetByIdAsync(string id)
     {
-        var area = await _areaRepository.GetByIdAsync<AreaDto>(id);
-        if (area == null) return Response.NotFound(id, "Area not found.");
+        var area = await _areaRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Area", id);
 
-        return Response.Ok(area);
+        return _mapper.Map<AreaDto>(area);
     }
 
-    public async Task<ActionResult<AreaDto>> UpdateAsync(string id, string? newName, string? newDescription)
+    public async Task<AreaDto> UpdateAsync(string id, UpdateAreaRequest req)
     {
-        if (newName == null && newDescription == null) return Response.BadRequest("At least one field is required.", null);
+        var area = await _areaRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Area", id);
 
-        var res = await _areaRepository.GetEntityByIdAsync(id);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        if (res.Data == null ) return Response.NotFound(id, "Area not found.");
+        area.Name = req.NewName ?? area.Name;
+        area.Description = req.NewDescription ?? area.Description;
 
-        res.Data.Name = newName ?? res.Data.Name;
-        res.Data.Description = newDescription ?? res.Data.Description;
-
-        var res2 = await _areaRepository.UpdateAsync(res.Data);
-        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
+        await _areaRepository.UpdateAsync(area);
         
-        return Response.Ok(_mapper.Map<AreaDto>(res.Data));
+        return _mapper.Map<AreaDto>(area);
     }
 }

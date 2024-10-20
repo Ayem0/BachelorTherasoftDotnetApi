@@ -9,10 +9,10 @@ namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 
 public interface IWorkspaceRoleService
 {
-    Task<ActionResult<WorkspaceRoleDto>> GetByIdAsync(string id);
-    Task<ActionResult<WorkspaceRoleDto>> CreateAsync(CreateWorkspaceRoleRequest request);
-    Task<ActionResult> AddRoleToMemberAsync(string id, string userId);
-    Task<ActionResult> RemoveRoleFromMemberAsync(string id, string userId);
-    Task<ActionResult> DeleteAsync(string id);
-    Task<ActionResult<WorkspaceRoleDto>> UpdateAsync(string id, UpdateWorkspaceRoleRequest request);
+    Task<WorkspaceRoleDto> GetByIdAsync(string id);
+    Task<WorkspaceRoleDto> CreateAsync(CreateWorkspaceRoleRequest request);
+    // Task< AddRoleToMemberAsync(string id, string userId);
+    // Task< RemoveRoleFromMemberAsync(string id, string userId);
+    Task<bool> DeleteAsync(string id);
+    Task<WorkspaceRoleDto> UpdateAsync(string id, UpdateWorkspaceRoleRequest request);
 }

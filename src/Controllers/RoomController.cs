@@ -28,7 +28,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<RoomDto>> GetById([FromQuery] string id)
         {
-            return await _roomService.GetByIdAsync(id);
+            var res = await _roomService.GetByIdAsync(id);
+            return Ok(res);
         }
 
         /// <summary>
@@ -42,7 +43,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            return await _roomService.CreateAsync(request);
+            var res = await _roomService.CreateAsync(request);
+            return CreatedAtAction(null, res);
         }
 
         /// <summary>
@@ -50,11 +52,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpDelete("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> Delete([FromQuery] string id)
         {
-            return await _roomService.DeleteAsync(id);
+            var res = await _roomService.DeleteAsync(id);
+            return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Room with id '{id} not found.'"});
         }
 
         /// <summary>
@@ -68,7 +71,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            return await _roomService.UpdateAsync(id, request);
+            var res = await _roomService.UpdateAsync(id, request);
+            return Ok(res);
         }
     }
 }

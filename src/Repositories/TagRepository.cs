@@ -10,7 +10,7 @@ namespace BachelorTherasoftDotnetApi.src.Repositories;
 
 public class TagRepository : BaseMySqlRepository<Tag>, ITagRepository
 {
-    public TagRepository(MySqlDbContext context, IMapper mapper) : base(context, mapper)
+    public TagRepository(MySqlDbContext context) : base(context)
     {
     }
 

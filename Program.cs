@@ -11,7 +11,6 @@ using BachelorTherasoftDotnetApi.src.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using MySqlConnector;       
 using System.Reflection;
 
 
@@ -58,11 +57,8 @@ builder.Services.AddSwaggerGen(o =>
 });
 // MySQL service
 builder.Services.AddDbContext<MySqlDbContext>( 
-    options => options.UseMySql(
-        new MySqlConnection(builder.Configuration.GetConnectionString("MySQL")),
-        new MySqlServerVersion(new Version(8, 0, 38)),
-        options => options.EnableRetryOnFailure()
-));
+    options => options.UseMySQL(builder.Configuration.GetConnectionString("MySQL")!)
+);
 // MongoDB service
 builder.Services.AddDbContext<MongoDbContext>(
     options => options.UseMongoDB(builder.Configuration.GetConnectionString("MongoDB")!, builder.Configuration["MongoDbSettings:DbName"]!)
@@ -80,6 +76,11 @@ builder.Services.AddIdentityApiEndpoints<User>(options => {
     options.Lockout.MaxFailedAccessAttempts = 5;
 }).AddEntityFrameworkStores<MySqlDbContext>();
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "SampleInstance";
+});
 // Email service
 //builder.Services.AddTransient<IEmailSender, EmailSender>();
 //builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
@@ -137,7 +138,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseExceptionHandler("/error");
 app.UseAuthentication();
 
 app.UseAuthorization();

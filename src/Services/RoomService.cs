@@ -2,11 +2,10 @@ using AutoMapper;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
+using BachelorTherasoftDotnetApi.src.Exceptions;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
-using BachelorTherasoftDotnetApi.src.Utils;
-using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
@@ -22,50 +21,38 @@ public class RoomService : IRoomService
         _mapper = mapper;
     }
 
-    public async Task<ActionResult<RoomDto>> CreateAsync(CreateRoomRequest request)
+    public async Task<RoomDto> CreateAsync(CreateRoomRequest request)
     {
-        var res = await _areaRepository.GetEntityByIdAsync(request.AreaId);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        if (res.Data == null) return Response.NotFound(request.AreaId, nameof(res.Data));
+        var area = await _areaRepository.GetEntityByIdAsync(request.AreaId) ?? throw new NotFoundException("Area", request.AreaId);
 
-        var room = new Room(res.Data, request.Name, request.Description) { Area = res.Data };
+        var room = new Room(area, request.Name, request.Description) { Area = area };
 
-        var res2 = await _roomRepository.CreateAsync(room);
-        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
+        await _roomRepository.CreateAsync(room);
 
-        return Response.CreatedAt(_mapper.Map<RoomDto>(room));
+        return _mapper.Map<RoomDto>(room);
     }
 
-    public async Task<ActionResult> DeleteAsync(string id)
+    public async Task<bool> DeleteAsync(string id)
     {
-        var res = await _roomRepository.DeleteAsync(id);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-
-        return Response.NoContent();
+        return await _roomRepository.DeleteAsync(id);
     }
 
-    public async Task<ActionResult<RoomDto>> GetByIdAsync(string id)
+    public async Task<RoomDto> GetByIdAsync(string id)
     {
-        var room = await _roomRepository.GetByIdAsync<RoomDto>(id);
-        if (room == null) return Response.NotFound(id, nameof(room));
+        var room = await _roomRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Room", id);
 
-        return Response.Ok(room);
+        return _mapper.Map<RoomDto>(room);
     }
 
-    public async Task<ActionResult<RoomDto>> UpdateAsync(string id, UpdateRoomRequest request)
+    public async Task<RoomDto> UpdateAsync(string id, UpdateRoomRequest request)
     {
-        if (request.NewName == null && request.NewDescription == null) return Response.BadRequest("At least one field is required.", null);
+        var room = await _roomRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Room", id);
 
-        var res = await _roomRepository.GetEntityByIdAsync(id);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        if (res.Data == null) return Response.NotFound(id, nameof(res.Data));
+        room.Name = request.NewName ?? room.Name;
+        room.Description = request.NewDescription ?? room.Description;
 
-        res.Data.Name = request.NewName ?? res.Data.Name;
-        res.Data.Description = request.NewDescription ?? res.Data.Description;
+        await _roomRepository.UpdateAsync(room);
 
-        var res2 = await _roomRepository.UpdateAsync(res.Data);
-        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
-        
-        return Response.Ok(_mapper.Map<RoomDto>(res.Data));
+        return _mapper.Map<RoomDto>(room);
     }
 }

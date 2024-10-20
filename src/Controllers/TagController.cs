@@ -1,5 +1,3 @@
-using Amazon.Runtime.Internal;
-using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
@@ -26,9 +24,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<TagDto>> GetById([FromQuery] string id)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetById([FromQuery] string id)
         {
-            return await _tagService.GetByIdAsync(id);
+            var tag = await _tagService.GetByIdAsync(id);
+            return Ok(tag);
         }
 
         /// <summary>
@@ -36,13 +36,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPost("")]
         [Authorize]
-        [ProducesResponseType(typeof(TagDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ErrorResponse<string>), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<TagDto>> Create([FromBody] CreateTagRequest request)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Create([FromBody] CreateTagRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-
-            return await _tagService.CreateAsync(request);
+            var res = await _tagService.CreateAsync(request);
+            return CreatedAtAction("Create", res);
         }
 
         /// <summary>
@@ -50,11 +49,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpDelete("")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromQuery] string id)
         {
-            return await _tagService.DeleteAsync(id);
+            var res = await _tagService.DeleteAsync(id);
+            return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Tag with id '{id} not found.'"});
         }
 
         /// <summary>
@@ -64,11 +64,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<TagDto>> Update([FromQuery] string id, [FromBody] UpdateTagRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-
-            return await _tagService.UpdateAsync(id, request);
+            if (request.NewName == null && request.NewDescription == null) return BadRequest(new ProblemDetails(){ Title = "At least one field is required."});
+            var tag = await _tagService.UpdateAsync(id, request);
+            return Ok(tag);
         }
     }
 }

@@ -2,6 +2,7 @@ using AutoMapper;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
+using BachelorTherasoftDotnetApi.src.Exceptions;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
@@ -25,89 +26,76 @@ public class WorkspaceRoleService : IWorkspaceRoleService
         _mapper = mapper;
     }
 
-    public async Task<ActionResult> AddRoleToMemberAsync(string id, string userId)
-    {
-        var res = await _workspaceRoleRepository.GetEntityByIdAsync(id);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        if (res.Data == null) return Response.NotFound(id, "WorkspaceRole");
+    // public async Task<ActionResult> AddRoleToMemberAsync(string id, string userId)
+    // {
+    //     var workspaceRole = await _workspaceRoleRepository.GetEntityByIdAsync(id);
+    //     if (workspace == null) return Response.NotFound(id, "WorkspaceRole");
 
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user == null) return Response.NotFound(userId, "User");
+    //     var user = await _userManager.FindByIdAsync(userId);
+    //     if (user == null) return Response.NotFound(userId, "User");
 
 
-        if (!res.Data.Users.Contains(user))
-        {
-            res.Data.Users.Add(user);
-            var res2 = await _workspaceRoleRepository.UpdateAsync(res.Data);
-            if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
+    //     if (!workspace.Users.Contains(user))
+    //     {
+    //         workspace.Users.Add(user);
+    //         var res2 = await _workspaceRoleRepository.UpdateAsync(workspace);
+    //         if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
             
-            return Response.Ok("Successfully added role to member.");
-        }
-        return Response.BadRequest("Member already has this role.", null);
+    //         return Response.Ok("Successfully added role to member.");
+    //     }
+    //     return Response.BadRequest("Member already has this role.", null);
+    // }
+
+    public async Task<WorkspaceRoleDto> CreateAsync(CreateWorkspaceRoleRequest request)
+    {
+        var workspace = await _workspaceRepository.GetEntityByIdAsync(request.WorkspaceId) ?? throw new NotFoundException("Workspace", request.WorkspaceId);
+
+        var workspaceRole = new WorkspaceRole(workspace, request.Name, request.Description) { Workspace = workspace };
+
+        await _workspaceRoleRepository.CreateAsync(workspaceRole);
+
+        return _mapper.Map<WorkspaceRoleDto>(workspaceRole);
     }
 
-    public async Task<ActionResult<WorkspaceRoleDto>> CreateAsync(CreateWorkspaceRoleRequest request)
+    public async Task<bool> DeleteAsync(string id)
     {
-        var res = await _workspaceRepository.GetEntityByIdAsync(request.WorkspaceId);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        if (res.Data == null) return Response.NotFound(request.WorkspaceId, "Workspace");
-
-        var workspaceRole = new WorkspaceRole(res.Data, request.Name, request.Description) { Workspace = res.Data };
-
-        var res2 = await _workspaceRoleRepository.CreateAsync(workspaceRole);
-        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
-
-        return Response.CreatedAt(_mapper.Map<WorkspaceRoleDto>(workspaceRole));
+        return await _workspaceRoleRepository.DeleteAsync(id);
     }
 
-    public async Task<ActionResult> DeleteAsync(string id)
+    public async Task<WorkspaceRoleDto> GetByIdAsync(string id)
     {
-        var res = await _workspaceRoleRepository.DeleteAsync(id);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        return Response.NoContent();
+        var workspaceRole = await _workspaceRoleRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("WorkspaceRole", id);
+
+        return _mapper.Map<WorkspaceRoleDto>(workspaceRole);
     }
 
-    public async Task<ActionResult<WorkspaceRoleDto>> GetByIdAsync(string id)
+    // public async Task<ActionResult> RemoveRoleFromMemberAsync(string id, string userId)
+    // {
+    //     var workspaceRole = await _workspaceRoleRepository.GetEntityByIdAsync(id); // TODO a changer par une requete qui join les users
+    //     if (workspaceRole == null) return Response.NotFound(id, "WorkspaceRole");
+
+    //     var user = await _userManager.FindByIdAsync(userId);
+    //     if (user == null )return Response.NotFound(userId, "User");
+
+    //     var isContained = res.Data.Users.Remove(user);
+    //     if (isContained) {
+    //         var res2 = await _workspaceRoleRepository.UpdateAsync(res.Data);
+    //         if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
+
+    //         return Response.Ok("Successfully removed role from member.");
+    //     }
+    //     return Response.BadRequest("Member does not have this role.", null);
+    // }
+
+    public async Task<WorkspaceRoleDto> UpdateAsync(string id, UpdateWorkspaceRoleRequest request)
     {
-        var workspaceRole = await _workspaceRoleRepository.GetByIdAsync<WorkspaceRoleDto>(id);
-        if (workspaceRole == null) return Response.NotFound(id, "WorkspaceRole");
+        var workspaceRole = await _workspaceRoleRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("WorkspaceRole", id);
 
-        return Response.Ok(workspaceRole);
-    }
+        workspaceRole.Name = request.NewName ?? workspaceRole.Name;
+        workspaceRole.Description = request.NewDescription ?? workspaceRole.Description;
 
-    public async Task<ActionResult> RemoveRoleFromMemberAsync(string id, string userId)
-    {
-        var res = await _workspaceRoleRepository.GetEntityByIdAsync(id); // TODO a changer par une requete qui join les users
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        if (res.Data == null) return Response.NotFound(id, "WorkspaceRole");
+        await _workspaceRoleRepository.UpdateAsync(workspaceRole);
 
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user == null )return Response.NotFound(userId, "User");
-
-        var isContained = res.Data.Users.Remove(user);
-        if (isContained) {
-            var res2 = await _workspaceRoleRepository.UpdateAsync(res.Data);
-            if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
-
-            return Response.Ok("Successfully removed role from member.");
-        }
-        return Response.BadRequest("Member does not have this role.", null);
-    }
-
-    public async Task<ActionResult<WorkspaceRoleDto>> UpdateAsync(string id, UpdateWorkspaceRoleRequest request)
-    {
-        if (request.NewName == null && request.NewDescription == null) return Response.BadRequest("At least one field is required.", null);
-
-        var res = await _workspaceRoleRepository.GetEntityByIdAsync(id);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        if (res.Data == null ) return Response.NotFound(id,"Workspace Role");
-
-        res.Data.Name = request.NewName ?? res.Data.Name;
-        res.Data.Description = request.NewDescription ?? res.Data.Description;
-
-        var res2 = await _workspaceRoleRepository.UpdateAsync(res.Data);
-        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
-
-        return Response.Ok(_mapper.Map<WorkspaceRoleDto>(res.Data));
+        return _mapper.Map<WorkspaceRoleDto>(workspaceRole);
     }
 }

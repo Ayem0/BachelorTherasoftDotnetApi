@@ -2,12 +2,11 @@ using AutoMapper;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
+using BachelorTherasoftDotnetApi.src.Exceptions;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
-using BachelorTherasoftDotnetApi.src.Utils;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
@@ -23,77 +22,62 @@ public class WorkspaceService : IWorkspaceService
         _mapper = mapper;
     }
 
-    public async Task<ActionResult<WorkspaceDto>> GetByIdAsync(string id)
+    public async Task<WorkspaceDto> GetByIdAsync(string id)
     {
-        var workspace = await _workspaceRepository.GetByIdAsync<WorkspaceDto>(id);
-        if (workspace == null) return Response.NotFound(id, "Workspace");
+        var workspace = await _workspaceRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Workspace", id);
 
-        return Response.Ok(workspace);
+        return _mapper.Map<WorkspaceDto>(workspace);
     }
 
-    public async Task<ActionResult<WorkspaceDetailsDto>> GetDetailsByIdAsync(string id)
+    public async Task<WorkspaceDetailsDto> GetDetailsByIdAsync(string id)
     {
-        var workspace = await _workspaceRepository.GetByIdAsync<WorkspaceDetailsDto>(id);
-        if (workspace == null) return Response.NotFound(id, "Workspace");
+        var workspace = await _workspaceRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Workspace", id);
 
-        return Response.Ok(workspace);
+        return _mapper.Map<WorkspaceDetailsDto>(workspace);
     }
 
-    public async Task<ActionResult<WorkspaceDto>> CreateAsync(string userId, CreateWorkspaceRequest request)
+    public async Task<WorkspaceDto> CreateAsync(string userId, CreateWorkspaceRequest request)
     {
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user == null) return Response.NotFound(userId, "User");
+        var user = await _userManager.FindByIdAsync(userId) ?? throw new NotFoundException("User", userId);
 
         var workspace = new Workspace(request.Name, request.Description);
-        var workspaceUser = new WorkspaceUser(user, workspace) { User = user, Workspace = workspace };
 
-        workspace.Users.Add(workspaceUser);
+        workspace.Users.Add(user);
 
-        var res = await _workspaceRepository.CreateAsync(workspace);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
+        await _workspaceRepository.CreateAsync(workspace);
 
-        return Response.CreatedAt(_mapper.Map<WorkspaceDto>(workspace));
+        return _mapper.Map<WorkspaceDto>(workspace);
     }
 
-    public async Task<ActionResult> RemoveMemberAsync(string id, string userId)
+    // public async Task<ActionResult> RemoveMemberAsync(string id, string userId)
+    // {
+    //     var workspace = await _workspaceRepository.GetEntityByIdAsync(id);
+    //     if (workspace == null) return Response.NotFound(id, "Workspace");
+
+    //     var workspaceUser = workspace.Users.Where(x => x.UserId == userId).First();
+    //     if (workspaceUser == null) return Response.NotFound(userId, "User");
+
+    //     workspaceUser.DeletedAt = DateTime.Now;
+
+    //     var res2 = await _workspaceRepository.UpdateAsync(workspace);
+
+    //     return Response.Ok("Successfully removed member.");
+    // }
+
+    public async Task<bool> DeleteAsync(string id)
     {
-        var res = await _workspaceRepository.GetEntityByIdAsync(id);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        if (res.Data == null) return Response.NotFound(id, "Workspace");
-
-        var workspaceUser = res.Data.Users.Where(x => x.UserId == userId).First();
-        if (workspaceUser == null) return Response.NotFound(userId, "User");
-
-        workspaceUser.DeletedAt = DateTime.Now;
-
-        var res2 = await _workspaceRepository.UpdateAsync(res.Data);
-        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
-
-        return Response.Ok("Successfully removed member.");
+        return await _workspaceRepository.DeleteAsync(id);
     }
 
-    public async Task<ActionResult> DeleteAsync(string id)
+    public async Task<WorkspaceDto> UpdateAsync(string id, UpdateWorkspaceRequest req)
     {
-        var res = await _workspaceRepository.DeleteAsync(id);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        
-        return Response.NoContent();
-    }
+        var workspace = await _workspaceRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Workspace", id);
 
-    public async Task<ActionResult<WorkspaceDto>> UpdateAsync(string id, UpdateWorkspaceRequest request)
-    {
-        if (request.NewName == null && request.NewDescription == null) return new BadRequestObjectResult("At least one field is required.");
-        
-        var res = await _workspaceRepository.GetEntityByIdAsync(id);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        if (res.Data == null ) return new NotFoundObjectResult("Workspace not found.");
+        workspace.Name = req.NewName ?? workspace.Name;
+        workspace.Description = req.NewDescription ?? workspace.Description;
 
-        res.Data.Name = request.NewName ?? res.Data.Name;
-        res.Data.Description = request.NewDescription ?? res.Data.Description;
+        await _workspaceRepository.UpdateAsync(workspace);
 
-        var res2 = await _workspaceRepository.UpdateAsync(res.Data);
-        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
-
-        return Response.Ok(_mapper.Map<WorkspaceDto>(res.Data));
+        return _mapper.Map<WorkspaceDto>(workspace);
     }
 }

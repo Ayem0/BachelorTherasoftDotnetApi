@@ -4,5 +4,6 @@ public enum Status
 {
     Pending = 0,
     Accepted = 1,
-    Canceled = 2
+    Canceled = 2,
+    Refused = 3
 }

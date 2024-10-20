@@ -1,10 +1,11 @@
 using AutoMapper;
+using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
+using BachelorTherasoftDotnetApi.src.Dtos.Update;
+using BachelorTherasoftDotnetApi.src.Exceptions;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
-using BachelorTherasoftDotnetApi.src.Utils;
-using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 // TODO voir si mettre les areas dans le LocationDto
@@ -20,54 +21,40 @@ public class LocationService : ILocationService
         _mapper = mapper;
     }
 
-    public async Task<ActionResult<LocationDto>> GetByIdAsync(string id)
+    public async Task<LocationDto?> GetByIdAsync(string id)
     {
-        var location = await _locationRepository.GetByIdAsync<LocationDto>(id);
-        if (location == null) return Response.NotFound(id, "Location");
+        var location = await _locationRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Location", id);
 
-        return Response.Ok(location);
+        return location != null ? _mapper.Map<LocationDto>(location) : null;
     }
 
-    public async Task<ActionResult> DeleteAsync(string id)
+    public async Task<bool> DeleteAsync(string id)
     {
-        var res = await _locationRepository.DeleteAsync(id);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        
-        return Response.NoContent();
+        return await _locationRepository.DeleteAsync(id);
     }
 
-    public async Task<ActionResult<LocationDto>> CreateAsync(string workspaceId, string name, string? description, string? address, string? city, string? country)
+    public async Task<LocationDto> CreateAsync(CreateLocationRequest req)
     {
-        var res = await _workspaceRepository.GetEntityByIdAsync(workspaceId);
-        if(!res.Success) return Response.BadRequest(res.Message, res.Details);
-        if (res.Data == null) return Response.NotFound(workspaceId, "Workspace");
+        var workspace = await _workspaceRepository.GetEntityByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
 
-        var location = new Location(res.Data, name, description, address, city, country) { Workspace = res.Data };
+        var location = new Location(workspace, req.Name, req.Description, req.Address, req.City, req.Country) { Workspace = workspace };
+        await _locationRepository.CreateAsync(location);
 
-        var res2 = await _locationRepository.CreateAsync(location);
-        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
-
-        return Response.CreatedAt(_mapper.Map<LocationDto>(location));
+        return _mapper.Map<LocationDto>(location);
     }
 
-    public async Task<ActionResult<LocationDto>> UpdateAsync(string id, string? newName, string? newDescription, string? newAddress, string? newCity, string? newCountry)
-    {
-        if (newName == null && newDescription == null && newAddress == null && newCity == null && newCountry == null) 
-            return Response.BadRequest("At least one field is required.", null);
-            
-        var res = await _locationRepository.GetEntityByIdAsync(id);
-        if (!res.Success) return Response.BadRequest(res.Message, res.Details);
-        if (res.Data == null ) return Response.NotFound(id, "Location");
+    public async Task<LocationDto> UpdateAsync(string id, UpdateLocationRequest req)
+    {       
+        var location = await _locationRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Location", id);
 
-        res.Data.Name = newName ?? res.Data.Name;
-        res.Data.Description = newDescription ?? res.Data.Description;
-        res.Data.Address = newAddress ?? res.Data.Address;
-        res.Data.City = newCity ?? res.Data.Name;
-        res.Data.Country = newCountry ?? res.Data.Country;
+        location.Name = req.NewName ?? location.Name;
+        location.Description = req.NewDescription ?? location.Description;
+        location.Address = req.NewAddress ?? location.Address;
+        location.City = req.NewCity ?? location.Name;
+        location.Country = req.NewCountry ?? location.Country;
 
-        var res2 = await _locationRepository.UpdateAsync(res.Data);
-        if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
+        await _locationRepository.UpdateAsync(location);
 
-        return Response.Ok(_mapper.Map<LocationDto>(res.Data));
+        return _mapper.Map<LocationDto>(location);
     }
 }

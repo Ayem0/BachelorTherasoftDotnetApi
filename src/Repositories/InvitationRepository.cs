@@ -10,7 +10,7 @@ namespace BachelorTherasoftDotnetApi.src.Repositories;
 
 public class InvitationRepository : BaseMySqlRepository<Invitation>, IInvitationRepository
 {
-    public InvitationRepository(MySqlDbContext context, IMapper mapper) : base(context, mapper)
+    public InvitationRepository(MySqlDbContext context) : base(context)
     {
     }
     public async Task<List<Invitation>> GetByReceiverUserIdAsync(string userId)

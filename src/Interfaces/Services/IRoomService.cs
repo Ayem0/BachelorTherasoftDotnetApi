@@ -10,8 +10,8 @@ namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 
 public interface IRoomService
 {
-    Task<ActionResult<RoomDto>> GetByIdAsync(string id);
-    Task<ActionResult<RoomDto>> CreateAsync(CreateRoomRequest request);
-    Task<ActionResult> DeleteAsync(string id);
-    Task<ActionResult<RoomDto>> UpdateAsync(string id, UpdateRoomRequest request);
+    Task<RoomDto> GetByIdAsync(string id);
+    Task<RoomDto> CreateAsync(CreateRoomRequest request);
+    Task<bool> DeleteAsync(string id);
+    Task<RoomDto> UpdateAsync(string id, UpdateRoomRequest request);
 }

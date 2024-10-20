@@ -8,7 +8,7 @@ namespace BachelorTherasoftDotnetApi.src.Repositories;
 
 public class ParticipantCategoryRepository : BaseMySqlRepository<ParticipantCategory>, IParticipantCategoryRepository
 {
-    public ParticipantCategoryRepository(MySqlDbContext context, IMapper mapper) : base(context, mapper)
+    public ParticipantCategoryRepository(MySqlDbContext context) : base(context)
     {
     }
 }

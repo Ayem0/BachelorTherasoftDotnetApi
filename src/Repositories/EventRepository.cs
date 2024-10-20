@@ -9,7 +9,7 @@ namespace BachelorTherasoftDotnetApi.src.Repositories;
 
 public class EventRepository : BaseMySqlRepository<Event>, IEventRepository
 {
-    public EventRepository(MySqlDbContext context, IMapper mapper) : base(context, mapper)
+    public EventRepository(MySqlDbContext context) : base(context)
     {
     }
 
