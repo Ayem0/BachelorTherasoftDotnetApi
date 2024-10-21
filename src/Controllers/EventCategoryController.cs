@@ -24,7 +24,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<EventCategoryDto>> GetById([FromQuery] string id)
+        public async Task<IActionResult> GetById([FromQuery] string id)
         {
             var res = await _eventCategoryService.GetByIdAsync(id);
             return Ok(res);
@@ -37,7 +37,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<EventCategoryDto>> Create([FromBody] CreateEventCategoryRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateEventCategoryRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
@@ -65,7 +65,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<EventCategoryDto>> Update([FromQuery] string id, [FromBody] UpdateEventCategoryRequest request)
+        public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateEventCategoryRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 

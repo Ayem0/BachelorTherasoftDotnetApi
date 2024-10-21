@@ -26,7 +26,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<AreaDto>> GetById([FromQuery] string id)
+        public async Task<IActionResult> GetById([FromQuery] string id)
         {
             var res =  await _areaService.GetByIdAsync(id);
             return Ok(res);
@@ -38,7 +38,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [HttpPost("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult<AreaDto>> Create([FromBody] CreateAreaRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateAreaRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
@@ -54,7 +54,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> Delete([FromQuery] string id)
+        public async Task<IActionResult> Delete([FromQuery] string id)
         {
             var res = await _areaService.DeleteAsync(id);
             return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Area with id '{id} not found.'"});
@@ -67,7 +67,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<AreaDto>> Update([FromQuery] string id, [FromBody] UpdateAreaRequest request)
+        public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateAreaRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 

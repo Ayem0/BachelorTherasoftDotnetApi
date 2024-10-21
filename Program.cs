@@ -138,7 +138,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseExceptionHandler("/error");
+app.UseExceptionHandler("/Api/Error");
 app.UseAuthentication();
 
 app.UseAuthorization();

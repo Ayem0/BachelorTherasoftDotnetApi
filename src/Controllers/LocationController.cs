@@ -24,7 +24,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<LocationDto>> GetById([FromQuery] string id)
+        public async Task<IActionResult> GetById([FromQuery] string id)
         {
             var res = await _locationService.GetByIdAsync(id);
             return Ok(res);
@@ -37,7 +37,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<LocationDto>> Create([FromBody] CreateLocationRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateLocationRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
@@ -66,7 +66,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<LocationDto>> Update([FromQuery] string id, [FromBody] UpdateLocationRequest request)
+        public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateLocationRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 

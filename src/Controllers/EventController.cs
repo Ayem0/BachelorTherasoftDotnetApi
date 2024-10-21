@@ -23,7 +23,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<EventDto>> GetById([FromQuery] string id)
+        public async Task<IActionResult> GetById([FromQuery] string id)
         {
             var res =  await _eventService.GetByIdAsync(id);
             return Ok(res);
@@ -36,7 +36,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<EventDto>> Create([FromBody] CreateEventRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateEventRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
@@ -51,7 +51,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> Delete([FromQuery] string id)
+        public async Task<IActionResult> Delete([FromQuery] string id)
         {
             var res =  await _eventService.DeleteAsync(id);
             return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Event with id '{id} not found.'"});
@@ -65,7 +65,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<EventDto>> Update([FromQuery] string id, [FromBody] UpdateEventRequest request)
+        public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateEventRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
@@ -80,7 +80,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<List<EventDto>>> CreateWithRepetition([FromBody] CreateEventWithRepetitionRequest request)
+        public async Task<IActionResult> CreateWithRepetition([FromBody] CreateEventWithRepetitionRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 

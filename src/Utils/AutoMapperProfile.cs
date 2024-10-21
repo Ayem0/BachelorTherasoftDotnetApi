@@ -37,5 +37,8 @@ public class AutoMapperProfile : Profile
         CreateMap<WorkspaceRole, WorkspaceRoleDto>();
         CreateMap<Tag, TagDto>();
         CreateMap<User, UserDto>();
+        CreateMap<Area, AreaDto>();
+        CreateMap<Room, RoomDto>();
+        CreateMap<Event, EventDto>();
     }
 }

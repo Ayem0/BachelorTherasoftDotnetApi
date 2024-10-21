@@ -22,7 +22,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [HttpGet("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<SlotDto>> GetById([FromQuery] string id)
+        public async Task<IActionResult> GetById([FromQuery] string id)
         {
             var res = await _SlotService.GetByIdAsync(id);
             return Ok(res);
@@ -34,7 +34,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [HttpPost("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created / StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<SlotDto>> Create([FromBody] CreateSlotRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateSlotRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
@@ -63,7 +63,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<List<SlotDto>>> CreateWithRepetition([FromBody] CreateSlotWithRepetitionRequest request)
+        public async Task<IActionResult> CreateWithRepetition([FromBody] CreateSlotWithRepetitionRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 

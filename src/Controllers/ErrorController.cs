@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("Api/[controller]")]
     [ApiController]
     public class ErrorController : ControllerBase
     {
-        [Route("/error")]
+        [HttpPost("")]
         public IActionResult HandleError()
         {
             var context = HttpContext.Features.Get<IExceptionHandlerFeature>();
