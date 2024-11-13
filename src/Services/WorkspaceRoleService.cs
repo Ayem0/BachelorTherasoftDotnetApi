@@ -48,7 +48,7 @@ public class WorkspaceRoleService : IWorkspaceRoleService
 
     public async Task<WorkspaceRoleDto> CreateAsync(CreateWorkspaceRoleRequest request)
     {
-        var workspace = await _workspaceRepository.GetEntityByIdAsync(request.WorkspaceId) ?? throw new NotFoundException("Workspace", request.WorkspaceId);
+        var workspace = await _workspaceRepository.GetByIdAsync(request.WorkspaceId) ?? throw new NotFoundException("Workspace", request.WorkspaceId);
 
         var workspaceRole = new WorkspaceRole(workspace, request.Name, request.Description) { Workspace = workspace };
 

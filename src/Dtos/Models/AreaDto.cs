@@ -10,9 +10,5 @@ public class AreaDto
     [Required]
     public required string Name { get; set; }
     public string? Description { get; set; }
-}
-
-public class AreaWithRoomsDto : AreaDto
-{
     public List<RoomDto> Rooms { get; set; } = [];
 }

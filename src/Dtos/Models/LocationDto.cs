@@ -14,6 +14,5 @@ public class LocationDto
     public string? City { get; set; }
     public string? Country { get; set; }
 
-    // [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    // public List<AreaDto>? Areas { get; set; }
+    public List<AreaDto> Areas { get; set; } = [];
 }

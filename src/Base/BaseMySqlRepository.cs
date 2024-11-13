@@ -57,7 +57,7 @@ public class BaseMySqlRepository<T> : IBaseRepository<T> where T : BaseModel
     {
         try
         {
-            entity.CreatedAt = DateTime.Now;
+            entity.CreatedAt = DateTime.UtcNow;
             _dbSet.Add(entity);
 
             await _context.SaveChangesAsync();
@@ -73,7 +73,7 @@ public class BaseMySqlRepository<T> : IBaseRepository<T> where T : BaseModel
     {
         try
         {
-            entity.UpdatedAt = DateTime.Now;
+            entity.UpdatedAt = DateTime.UtcNow;
             _dbSet.Update(entity);
 
             await _context.SaveChangesAsync();
@@ -89,7 +89,7 @@ public class BaseMySqlRepository<T> : IBaseRepository<T> where T : BaseModel
     {
         try
         {
-            var res = await _dbSet.Where(x => x.Id == id && x.DeletedAt == null).ExecuteUpdateAsync(x => x.SetProperty(x => x.DeletedAt, DateTime.Now));
+            var res = await _dbSet.Where(x => x.Id == id && x.DeletedAt == null).ExecuteUpdateAsync(x => x.SetProperty(x => x.DeletedAt, DateTime.UtcNow));
             return res > 0;
 
         }
@@ -106,7 +106,7 @@ public class BaseMySqlRepository<T> : IBaseRepository<T> where T : BaseModel
         {
             foreach (var entity in entities)
             {
-                entity.CreatedAt = DateTime.Now;
+                entity.CreatedAt = DateTime.UtcNow;
             }
 
             _dbSet.AddRange(entities);

@@ -35,7 +35,7 @@ public class LocationService : ILocationService
 
     public async Task<LocationDto> CreateAsync(CreateLocationRequest req)
     {
-        var workspace = await _workspaceRepository.GetEntityByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
+        var workspace = await _workspaceRepository.GetByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
 
         var location = new Location(workspace, req.Name, req.Description, req.Address, req.City, req.Country) { Workspace = workspace };
         await _locationRepository.CreateAsync(location);

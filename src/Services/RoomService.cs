@@ -39,14 +39,14 @@ public class RoomService : IRoomService
 
     public async Task<RoomDto> GetByIdAsync(string id)
     {
-        var room = await _roomRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Room", id);
+        var room = await _roomRepository.GetByIdAsync(id) ?? throw new NotFoundException("Room", id);
 
         return _mapper.Map<RoomDto>(room);
     }
 
     public async Task<RoomDto> UpdateAsync(string id, UpdateRoomRequest request)
     {
-        var room = await _roomRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Room", id);
+        var room = await _roomRepository.GetByIdAsync(id) ?? throw new NotFoundException("Room", id);
 
         room.Name = request.NewName ?? room.Name;
         room.Description = request.NewDescription ?? room.Description;

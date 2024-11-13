@@ -32,7 +32,7 @@ public class EventService : IEventService
 
     public async Task<EventDto?> CreateAsync(CreateEventRequest req)
     {
-        var room = await _roomRepository.GetEntityByIdAsync(req.RoomId) ?? throw new NotFoundException("Room", req.RoomId);
+        var room = await _roomRepository.GetDetailsByIdAsync(req.RoomId) ?? throw new NotFoundException("Room", req.RoomId);
 
         var eventCategory = await _eventCategoryRepository.GetEntityByIdAsync(req.EventCategoryId) ?? throw new NotFoundException("EventCategory", req.EventCategoryId);
 
@@ -61,7 +61,7 @@ public class EventService : IEventService
         };
         var canAdd = CanAddEvent(room, eventToAdd);
         // TODO faire en sorte de retourner si c'est un probleme de slot ou un probleme d'event
-        if (!canAdd) return null;
+        if (!canAdd) throw new BadRequestException("Cannot add event.", "Cannot add event.");
 
         await _eventRepository.CreateAsync(eventToAdd);
 
@@ -86,7 +86,7 @@ public class EventService : IEventService
 
         if (req.NewRoomId != null)
         {
-            var room = await _roomRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Room", req.NewRoomId);
+            var room = await _roomRepository.GetByIdAsync(id) ?? throw new NotFoundException("Room", req.NewRoomId);
 
             eventToUpdate.Room = room;
             eventToUpdate.RoomId = room.Id;
@@ -186,7 +186,7 @@ public class EventService : IEventService
 
     public async Task<List<EventDto>?> CreateWithRepetitionAsync(CreateEventWithRepetitionRequest request)
     {
-        var room = await _roomRepository.GetEntityByIdAsync(request.RoomId);
+        var room = await _roomRepository.GetDetailsByIdAsync(request.RoomId);
         if (room == null) return null;
 
         var eventCategory = await _eventCategoryRepository.GetEntityByIdAsync(request.EventCategoryId);

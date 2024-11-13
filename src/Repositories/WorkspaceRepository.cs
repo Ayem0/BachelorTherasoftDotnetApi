@@ -1,35 +1,105 @@
 using BachelorTherasoftDotnetApi.src.Models;
 using BachelorTherasoftDotnetApi.src.Databases;
-using Microsoft.EntityFrameworkCore;
-using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
-using AutoMapper;
-using BachelorTherasoftDotnetApi.src.Dtos.Models;
+using Microsoft.EntityFrameworkCore;
+using BachelorTherasoftDotnetApi.src.Exceptions;
+using BachelorTherasoftDotnetApi.src.Enums;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
 
-public class WorkspaceRepository : BaseMySqlRepository<Workspace>, IWorkspaceRepository
+public class WorkspaceRepository : IWorkspaceRepository
 {
-    public WorkspaceRepository(MySqlDbContext context) : base(context)
+    private readonly MySqlDbContext _context;
+    public WorkspaceRepository(MySqlDbContext context) 
     {
+        _context = context;
     }
 
-    // public async Task<WorkspaceDetailsDto?> GetDetailsByIdAsync(string id)
-    // {
-    //     Workspace? workspace = await _context.Workspace
-    //         .Include(wu => wu.Users)
-    //             .ThenInclude(wu => wu.User)
-    //         .Include(w => w.WorkspaceRoles)
-    //         .Include(w => w.Participants)
-    //         .Include(w => w.ParticipantCategories)
-    //         .Include(w => w.EventCategories)
-    //         .Include(w => w.Locations)
-    //         .Include(w => w.Slots)
-    //         .Include(w => w.Tags)
-    //         .Where(w => w.Id == id && w.DeletedAt == null && w.Users.All(u => u.DeletedAt == null && u.User.DeletedAt == null) && w.WorkspaceRoles.All(wr => wr.DeletedAt == null) 
-    //             && w.Participants.All(wr => wr.DeletedAt == null) && w.ParticipantCategories.All(wr => wr.DeletedAt == null) && w.EventCategories.All(wr => wr.DeletedAt == null) 
-    //             && w.Locations.All(wr => wr.DeletedAt == null) && w.Slots.All(wr => wr.DeletedAt == null) && w.Tags.All(wr => wr.DeletedAt == null))
-    //         .FirstOrDefaultAsync();
-    //     return workspace != null ? _mapper.Map<WorkspaceDetailsDto>(workspace) : null;
-    // }
+    public async Task<Workspace> CreateAsync(Workspace workspace)
+    {
+        try
+        {    
+            workspace.CreatedAt = DateTime.UtcNow;
+            _context.Workspace.Add(workspace);
+            var res = await _context.SaveChangesAsync();
+            return workspace ?? throw new DbException(DbAction.Create, "Workspace");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating workspace : {ex.Message}");
+            throw new DbException(DbAction.Create, "Workspace");
+        }   
+    }
+
+    public async Task<bool> DeleteAsync(string id)
+    {
+        try
+        {    
+            var res = await _context.Workspace
+                .Where(x => x.Id == id && x.DeletedAt == null)
+                .ExecuteUpdateAsync(x => x.SetProperty(x => x.DeletedAt, DateTime.UtcNow));
+            
+            return res > 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting workspace with Id '{id}' : {ex.Message}");
+            throw new DbException(DbAction.Delete, "Workspace", id);
+        }   
+    }
+
+    public async Task<Workspace?> GetByIdAsync(string id)
+    {
+        try
+        {    
+            return await _context.Workspace
+                .Where(x => x.Id == id && x.DeletedAt == null)
+                .FirstOrDefaultAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting workspace with Id '{id}' : {ex.Message}");
+            throw new DbException(DbAction.Read, "Workspace", id);
+        }   
+    }
+
+    public async Task<Workspace?> GetDetailsByIdAsync(string id)
+    {
+        try
+        {    
+            return await _context.Workspace
+                .Include(x => x.Users.Where(y => y.DeletedAt == null))
+                .Include(x => x.Locations.Where(y => y.DeletedAt == null))
+                    .ThenInclude(x => x.Areas.Where(y => y.DeletedAt == null))
+                        .ThenInclude(x => x.Rooms.Where(y => y.DeletedAt == null))
+                .Include(x => x.WorkspaceRoles.Where(y => y.DeletedAt == null))
+                .Include(x => x.Tags.Where(y => y.DeletedAt == null))
+                .Include(x => x.EventCategories.Where(y => y.DeletedAt == null))
+                .Include(x => x.Slots.Where(y => y.DeletedAt == null))
+                .Include(x => x.Participants.Where(y => y.DeletedAt == null))
+                .Include(x => x.ParticipantCategories.Where(y => y.DeletedAt == null))
+                .Where(x => x.Id == id && x.DeletedAt == null)
+                .FirstOrDefaultAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting workspace with Id '{id}' : {ex.Message}");
+            throw new DbException(DbAction.Read, "Workspace", id);
+        }   
+    }
+
+    public async Task<Workspace> UpdateAsync(Workspace workspace)
+    {
+        try
+        {    
+            workspace.UpdatedAt = DateTime.UtcNow;
+            var res = await _context.SaveChangesAsync();
+            return res > 0 ? workspace : throw new DbException(DbAction.Update, "Workspace", workspace.Id);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating workspace with Id '{workspace.Id}' : {ex.Message}");
+            throw new DbException(DbAction.Update, "Workspace", workspace.Id);
+        }   
+    }
 }

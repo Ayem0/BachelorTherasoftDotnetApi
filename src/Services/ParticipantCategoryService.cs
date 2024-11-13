@@ -23,7 +23,7 @@ public class ParticipantCategoryService : IParticipantCategoryService
 
     public async Task<ParticipantCategoryDto> CreateAsync(CreateParticipantCategoryRequest request)
     {
-        var workspace = await _workspaceRepository.GetEntityByIdAsync(request.WorkspaceId) ?? throw new NotFoundException("Workspace", request.WorkspaceId);
+        var workspace = await _workspaceRepository.GetByIdAsync(request.WorkspaceId) ?? throw new NotFoundException("Workspace", request.WorkspaceId);
         var participantCategory = new ParticipantCategory(workspace, request.Name, request.Icon) { Workspace = workspace };
 
         await _participantCategoryRepository.CreateAsync(participantCategory);

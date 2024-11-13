@@ -92,7 +92,7 @@ public class InvitationService : IInvitationService
 
         var receiver = await _userManager.FindByIdAsync(receiverId) ?? throw new NotFoundException("User", receiverId);
 
-        var workspace = await _workspaceRepository.GetEntityByIdAsync(workspaceId) ?? throw new NotFoundException("Workspace", workspaceId);
+        var workspace = await _workspaceRepository.GetByIdAsync(workspaceId) ?? throw new NotFoundException("Workspace", workspaceId);
 
         var existingInvitation = await _invitationRepository.GetEntityByIdAsync(workspaceId + "_" + receiverId);
         if (existingInvitation != null) throw new NotFoundException("Invitation", senderId); // TODO a changer

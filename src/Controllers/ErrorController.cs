@@ -30,6 +30,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
                     problemDetails.Status = StatusCodes.Status500InternalServerError;
                     problemDetails.Title = "An unexpected error occurred. Try again.";
                     break;
+
+                case BadRequestException badRequestException:
+                    problemDetails.Status = StatusCodes.Status400BadRequest;
+                    problemDetails.Title = badRequestException.Title;
+                    problemDetails.Detail = badRequestException.Details;
+                    break;
             }
 
             return StatusCode(problemDetails.Status.Value, problemDetails);

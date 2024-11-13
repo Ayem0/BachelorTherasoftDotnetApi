@@ -23,7 +23,7 @@ public class TagService : ITagService
 
     public async Task<TagDto> CreateAsync(CreateTagRequest request)
     {
-        var workspace = await _workspaceRepository.GetEntityByIdAsync(request.WorkspaceId) ?? throw new NotFoundException("Workspace", request.WorkspaceId);
+        var workspace = await _workspaceRepository.GetByIdAsync(request.WorkspaceId) ?? throw new NotFoundException("Workspace", request.WorkspaceId);
 
         var tag = new Tag(workspace, request.Name, request.Icon, request.Description){ Workspace = workspace };
         

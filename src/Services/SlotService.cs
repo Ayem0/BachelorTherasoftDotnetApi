@@ -35,7 +35,7 @@ public class SlotService : ISlotService
 
     public async Task<SlotDto> CreateAsync(CreateSlotRequest request)
     {
-        var workspace = await _workspaceRepository.GetEntityByIdAsync(request.WorkspaceId) ?? throw new NotFoundException("Workspace", request.WorkspaceId);
+        var workspace = await _workspaceRepository.GetByIdAsync(request.WorkspaceId) ?? throw new NotFoundException("Workspace", request.WorkspaceId);
 
         List<EventCategory> eventCategories = [];
         if (request.EventCategoryIds != null)
@@ -78,7 +78,7 @@ public class SlotService : ISlotService
     // TODO voir si faire AddRoomToSlot plutot
     public async Task<bool> AddSlotToRoom(string slotId, string roomId)
     {
-        var room = await _roomRepository.GetEntityByIdAsync(roomId) ?? throw new NotFoundException("Room", roomId);
+        var room = await _roomRepository.GetDetailsByIdAsync(roomId) ?? throw new NotFoundException("Room", roomId);
 
         var slot = await _slotRepository.GetEntityByIdAsync(slotId) ?? throw new NotFoundException("Slot", slotId);
 
@@ -121,7 +121,7 @@ public class SlotService : ISlotService
 
     public async Task<List<SlotDto>> CreateWithRepetitionAsync(CreateSlotWithRepetitionRequest request)
     {
-        var workspace = await _workspaceRepository.GetEntityByIdAsync(request.WorkspaceId) ?? throw new NotFoundException("Workspace", request.WorkspaceId);
+        var workspace = await _workspaceRepository.GetByIdAsync(request.WorkspaceId) ?? throw new NotFoundException("Workspace", request.WorkspaceId);
 
         List<EventCategory> eventCategories = [];
         if (request.EventCategoryIds != null)

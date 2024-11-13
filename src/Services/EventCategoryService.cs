@@ -23,7 +23,7 @@ public class EventCategoryService : IEventCategoryService
 
     public async Task<EventCategoryDto> CreateAsync(CreateEventCategoryRequest req)
     {
-        var workspace = await _workspaceRepository.GetEntityByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
+        var workspace = await _workspaceRepository.GetByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
 
         var eventCategory = new EventCategory(workspace, req.Name, req.Icon, req.Color){ Workspace = workspace };
 

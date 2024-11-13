@@ -59,10 +59,6 @@ builder.Services.AddSwaggerGen(o =>
 builder.Services.AddDbContext<MySqlDbContext>( 
     options => options.UseMySQL(builder.Configuration.GetConnectionString("MySQL")!)
 );
-// MongoDB service
-builder.Services.AddDbContext<MongoDbContext>(
-    options => options.UseMongoDB(builder.Configuration.GetConnectionString("MongoDB")!, builder.Configuration["MongoDbSettings:DbName"]!)
-);
 // Identity service
 builder.Services.AddIdentityApiEndpoints<User>(options => {
     // options.SignIn.RequireConfirmedEmail = true;
@@ -85,6 +81,13 @@ builder.Services.AddStackExchangeRedisCache(options =>
 //builder.Services.AddTransient<IEmailSender, EmailSender>();
 //builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 
+// Cors
+builder.Services.AddCors(options => options.AddPolicy("Angular", 
+    policy => policy.WithOrigins("http://localhost:4200")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials()
+));
 // Authentication service
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
@@ -136,7 +139,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors("Angular");
 app.UseHttpsRedirection();
 app.UseExceptionHandler("/Api/Error");
 app.UseAuthentication();

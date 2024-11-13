@@ -1,9 +1,12 @@
-using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Models;
 
 namespace BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 
-public interface IWorkspaceRepository : IBaseRepository<Workspace>
+public interface IWorkspaceRepository
 {
-    // Task<Workspace?> GetDetailsByIdAsync(string id);
+    Task<Workspace> CreateAsync(Workspace workspace);
+    Task<Workspace?> GetByIdAsync(string id);
+    Task<Workspace> UpdateAsync(Workspace workspace);
+    Task<bool> DeleteAsync(string id);
+    Task<Workspace?> GetDetailsByIdAsync(string id);
 }

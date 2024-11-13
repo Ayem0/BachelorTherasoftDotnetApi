@@ -24,14 +24,14 @@ public class WorkspaceService : IWorkspaceService
 
     public async Task<WorkspaceDto> GetByIdAsync(string id)
     {
-        var workspace = await _workspaceRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Workspace", id);
+        var workspace = await _workspaceRepository.GetByIdAsync(id) ?? throw new NotFoundException("Workspace", id);
 
         return _mapper.Map<WorkspaceDto>(workspace);
     }
 
     public async Task<WorkspaceDetailsDto> GetDetailsByIdAsync(string id)
     {
-        var workspace = await _workspaceRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Workspace", id);
+        var workspace = await _workspaceRepository.GetDetailsByIdAsync(id) ?? throw new NotFoundException("Workspace", id);
 
         return _mapper.Map<WorkspaceDetailsDto>(workspace);
     }
@@ -44,20 +44,20 @@ public class WorkspaceService : IWorkspaceService
 
         workspace.Users.Add(user);
 
-        await _workspaceRepository.CreateAsync(workspace);
+        var createdWorkspace = await _workspaceRepository.CreateAsync(workspace);
 
-        return _mapper.Map<WorkspaceDto>(workspace);
+        return _mapper.Map<WorkspaceDto>(createdWorkspace);
     }
 
     // public async Task<ActionResult> RemoveMemberAsync(string id, string userId)
     // {
-    //     var workspace = await _workspaceRepository.GetEntityByIdAsync(id);
+    //     var workspace = await _workspaceRepository.GetByIdAsync(id);
     //     if (workspace == null) return Response.NotFound(id, "Workspace");
 
     //     var workspaceUser = workspace.Users.Where(x => x.UserId == userId).First();
     //     if (workspaceUser == null) return Response.NotFound(userId, "User");
 
-    //     workspaceUser.DeletedAt = DateTime.Now;
+    //     workspaceUser.DeletedAt = DateTime.UtcNow;
 
     //     var res2 = await _workspaceRepository.UpdateAsync(workspace);
 
@@ -71,7 +71,7 @@ public class WorkspaceService : IWorkspaceService
 
     public async Task<WorkspaceDto> UpdateAsync(string id, UpdateWorkspaceRequest req)
     {
-        var workspace = await _workspaceRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Workspace", id);
+        var workspace = await _workspaceRepository.GetByIdAsync(id) ?? throw new NotFoundException("Workspace", id);
 
         workspace.Name = req.NewName ?? workspace.Name;
         workspace.Description = req.NewDescription ?? workspace.Description;
