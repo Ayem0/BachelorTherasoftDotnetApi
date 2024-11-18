@@ -9,4 +9,5 @@ public interface IWorkspaceRepository
     Task<Workspace> UpdateAsync(Workspace workspace);
     Task<bool> DeleteAsync(string id);
     Task<Workspace?> GetDetailsByIdAsync(string id);
+    Task<Workspace[]> GetByUserIdAsync(string id);
 }

@@ -63,7 +63,7 @@ public class RoomRepository : IRoomRepository
         }   
     }
 
-    public async Task<Room?> GetDetailsByIdAsync(string id)
+    public async Task<Room?> GetJoinEventsSlotsByIdAsync(string id)
     {
         try
         {    

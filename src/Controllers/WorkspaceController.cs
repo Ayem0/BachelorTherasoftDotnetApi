@@ -4,6 +4,7 @@ using BachelorTherasoftDotnetApi.src.Dtos.Update;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
@@ -27,6 +28,23 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> GetById([FromQuery] string id)
         {
             var res = await _workspaceService.GetByIdAsync(id);
+            return Ok(res);
+        }
+
+
+        /// <summary>
+        /// Get a workspace by id.
+        /// </summary>
+        [HttpGet("User")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetByUser()
+        {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+            
+            var res = await _workspaceService.GetByUserIdAsync(userId);
             return Ok(res);
         }
 

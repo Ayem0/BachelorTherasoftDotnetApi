@@ -2,6 +2,7 @@
 using AutoMapper;
 using BachelorTherasoftDotnetApi.src.Databases;
 using BachelorTherasoftDotnetApi.src.Dtos;
+using BachelorTherasoftDotnetApi.src.Hubs;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
@@ -92,6 +93,9 @@ builder.Services.AddCors(options => options.AddPolicy("Angular",
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
+// SignalR
+builder.Services.AddSignalR();
+
 // Custom Repositories
 builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
 builder.Services.AddScoped<IWorkspaceRoleRepository, WorkspaceRoleRepository>();
@@ -170,5 +174,7 @@ app.MapPost("/registerBis", async (
     return Results.ValidationProblem(result.Errors.ToDictionary(e => e.Code, e => new[] { e.Description }));
 });
 app.MapControllers();
+app.MapHub<GlobalHub>("/global");
+app.MapHub<WorkspaceHub>("/workspace");
 
 app.Run();

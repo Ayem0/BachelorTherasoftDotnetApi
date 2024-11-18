@@ -32,7 +32,7 @@ public class EventService : IEventService
 
     public async Task<EventDto?> CreateAsync(CreateEventRequest req)
     {
-        var room = await _roomRepository.GetDetailsByIdAsync(req.RoomId) ?? throw new NotFoundException("Room", req.RoomId);
+        var room = await _roomRepository.GetJoinEventsSlotsByIdAsync(req.RoomId) ?? throw new NotFoundException("Room", req.RoomId);
 
         var eventCategory = await _eventCategoryRepository.GetEntityByIdAsync(req.EventCategoryId) ?? throw new NotFoundException("EventCategory", req.EventCategoryId);
 
@@ -186,7 +186,7 @@ public class EventService : IEventService
 
     public async Task<List<EventDto>?> CreateWithRepetitionAsync(CreateEventWithRepetitionRequest request)
     {
-        var room = await _roomRepository.GetDetailsByIdAsync(request.RoomId);
+        var room = await _roomRepository.GetJoinEventsSlotsByIdAsync(request.RoomId);
         if (room == null) return null;
 
         var eventCategory = await _eventCategoryRepository.GetEntityByIdAsync(request.EventCategoryId);

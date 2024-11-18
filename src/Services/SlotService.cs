@@ -78,7 +78,7 @@ public class SlotService : ISlotService
     // TODO voir si faire AddRoomToSlot plutot
     public async Task<bool> AddSlotToRoom(string slotId, string roomId)
     {
-        var room = await _roomRepository.GetDetailsByIdAsync(roomId) ?? throw new NotFoundException("Room", roomId);
+        var room = await _roomRepository.GetJoinEventsSlotsByIdAsync(roomId) ?? throw new NotFoundException("Room", roomId);
 
         var slot = await _slotRepository.GetEntityByIdAsync(slotId) ?? throw new NotFoundException("Slot", slotId);
 

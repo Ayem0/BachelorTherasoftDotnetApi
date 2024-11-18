@@ -29,6 +29,13 @@ public class WorkspaceService : IWorkspaceService
         return _mapper.Map<WorkspaceDto>(workspace);
     }
 
+    public async Task<WorkspaceDto[]> GetByUserIdAsync(string id)
+    {
+        var workspace = await _workspaceRepository.GetByUserIdAsync(id) ?? throw new NotFoundException("Workspace", id);
+
+        return _mapper.Map<WorkspaceDto[]>(workspace);
+    }
+
     public async Task<WorkspaceDetailsDto> GetDetailsByIdAsync(string id)
     {
         var workspace = await _workspaceRepository.GetDetailsByIdAsync(id) ?? throw new NotFoundException("Workspace", id);
