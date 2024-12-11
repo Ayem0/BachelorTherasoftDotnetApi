@@ -53,7 +53,7 @@ public class WorkspaceService : IWorkspaceService
 
         var createdWorkspace = await _workspaceRepository.CreateAsync(workspace);
 
-        return _mapper.Map<WorkspaceDto>(createdWorkspace);
+        return _mapper.Map<WorkspaceDetailsDto>(createdWorkspace);
     }
 
     // public async Task<ActionResult> RemoveMemberAsync(string id, string userId)

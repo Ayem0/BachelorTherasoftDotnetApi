@@ -1,5 +1,4 @@
-using System;
-using BachelorTherasoftDotnetApi.src.Dtos.Models;
+using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
@@ -8,23 +7,45 @@ namespace BachelorTherasoftDotnetApi.src.Hubs;
 public class WorkspaceHub : Hub
 {
     private static readonly ConnectionMapping _connections = new();
+    private readonly IUserRepository _userRepository;
+    public WorkspaceHub(IUserRepository userRepository)
+    {
+        _userRepository = userRepository;
+    }
 
-    public override Task OnConnectedAsync()
+    public override async Task<Task> OnConnectedAsync()
     {
         var userId = Context.UserIdentifier;
+        Console.WriteLine(userId);
+
         if (userId != null)
         {
-            _connections.Add(userId, Context.ConnectionId);
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user != null) {
+                foreach (var workspace in user.Workspaces) 
+                {
+                    await JoinWorkspaceGroup(workspace.Id);
+                    Console.WriteLine($"JOINED GROUP {workspace.Name}");
+                }
+                _connections.Add(userId, Context.ConnectionId);
+            }
         }
         return base.OnConnectedAsync();
     }
 
-    public override Task OnDisconnectedAsync(Exception? exception)
+    public override async Task<Task> OnDisconnectedAsync(Exception? exception)
     {
         var userId = Context.UserIdentifier; 
         if (userId != null)
         {
-            _connections.Remove(userId, Context.ConnectionId);
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user != null) {
+                foreach (var workspace in user.Workspaces) 
+                {
+                    await LeaveWorkspaceGroup(workspace.Id);
+                }
+                _connections.Remove(userId, Context.ConnectionId);
+            }
         }
         return base.OnDisconnectedAsync(exception);
     }
@@ -37,6 +58,11 @@ public class WorkspaceHub : Hub
     public async Task LeaveWorkspaceGroup(string workspaceId) 
     {
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, workspaceId);
-        
+    }
+
+    public async Task NotifyWorkspaceGroup(string workspaceId, string message) 
+    {
+        await Clients.Group(workspaceId).SendAsync("ReceiveNotification", message);
+        Console.WriteLine("NOTIFIED WORKSPACE GROUP USERS");
     }
 }

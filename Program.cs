@@ -82,9 +82,16 @@ builder.Services.AddStackExchangeRedisCache(options =>
 //builder.Services.AddTransient<IEmailSender, EmailSender>();
 //builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 
-// Cors
-builder.Services.AddCors(options => options.AddPolicy("Angular", 
-    policy => policy.WithOrigins("http://localhost:4200")
+// Cors client
+builder.Services.AddCors(options => options.AddPolicy("Client", 
+    policy => policy.WithOrigins("http://localhost:4200", "http://localhost:4000")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials()
+));
+// Cors server ssr
+builder.Services.AddCors(options => options.AddPolicy("Server", 
+    policy => policy.WithOrigins("http://client:4200")
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials()
@@ -112,6 +119,7 @@ builder.Services.AddScoped<IParticipantCategoryRepository, ParticipantCategoryRe
 builder.Services.AddScoped<ISlotRepository, SlotRepository>();
 // builder.Services.AddScoped<IEventMemberRepository, EventMemberRepository>();
 builder.Services.AddScoped<IInvitationRepository, InvitationRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 
 // Custom Services
@@ -143,7 +151,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors("Angular");
+app.UseCors("Client");
+app.UseCors("Server");
 app.UseHttpsRedirection();
 app.UseExceptionHandler("/Api/Error");
 app.UseAuthentication();

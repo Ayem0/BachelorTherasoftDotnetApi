@@ -1,4 +1,4 @@
-namespace BachelorTherasoftDotnetApi.src.Services;
+namespace BachelorTherasoftDotnetApi.src.Utils;
 
 public class AuthMessageSenderOptions
 {
