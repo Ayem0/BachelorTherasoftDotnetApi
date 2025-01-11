@@ -34,7 +34,6 @@
 
   <ItemGroup>
     <Folder Include="src\Dtos\Models\" />
-    <Folder Include="src\Dtos\Update\" />
   </ItemGroup>
 
 </Project>

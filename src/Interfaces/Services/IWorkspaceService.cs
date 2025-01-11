@@ -8,7 +8,7 @@ namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 public interface IWorkspaceService
 {
     Task<WorkspaceDto> GetByIdAsync(string id);
-    Task<WorkspaceDto[]> GetByUserIdAsync(string id);
+    Task<List<WorkspaceDto>> GetByUserIdAsync(string id);
     Task<WorkspaceDetailsDto> GetDetailsByIdAsync(string id);
     Task<WorkspaceDto> CreateAsync(string userId, CreateWorkspaceRequest request);
     // Task<bool> RemoveMemberAsync(string id, string userId);

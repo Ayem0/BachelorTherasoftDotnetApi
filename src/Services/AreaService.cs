@@ -23,7 +23,7 @@ public class AreaService : IAreaService
 
     public async Task<AreaDto> CreateAsync(CreateAreaRequest request)
     {
-        var location = await _locationRepository.GetEntityByIdAsync(request.LocationId) ?? throw new NotFoundException("Location", request.LocationId);
+        var location = await _locationRepository.GetByIdAsync(request.LocationId) ?? throw new NotFoundException("Location", request.LocationId);
 
         var area = new Area(location, request.Name, request.Description){ Location = location };
         

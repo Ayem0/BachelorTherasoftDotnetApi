@@ -23,7 +23,7 @@ public class LocationService : ILocationService
 
     public async Task<LocationDto?> GetByIdAsync(string id)
     {
-        var location = await _locationRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Location", id);
+        var location = await _locationRepository.GetDetailsByIdAsync(id) ?? throw new NotFoundException("Location", id);
 
         return location != null ? _mapper.Map<LocationDto>(location) : null;
     }
@@ -45,7 +45,7 @@ public class LocationService : ILocationService
 
     public async Task<LocationDto> UpdateAsync(string id, UpdateLocationRequest req)
     {       
-        var location = await _locationRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Location", id);
+        var location = await _locationRepository.GetByIdAsync(id) ?? throw new NotFoundException("Location", id);
 
         location.Name = req.NewName ?? location.Name;
         location.Description = req.NewDescription ?? location.Description;
@@ -56,5 +56,12 @@ public class LocationService : ILocationService
         await _locationRepository.UpdateAsync(location);
 
         return _mapper.Map<LocationDto>(location);
+    }
+
+    public async Task<List<LocationDto>> GetByWorkspaceIdAsync(string workspaceId)
+    {
+        var locations = await _locationRepository.GetByWorkspaceIdAsync(workspaceId);
+
+        return _mapper.Map<List<LocationDto>>(locations);
     }
 }

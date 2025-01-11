@@ -84,14 +84,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
 
 // Cors client
 builder.Services.AddCors(options => options.AddPolicy("Client", 
-    policy => policy.WithOrigins("http://localhost:4200", "http://localhost:4000")
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials()
-));
-// Cors server ssr
-builder.Services.AddCors(options => options.AddPolicy("Server", 
-    policy => policy.WithOrigins("http://client:4200")
+    policy => policy.WithOrigins("http://localhost:4200", "https://192.168.1.18:4200")
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials()
@@ -133,6 +126,7 @@ builder.Services.AddScoped<IEventCategoryService, EventCategoryService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IParticipantService, ParticipantService>();
 builder.Services.AddScoped<IParticipantCategoryService, ParticipantCategoryService>();
+builder.Services.AddScoped<IUserService, UserService>();
 // builder.Services.AddScoped<IConversationService, ConversationService>();
 // builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddScoped<ISlotService, SlotService>();
@@ -152,36 +146,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseCors("Client");
-app.UseCors("Server");
 app.UseHttpsRedirection();
 app.UseExceptionHandler("/Api/Error");
 app.UseAuthentication();
-
 app.UseAuthorization();
-
 app.MapIdentityApi<User>();
-// TODO a delete lors de l'auth controller et auth service
-app.MapPost("/registerBis", async (
-    RegisterBisRequest request,
-    UserManager<User> userManager) =>
-{
-    var user = new User()
-    {
-        UserName = request.Email,
-        Email = request.Email,
-        FirstName = request.FirstName,
-        LastName = request.LastName
-    };
-
-    var result = await userManager.CreateAsync(user, request.Password);
-
-    if (result.Succeeded)
-    {
-        return Results.Ok();
-    }
-
-    return Results.ValidationProblem(result.Errors.ToDictionary(e => e.Code, e => new[] { e.Description }));
-});
 app.MapControllers();
 app.MapHub<GlobalHub>("/global");
 app.MapHub<WorkspaceHub>("/workspace");

@@ -10,17 +10,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("Api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<User> _userManager;
-        private readonly IMapper _mapper;
-        public AuthController(UserManager<User> userManager, IMapper mapper)
-        {
-            _userManager = userManager;
-            _mapper = mapper;
-        }
         /// <summary>
         /// Logout.
         /// </summary>
@@ -29,26 +22,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync();
+            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+            Response.Cookies?.Delete(".AspNetCore.Identity.Application");
             return Ok();
-        }
-
-        /// <summary>
-        /// Get user info.
-        /// </summary>
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [Authorize]
-        [HttpGet("me")]
-        public async Task<IActionResult> Me()
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null) return Unauthorized();
-
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null) return Unauthorized();
-
-            return Ok(_mapper.Map<UserDto>(user));
         }
     }
 }

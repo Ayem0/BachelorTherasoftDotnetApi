@@ -73,5 +73,18 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             var res = await _locationService.UpdateAsync(id, request);
             return Ok(res);
         }
+
+        /// <summary>
+        /// Get locations by workspace id.
+        /// </summary>
+        [HttpGet("Workspace")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetByWorkspace([FromQuery] string workspaceId)
+        {   
+            var res = await _locationService.GetByWorkspaceIdAsync(workspaceId);
+            return Ok(res);
+        }
     }
 }

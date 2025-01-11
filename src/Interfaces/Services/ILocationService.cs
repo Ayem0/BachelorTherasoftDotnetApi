@@ -10,6 +10,7 @@ namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 public interface ILocationService
 {
     Task<LocationDto?> GetByIdAsync(string id);
+    Task<List<LocationDto>> GetByWorkspaceIdAsync(string id);
     Task<LocationDto> CreateAsync(CreateLocationRequest req);
     Task<bool> DeleteAsync(string id);
     Task<LocationDto> UpdateAsync(string id, UpdateLocationRequest req);
