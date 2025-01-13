@@ -290,6 +290,8 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     Id = table.Column<string>(type: "varchar(255)", nullable: false),
                     WorkspaceId = table.Column<string>(type: "varchar(255)", nullable: false),
                     Name = table.Column<string>(type: "longtext", nullable: false),
+                    Description = table.Column<string>(type: "longtext", nullable: true),
+                    Color = table.Column<string>(type: "longtext", nullable: false),
                     Icon = table.Column<string>(type: "longtext", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
