@@ -67,7 +67,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateTagRequest request)
         {
-            if (request.NewName == null && request.NewDescription == null) return BadRequest(new ProblemDetails(){ Title = "At least one field is required."});
+            if (request.Name == null && request.Description == null && request.Color == null && request.Name == null) return BadRequest(new ProblemDetails(){ Title = "At least one field is required."});
             var tag = await _tagService.UpdateAsync(id, request);
             return Ok(tag);
         }

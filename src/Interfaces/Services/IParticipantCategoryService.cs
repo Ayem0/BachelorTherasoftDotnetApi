@@ -12,3 +12,4 @@ public interface IParticipantCategoryService
     Task<bool> DeleteAsync(string id);
     Task<ParticipantCategoryDto> UpdateAsync(string id, UpdateParticipantCategoryRequest req);
 }
+    

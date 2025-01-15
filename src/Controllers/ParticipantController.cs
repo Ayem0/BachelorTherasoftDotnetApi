@@ -67,8 +67,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateParticipantRequest req)
         {
-            if ( req.NewAddress == null && req.NewFirstName == null && req.NewLastName == null && req.NewCity == null && req.NewDateOfBirth == null 
-                && req.NewCountry == null && req.NewEmail == null && req.NewParticipantCategoryId == null && req.NewDescription == null)
+            if (req.Address == null && req.FirstName == null && req.LastName == null && req.City == null && req.DateOfBirth == null 
+                && req.Country == null && req.Email == null && req.ParticipantCategoryId == null && req.Description == null)
                 return BadRequest(new ProblemDetails() { Title = "At least one field is required."});
 
             var res = await _participantService.UpdateAsync(id, req);

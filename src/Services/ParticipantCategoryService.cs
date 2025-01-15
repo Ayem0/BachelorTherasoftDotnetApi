@@ -47,10 +47,10 @@ public class ParticipantCategoryService : IParticipantCategoryService
     {
         var participantCategory = await _participantCategoryRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("ParticipantCategory", id);
 
-        participantCategory.Name = req.NewName ?? participantCategory.Name;
-        participantCategory.Icon = req.NewIcon ?? participantCategory.Icon;
-        participantCategory.Description = req.NewDescription ?? participantCategory.Description;
-        participantCategory.Color = req.NewColor ?? participantCategory.Color;
+        participantCategory.Name = req.Name ?? participantCategory.Name;
+        participantCategory.Icon = req.Icon ?? participantCategory.Icon;
+        participantCategory.Description = req.Description ?? participantCategory.Description;
+        participantCategory.Color = req.Color ?? participantCategory.Color;
 
         await _participantCategoryRepository.UpdateAsync(participantCategory);
 

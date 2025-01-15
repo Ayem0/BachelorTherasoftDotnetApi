@@ -80,7 +80,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            if (request.NewDescription == null && request.NewName == null) return BadRequest(new ProblemDetails(){ Title = "At least one field is required."});
+            if (request.Description == null && request.Name == null) return BadRequest(new ProblemDetails(){ Title = "At least one field is required."});
 
             var res = await _workspaceRoleService.UpdateAsync(id, request);
             return Ok(res);

@@ -7,7 +7,7 @@ using MySql.EntityFrameworkCore.Metadata;
 namespace BachelorTherasoftDotnetApi.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -240,6 +240,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     Name = table.Column<string>(type: "longtext", nullable: false),
                     Icon = table.Column<string>(type: "longtext", nullable: false),
                     Color = table.Column<string>(type: "longtext", nullable: false),
+                    Description = table.Column<string>(type: "longtext", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
@@ -352,6 +353,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     WorkspaceId = table.Column<string>(type: "varchar(255)", nullable: false),
                     Name = table.Column<string>(type: "longtext", nullable: false),
                     Icon = table.Column<string>(type: "longtext", nullable: false),
+                    Color = table.Column<string>(type: "longtext", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),

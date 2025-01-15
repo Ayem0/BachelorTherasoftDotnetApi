@@ -25,7 +25,7 @@ public class TagService : ITagService
     {
         var workspace = await _workspaceRepository.GetByIdAsync(request.WorkspaceId) ?? throw new NotFoundException("Workspace", request.WorkspaceId);
 
-        var tag = new Tag(workspace, request.Name, request.Icon, request.Description){ Workspace = workspace };
+        var tag = new Tag(workspace, request.Name, request.Icon, request.Color, request.Description){ Workspace = workspace };
         
         await _tagRepository.CreateAsync(tag);
 
@@ -48,9 +48,10 @@ public class TagService : ITagService
     {
         var tag = await _tagRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Tag", id);
         
-        tag.Name = req.NewName ?? tag.Name;
-        tag.Icon = req.NewIcon ?? tag.Icon;
-        tag.Description = req.NewDescription ?? tag.Description;
+        tag.Name = req.Name ?? tag.Name;
+        tag.Icon = req.Icon ?? tag.Icon;
+        tag.Description = req.Description ?? tag.Description;
+        tag.Color = req.Color ?? tag.Color;
 
         await _tagRepository.UpdateAsync(tag);
 

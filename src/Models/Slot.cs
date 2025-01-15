@@ -48,7 +48,7 @@ public class Slot : BaseModel
     public DateOnly EndDate { get; set; }
     public TimeOnly StartTime { get; set; }
     public TimeOnly EndTime { get; set; }
-    public List<EventCategory> EventCategories { get; set; } = [];
+    public List<EventCategory>? EventCategories { get; set; }
     public Interval? RepetitionInterval { get; set; }
     public int? RepetitionNumber { get; set; }
     public Slot? MainSlot { get; set; }

@@ -25,7 +25,7 @@ public class EventCategoryService : IEventCategoryService
     {
         var workspace = await _workspaceRepository.GetByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
 
-        var eventCategory = new EventCategory(workspace, req.Name, req.Icon, req.Color){ Workspace = workspace };
+        var eventCategory = new EventCategory(workspace, req.Name, req.Icon, req.Color, req.Description){ Workspace = workspace };
 
         await _eventCategoryRepository.CreateAsync(eventCategory);
 
@@ -48,8 +48,10 @@ public class EventCategoryService : IEventCategoryService
     {
         var eventCategory = await _eventCategoryRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("EventCategory", id);
 
-        eventCategory.Name = req.NewName ?? eventCategory.Name;
-        eventCategory.Icon = req.NewIcon ?? eventCategory.Icon;
+        eventCategory.Name = req.Name ?? eventCategory.Name;
+        eventCategory.Icon = req.Icon ?? eventCategory.Icon;
+        eventCategory.Color = req.Color ?? eventCategory.Color;
+        eventCategory.Description = req.Description ?? eventCategory.Description;
 
         await _eventCategoryRepository.UpdateAsync(eventCategory);
 

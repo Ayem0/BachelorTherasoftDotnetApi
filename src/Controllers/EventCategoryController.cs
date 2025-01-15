@@ -69,7 +69,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            if (request.NewName == null && request.NewIcon == null ) return BadRequest(new ProblemDetails() { Title = "At least one field is required."});
+            if (request.Name == null && request.Icon == null && request.Color == null && request.Description == null) return BadRequest(new ProblemDetails() { Title = "At least one field is required."});
 
             var res =  await _eventCategoryService.UpdateAsync(id, request);
             return Ok(res);

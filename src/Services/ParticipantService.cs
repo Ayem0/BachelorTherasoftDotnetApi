@@ -57,23 +57,23 @@ public class ParticipantService : IParticipantService
     {
         var participant = await _participantRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Participant", id);
 
-        if (request.NewParticipantCategoryId != null)
+        if (request.ParticipantCategoryId != null)
         {
-            var participantCategory = await _participantCategoryRepository.GetEntityByIdAsync(request.NewParticipantCategoryId) 
-                ?? throw new NotFoundException("ParticipantCategory", request.NewParticipantCategoryId);
+            var participantCategory = await _participantCategoryRepository.GetEntityByIdAsync(request.ParticipantCategoryId) 
+                ?? throw new NotFoundException("ParticipantCategory", request.ParticipantCategoryId);
 
             participant.ParticipantCategory = participantCategory;
             participant.ParticipantCategoryId = participantCategory.Id;
         }
 
-        participant.FirstName = request.NewFirstName ?? participant.FirstName;
-        participant.LastName = request.NewLastName ?? participant.LastName;
-        participant.Email = request.NewEmail ?? participant.Email;
-        participant.Description = request.NewDescription ?? participant.Description;
-        participant.Address = request.NewAddress ?? participant.Address;
-        participant.City = request.NewCity ?? participant.City;
-        participant.Country = request.NewCountry ?? participant.Country;
-        participant.DateOfBirth = request.NewDateOfBirth ?? participant.DateOfBirth;
+        participant.FirstName = request.FirstName ?? participant.FirstName;
+        participant.LastName = request.LastName ?? participant.LastName;
+        participant.Email = request.Email ?? participant.Email;
+        participant.Description = request.Description ?? participant.Description;
+        participant.Address = request.Address ?? participant.Address;
+        participant.City = request.City ?? participant.City;
+        participant.Country = request.Country ?? participant.Country;
+        participant.DateOfBirth = request.DateOfBirth ?? participant.DateOfBirth;
 
         await _participantRepository.UpdateAsync(participant);
 

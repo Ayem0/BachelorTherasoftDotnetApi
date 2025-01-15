@@ -91,8 +91,8 @@ public class WorkspaceRoleService : IWorkspaceRoleService
     {
         var workspaceRole = await _workspaceRoleRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("WorkspaceRole", id);
 
-        workspaceRole.Name = request.NewName ?? workspaceRole.Name;
-        workspaceRole.Description = request.NewDescription ?? workspaceRole.Description;
+        workspaceRole.Name = request.Name ?? workspaceRole.Name;
+        workspaceRole.Description = request.Description ?? workspaceRole.Description;
 
         await _workspaceRoleRepository.UpdateAsync(workspaceRole);
 
