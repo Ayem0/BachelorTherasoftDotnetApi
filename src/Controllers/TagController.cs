@@ -22,10 +22,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("")]
         [Authorize]
+        [WorkspaceAuthorize("Tag")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetById([FromQuery] string id)
+        public async Task<IActionResult> GetById([FromQuery] string id, [FromQuery] string workspaceId)
         {
             var tag = await _tagService.GetByIdAsync(id);
             return Ok(tag);
@@ -38,7 +39,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create([FromBody] CreateTagRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateTagRequest request, [FromQuery] string workspaceId)
         {
             var res = await _tagService.CreateAsync(request);
             return CreatedAtAction("Create", res);
@@ -49,9 +50,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpDelete("")]
         [Authorize]
+        [WorkspaceAuthorize("Tag")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete([FromQuery] string id)
+        public async Task<IActionResult> Delete([FromQuery] string id, [FromQuery] string workspaceId)
         {
             var res = await _tagService.DeleteAsync(id);
             return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Tag with id '{id} not found.'"});
@@ -62,6 +64,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPut("")]
         [Authorize]
+        [WorkspaceAuthorize("Tag")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

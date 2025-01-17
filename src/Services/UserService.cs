@@ -12,31 +12,28 @@ namespace BachelorTherasoftDotnetApi.src.Services;
 
 public class UserService : IUserService
 {
-    private readonly UserManager<User> _userManager;
+    private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
-    public UserService(UserManager<User> userManager, IMapper mapper)
+    public UserService(IMapper mapper, IUserRepository userRepository)
     {
-        _userManager = userManager;
         _mapper = mapper;
+        _userRepository = userRepository;
     }
 
     public async Task<UserDto> GetUserInfoAsync(string id)
     {
-        var user = await _userManager.FindByIdAsync(id) ?? throw new NotFoundException("User", id);
-        
+        var user = await _userRepository.GetByIdAsync(id) ?? throw new NotFoundException("User", id);
         return _mapper.Map<UserDto>(user);
     }
 
     public async Task<UserDto> UpdateAsync(string id, UpdateUserRequest req)
     {
-        var user = await _userManager.FindByIdAsync(id) ?? throw new NotFoundException("User", id);
+        var user = await _userRepository.GetByIdAsync(id) ?? throw new NotFoundException("User", id);
 
         user.FirstName = req.FirstName ?? user.FirstName;
         user.LastName = req.LastName ?? user.LastName;
 
-        var res = await _userManager.UpdateAsync(user);
-
-        if (!res.Succeeded) throw new DbException(DbAction.Update, "User", id);
+        var res = await _userRepository.UpdateAsync(user);
 
         return new UserDto
         {
@@ -46,4 +43,9 @@ public class UserService : IUserService
         };
     }
 
+    public async Task<UserDto> GetUserJoinWorkspacesByIdAsync(string id) 
+    {
+        var user = await _userRepository.GetByIdJoinWorkspaceAsync(id) ?? throw new NotFoundException("User", id);
+        return _mapper.Map<UserDto>(user);
+    }
 }

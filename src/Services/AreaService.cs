@@ -56,4 +56,10 @@ public class AreaService : IAreaService
         
         return _mapper.Map<AreaDto>(area);
     }
+
+    public async Task<List<AreaDto>> GetAreasByLocationIdAsync(string locationId) {
+        var areas = await _areaRepository.GetAreasByLocationIdAsync(locationId);
+        
+        return _mapper.Map<List<AreaDto>>(areas);
+    }
 }

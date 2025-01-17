@@ -1,8 +1,13 @@
+using System.Security.Claims;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
-using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
+using BachelorTherasoftDotnetApi.src.Exceptions;
+using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
+using BachelorTherasoftDotnetApi.src.Models;
+using BachelorTherasoftDotnetApi.src.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 // TODO Ajouter la fonctionnalité d'update la location
@@ -14,9 +19,13 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
     public class AreaController : ControllerBase
     {
         private readonly IAreaService _areaService;
-        public AreaController(IAreaService areaService)
+        private readonly IUserService _userService;
+        private readonly ILocationService _locationService;
+        public AreaController(IAreaService areaService, ILocationService locationService, IUserService userService)
         {
             _areaService = areaService;
+            _locationService = locationService;
+            _userService = userService;
         }
 
         /// <summary>
@@ -65,6 +74,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPut("")]
         [Authorize]
+        [WorkspaceAuthorize("Area")]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateAreaRequest request)
@@ -75,6 +85,20 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
 
             var res =  await _areaService.UpdateAsync(id, request);
             return Ok(res);
+        }
+
+        /// <summary>
+        /// Get areas by location id.
+        /// </summary>
+        [HttpGet("Location")]
+        [Authorize]
+        [WorkspaceAuthorize("Area")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetAreasByLocationId([FromQuery] string id)
+        {   
+            var areas = await _areaService.GetAreasByLocationIdAsync(id);
+            return Ok(areas);
         }
     }
 }

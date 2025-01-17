@@ -8,7 +8,7 @@ public class User : IdentityUser
     public string? LastName { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? DeletedAt { get; set; }
-    public DateTime? ModifiedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
     public DateTime? DisabledAt { get; set; }
     public List<Workspace> Workspaces { get; set; } = [];
     public List<WorkspaceRole> WorkspaceRoles { get; set; } = [];

@@ -5,6 +5,7 @@ namespace BachelorTherasoftDotnetApi.src.Dtos.Models;
 
 public class LocationDto
 {
+    public required string WorkspaceId { get; set; }
     [Required]
     public string Id { get; set; } = string.Empty;
     [Required]
@@ -13,6 +14,11 @@ public class LocationDto
     public string? Address { get; set; }
     public string? City { get; set; }
     public string? Country { get; set; }
+}
 
+public class LocationDetailsDto : LocationDto 
+{
     public List<AreaDto> Areas { get; set; } = [];
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 }

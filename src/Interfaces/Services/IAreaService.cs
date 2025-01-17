@@ -10,4 +10,5 @@ public interface IAreaService
     Task<AreaDto> CreateAsync(CreateAreaRequest request);
     Task<bool> DeleteAsync(string id);
     Task<AreaDto> UpdateAsync(string id, UpdateAreaRequest request);
+    Task<List<AreaDto>> GetAreasByLocationIdAsync(string locationId);
 }

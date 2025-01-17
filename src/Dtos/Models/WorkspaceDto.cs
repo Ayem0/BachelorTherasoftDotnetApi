@@ -14,6 +14,9 @@ public class WorkspaceDetailsDto : WorkspaceDto
     public List<TagDto> Tags { get; set; } = [];
     [JsonPropertyName("members")]
     public List<UserDto> Users { get; set; } = [];
+
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 }
 
 public class WorkspaceDto

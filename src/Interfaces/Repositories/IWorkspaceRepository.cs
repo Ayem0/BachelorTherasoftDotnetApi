@@ -10,4 +10,5 @@ public interface IWorkspaceRepository
     Task<bool> DeleteAsync(string id);
     Task<Workspace?> GetDetailsByIdAsync(string id);
     Task<Workspace[]> GetByUserIdAsync(string id);
+    Task<Workspace?> GetJoinUsersByIdAsync(string id);
 }

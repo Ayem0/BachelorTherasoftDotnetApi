@@ -104,6 +104,21 @@ public class WorkspaceRepository : IWorkspaceRepository
         }   
     }
 
+    public async Task<Workspace?> GetJoinUsersByIdAsync(string id)
+    {
+        try
+        {    
+            return await _context.Workspace
+                .Include(x => x.Users.Where(y => y.DeletedAt == null))
+                .FirstOrDefaultAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting workspace with Id '{id}' : {ex.Message}");
+            throw new DbException(DbAction.Read, "Workspace", id);
+        }   
+    }
+
     public async Task<Workspace> UpdateAsync(Workspace workspace)
     {
         try

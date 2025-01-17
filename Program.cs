@@ -127,6 +127,7 @@ builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IParticipantService, ParticipantService>();
 builder.Services.AddScoped<IParticipantCategoryService, ParticipantCategoryService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IWorkspaceAuthorizationService, WorkspaceAuthorizationService>();
 // builder.Services.AddScoped<IConversationService, ConversationService>();
 // builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddScoped<ISlotService, SlotService>();
