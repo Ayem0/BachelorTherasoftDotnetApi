@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace BachelorTherasoftDotnetApi.src.Dtos.Models;
 
@@ -11,6 +12,7 @@ public class WorkspaceDetailsDto : WorkspaceDto
     public List<ParticipantCategoryDto> ParticipantCategories { get; set; } = [];
     public List<WorkspaceRoleDto> WorkspaceRoles { get; set; } = [];
     public List<TagDto> Tags { get; set; } = [];
+    [JsonPropertyName("members")]
     public List<UserDto> Users { get; set; } = [];
 }
 
