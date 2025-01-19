@@ -2,7 +2,7 @@
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class Tag : BaseModel
+public class Tag : BaseModel, BaseAuthorizationModel
 {
     public Tag(Workspace workspace, string name, string icon, string color, string? description)
     {

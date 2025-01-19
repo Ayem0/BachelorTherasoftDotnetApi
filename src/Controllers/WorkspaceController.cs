@@ -30,9 +30,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [WorkspaceAuthorize("Workspace")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById([FromQuery] string workspaceId)
+        public async Task<IActionResult> GetById([FromQuery] string id)
         {
-            var res = await _workspaceService.GetByIdAsync(workspaceId);
+            var res = await _workspaceService.GetByIdAsync(id);
             return Ok(res);
         }
 
@@ -61,9 +61,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [WorkspaceAuthorize("Workspace")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetDetailsByworkspaceId([FromQuery] string workspaceId)
+        public async Task<IActionResult> GetDetailsByworkspaceId([FromQuery] string id)
         {
-            var res = await _workspaceService.GetDetailsByIdAsync(workspaceId);
+            var res = await _workspaceService.GetDetailsByIdAsync(id);
             return Ok(res);
         }   
 
@@ -96,11 +96,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [WorkspaceAuthorize("Workspace")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]        
-        public async Task<IActionResult> Delete([FromQuery] string workspaceId)
+        public async Task<IActionResult> Delete([FromQuery] string id)
         {
-            var res = await _workspaceService.DeleteAsync(workspaceId);
+            var res = await _workspaceService.DeleteAsync(id);
 
-            return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Workspace with id '{workspaceId} not found.'"});
+            return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Workspace with id '{id} not found.'"});
         }
 
         /// <summary>
@@ -111,11 +111,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [WorkspaceAuthorize("Workspace")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update([FromQuery] string workspaceId, [FromBody] UpdateWorkspaceRequest request)
+        public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateWorkspaceRequest request)
         {
             if (request.NewName == null && request.NewDescription == null) return BadRequest(new ProblemDetails() { Title = "At least one field is required."});
 
-            var res = await _workspaceService.UpdateAsync(workspaceId, request);
+            var res = await _workspaceService.UpdateAsync(id, request);
             // await _workspaceHub.NotifyWorkspaceGroup(res.workspaceId, $"WORKSPACE {res.Name} UPDATED");
             await _workspaceHub.Clients.Group(res.Id).SendAsync("WorkspaceUpdated", $"WORKSPACE {res.Name} UPDATED");
             Console.WriteLine("WORKSPACE UPDATED ------------------------------------------------------------");

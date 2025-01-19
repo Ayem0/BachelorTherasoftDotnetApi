@@ -1,3 +1,4 @@
+using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +42,7 @@ public class WorkspaceAuthorizeAttribute : Attribute, IAsyncActionFilter
             context.Result = new StatusCodeResult(StatusCodes.Status500InternalServerError);
             return;
         }
+        
         var entity = await workspaceAuthorizationService.GetEntityById(_tableName, entityId);
         if (entity == null) {
             context.Result = new ForbidResult();
@@ -48,12 +50,13 @@ public class WorkspaceAuthorizeAttribute : Attribute, IAsyncActionFilter
         }
 
         var user = await userService.GetUserJoinWorkspacesByIdAsync(userId);
-        if (user == null || user.Workspaces == null || !user.Workspaces.Any(ws => ws.Id == entity.workspaceId))
+        if (user == null || user.Workspaces == null || !user.Workspaces.Any(ws => _tableName == "Workspace" ? ws.Id ==  entity.Id : ws.Id == entity.WorkspaceId))
         {
             context.Result = new ForbidResult();
             return;
         }
 
+        // TODO check user right with user request
         await next();
     }
 }

@@ -425,6 +425,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "varchar(255)", nullable: false),
+                    WorkspaceId = table.Column<string>(type: "varchar(255)", nullable: false),
                     LocationId = table.Column<string>(type: "varchar(255)", nullable: false),
                     Name = table.Column<string>(type: "longtext", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: true),
@@ -439,6 +440,12 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         name: "FK_Area_Location_LocationId",
                         column: x => x.LocationId,
                         principalTable: "Location",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Area_Workspace_WorkspaceId",
+                        column: x => x.WorkspaceId,
+                        principalTable: "Workspace",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -537,6 +544,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "varchar(255)", nullable: false),
+                    WorkspaceId = table.Column<string>(type: "varchar(255)", nullable: false),
                     AreaId = table.Column<string>(type: "varchar(255)", nullable: false),
                     Name = table.Column<string>(type: "longtext", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: true),
@@ -551,6 +559,12 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         name: "FK_Room_Area_AreaId",
                         column: x => x.AreaId,
                         principalTable: "Area",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Room_Workspace_WorkspaceId",
+                        column: x => x.WorkspaceId,
+                        principalTable: "Workspace",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -570,6 +584,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     RepetitionNumber = table.Column<int>(type: "int", nullable: true),
                     MainEventId = table.Column<string>(type: "varchar(255)", nullable: true),
                     RepetitionEndDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    WorkspaceId = table.Column<string>(type: "varchar(255)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
@@ -592,6 +607,12 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         name: "FK_Event_Room_RoomId",
                         column: x => x.RoomId,
                         principalTable: "Room",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Event_Workspace_WorkspaceId",
+                        column: x => x.WorkspaceId,
+                        principalTable: "Workspace",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -778,6 +799,11 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 column: "LocationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Area_WorkspaceId",
+                table: "Area",
+                column: "WorkspaceId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
@@ -843,6 +869,11 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 name: "IX_Event_RoomId",
                 table: "Event",
                 column: "RoomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Event_WorkspaceId",
+                table: "Event",
+                column: "WorkspaceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EventCategory_WorkspaceId",
@@ -913,6 +944,11 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 name: "IX_Room_AreaId",
                 table: "Room",
                 column: "AreaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Room_WorkspaceId",
+                table: "Room",
+                column: "WorkspaceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoomSlot_SlotsId",

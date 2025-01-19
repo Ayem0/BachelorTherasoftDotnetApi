@@ -4,5 +4,6 @@ namespace BachelorTherasoftDotnetApi.src.Base;
 
 public interface BaseAuthorizationModel
 {
- string WorkspaceId { get; }
+    string? WorkspaceId { get; }
+    string Id { get; }
 }

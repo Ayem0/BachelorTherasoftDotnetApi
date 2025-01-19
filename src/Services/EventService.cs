@@ -54,8 +54,9 @@ public class EventService : IEventService
             if (!tags.Contains(tag)) tags.Add(tag);
         }
 
-        var eventToAdd = new Event(req.Description, req.StartDate, req.EndDate, room, eventCategory, participants, tags, null, null, null, null)
+        var eventToAdd = new Event(room.Workspace, req.Description, req.StartDate, req.EndDate, room, eventCategory, participants, tags, null, null, null, null)
         {
+            Workspace = room.Workspace,
             Room = room,
             EventCategory = eventCategory
         };
@@ -211,9 +212,10 @@ public class EventService : IEventService
             if (!tags.Contains(tag)) tags.Add(tag);
         }
 
-        var mainEvent = new Event(request.Description, request.StartDate, request.EndDate, room, eventCategory, participants, tags,
+        var mainEvent = new Event(room.Workspace, request.Description, request.StartDate, request.EndDate, room, eventCategory, participants, tags,
             request.RepetitionInterval, request.RepetitionNumber, null, request.RepetitionEndDate)
         {
+            Workspace = room.Workspace,
             Room = room,
             EventCategory = eventCategory
         };
@@ -229,9 +231,10 @@ public class EventService : IEventService
 
         while (DateOnly.FromDateTime(repetitionStartDate) < request.RepetitionEndDate)
         {
-            var @event = new Event(request.Description, repetitionStartDate, repetitionEndDate, room, eventCategory, participants, tags,
+            var @event = new Event(room.Workspace, request.Description, repetitionStartDate, repetitionEndDate, room, eventCategory, participants, tags,
                 null, null, mainEvent, null)
             {
+                Workspace = room.Workspace,
                 Room = room,
                 EventCategory = eventCategory
             };

@@ -3,11 +3,13 @@ using BachelorTherasoftDotnetApi.src.Enums;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class Event : BaseModel
+public class Event : BaseModel, BaseAuthorizationModel
 {
-    public Event(string? description, DateTime startDate, DateTime endDate, Room room, EventCategory eventCategory, List<Participant> participants, 
+    public Event(Workspace workspace, string? description, DateTime startDate, DateTime endDate, Room room, EventCategory eventCategory, List<Participant> participants, 
         List<Tag> tags, Interval? repetitionInterval, int? repetitionNumber, Event? mainEvent, DateOnly? repetitionEndDate)
     {
+        Workspace = workspace;
+        WorkspaceId = workspace.Id;
         Description = description;
         StartDate = startDate;
         EndDate = endDate;
@@ -24,9 +26,10 @@ public class Event : BaseModel
         RepetitionEndDate = repetitionEndDate;
         // TODO ajouter la liste des Users
     }
-    public Event(string? description, DateTime startDate, DateTime endDate, string roomId, string eventCategoryId, Interval? repetitionInterval, 
+    public Event(string workspaceId, string? description, DateTime startDate, DateTime endDate, string roomId, string eventCategoryId, Interval? repetitionInterval, 
     int? repetitionNumber, string? mainEventId, DateOnly? repetitionEndDate)
     {
+        WorkspaceId = workspaceId;
         Description = description;
         StartDate = startDate;
         EndDate = endDate;
@@ -50,7 +53,8 @@ public class Event : BaseModel
     public Event? MainEvent { get; set; }
     public string? MainEventId { get; set; }
     public DateOnly? RepetitionEndDate { get; set; }
-
+    public string WorkspaceId { get; set; }
+    public required Workspace Workspace { get; set; }
 
 
 

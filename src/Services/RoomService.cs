@@ -25,7 +25,7 @@ public class RoomService : IRoomService
     {
         var area = await _areaRepository.GetEntityByIdAsync(request.AreaId) ?? throw new NotFoundException("Area", request.AreaId);
 
-        var room = new Room(area, request.Name, request.Description) { Area = area };
+        var room = new Room(area.Workspace, area, request.Name, request.Description) { Area = area, Workspace = area.Workspace };
 
         await _roomRepository.CreateAsync(room);
 

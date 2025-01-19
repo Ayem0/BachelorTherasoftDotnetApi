@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BachelorTherasoftDotnetApi.Migrations
 {
     [DbContext(typeof(MySqlDbContext))]
-    [Migration("20250117134352_Initial")]
+    [Migration("20250117205726_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -47,9 +47,15 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("WorkspaceId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("LocationId");
+
+                    b.HasIndex("WorkspaceId");
 
                     b.ToTable("Area");
                 });
@@ -161,6 +167,10 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("WorkspaceId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EventCategoryId");
@@ -168,6 +178,8 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.HasIndex("MainEventId");
 
                     b.HasIndex("RoomId");
+
+                    b.HasIndex("WorkspaceId");
 
                     b.ToTable("Event");
                 });
@@ -500,9 +512,15 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("WorkspaceId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AreaId");
+
+                    b.HasIndex("WorkspaceId");
 
                     b.ToTable("Room");
                 });
@@ -938,7 +956,15 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.Workspace", "Workspace")
+                        .WithMany()
+                        .HasForeignKey("WorkspaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Location");
+
+                    b.Navigation("Workspace");
                 });
 
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Document", b =>
@@ -989,11 +1015,19 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.Workspace", "Workspace")
+                        .WithMany()
+                        .HasForeignKey("WorkspaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("EventCategory");
 
                     b.Navigation("MainEvent");
 
                     b.Navigation("Room");
+
+                    b.Navigation("Workspace");
                 });
 
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.EventCategory", b =>
@@ -1106,7 +1140,15 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.Workspace", "Workspace")
+                        .WithMany()
+                        .HasForeignKey("WorkspaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Area");
+
+                    b.Navigation("Workspace");
                 });
 
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Slot", b =>

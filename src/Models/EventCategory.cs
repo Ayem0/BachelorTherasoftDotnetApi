@@ -2,7 +2,7 @@
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class EventCategory : BaseModel
+public class EventCategory : BaseModel, BaseAuthorizationModel
 {
     public EventCategory(Workspace workspace, string name, string icon, string color, string? description)
     {

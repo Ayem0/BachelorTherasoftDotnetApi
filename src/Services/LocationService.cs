@@ -50,7 +50,7 @@ public class LocationService : ILocationService
         location.Name = req.NewName ?? location.Name;
         location.Description = req.NewDescription ?? location.Description;
         location.Address = req.NewAddress ?? location.Address;
-        location.City = req.NewCity ?? location.Name;
+        location.City = req.NewCity ?? location.City;
         location.Country = req.NewCountry ?? location.Country;
 
         await _locationRepository.UpdateAsync(location);

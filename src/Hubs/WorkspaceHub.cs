@@ -16,7 +16,6 @@ public class WorkspaceHub : Hub
     public override async Task<Task> OnConnectedAsync()
     {
         var userId = Context.UserIdentifier;
-        Console.WriteLine(userId);
 
         if (userId != null)
         {

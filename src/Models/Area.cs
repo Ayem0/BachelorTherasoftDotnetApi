@@ -4,11 +4,12 @@ namespace BachelorTherasoftDotnetApi.src.Models;
 
 public class Area : BaseModel, BaseAuthorizationModel
 {
-    public Area(Location location, string name, string? description)
+    public Area(Workspace workspace, Location location, string name, string? description)
     {
         Location = location;
         LocationId = location.Id;
-        WorkspaceId = location.WorkspaceId;
+        Workspace = workspace;
+        WorkspaceId = workspace.Id;
         Name = name;
         Description = description;
     }
@@ -20,6 +21,7 @@ public class Area : BaseModel, BaseAuthorizationModel
         Description = description;
     }
     public string WorkspaceId { get; set; }
+    public required Workspace Workspace { get; set; }
     public string LocationId { get; set; }
     public required Location Location { get; set; }
     public string Name { get; set; }

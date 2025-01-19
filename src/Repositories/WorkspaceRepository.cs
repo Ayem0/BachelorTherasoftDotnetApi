@@ -110,6 +110,7 @@ public class WorkspaceRepository : IWorkspaceRepository
         {    
             return await _context.Workspace
                 .Include(x => x.Users.Where(y => y.DeletedAt == null))
+                .Where(x => x.Id == id && x.DeletedAt == null)
                 .FirstOrDefaultAsync();
         }
         catch (Exception ex)

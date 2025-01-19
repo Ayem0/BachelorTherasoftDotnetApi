@@ -2,7 +2,7 @@ using BachelorTherasoftDotnetApi.src.Base;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class Workspace : BaseModel
+public class Workspace : BaseModel, BaseAuthorizationModel
 {
         public Workspace(string name, string? description, List<User> users)
         {
@@ -25,4 +25,5 @@ public class Workspace : BaseModel
         public List<ParticipantCategory> ParticipantCategories { get; set; } = [];
         public List<Participant> Participants { get; set; } = [];
         public List<Tag> Tags { get; set; } = [];
+        public string? WorkspaceId => Id; 
 }

@@ -25,7 +25,7 @@ public class AreaService : IAreaService
     {
         var location = await _locationRepository.GetByIdAsync(request.LocationId) ?? throw new NotFoundException("Location", request.LocationId);
 
-        var area = new Area(location, request.Name, request.Description){ Location = location };
+        var area = new Area(location.Workspace, location, request.Name, request.Description){ Location = location, Workspace = location.Workspace };
         
         await _areaRepository.CreateAsync(area);
         

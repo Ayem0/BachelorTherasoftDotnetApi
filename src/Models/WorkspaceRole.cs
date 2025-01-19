@@ -3,7 +3,7 @@ using BachelorTherasoftDotnetApi.src.Base;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class WorkspaceRole : BaseModel
+public class WorkspaceRole : BaseModel, BaseAuthorizationModel
 {
     public WorkspaceRole(Workspace workspace, string name, string? description)
     {

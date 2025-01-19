@@ -1,7 +1,6 @@
 using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
@@ -49,10 +48,10 @@ public class WorkspaceAuthorizationService : IWorkspaceAuthorizationService
     {
         return tableName switch
         {
-            "Workspace" => await _workspaceRepository.GetJoinUsersByIdAsync(id) as BaseAuthorizationModel,
+            "Workspace" => await _workspaceRepository.GetJoinUsersByIdAsync(id),
             "WorkspaceRole" => await _workspaceRoleRepository.GetEntityByIdAsync(id),
             "Tag" => await _tagRepository.GetEntityByIdAsync(id),
-            "Participant" => await _participantRepository.GetEntityByIdAsync(id),
+            "Participant" => await _participantRepository.GetEntityByIdAsync(id) ,
             "ParticipantCategory" => await _participantCategoryRepository.GetEntityByIdAsync(id),
             "EventCategory" => await _eventCategoryRepository.GetEntityByIdAsync(id),
             "Slot" => await _slotRepository.GetEntityByIdAsync(id),

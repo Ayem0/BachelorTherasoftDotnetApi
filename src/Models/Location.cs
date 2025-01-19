@@ -2,7 +2,7 @@
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class Location : BaseModel
+public class Location : BaseModel, BaseAuthorizationModel
 {
     public Location(Workspace workspace, string name, string? description, string? address, string? city, string? country)
     {
