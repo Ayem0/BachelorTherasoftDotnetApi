@@ -33,7 +33,7 @@ public class SlotService : ISlotService
         return _mapper.Map<SlotDto>(slot);
     }
 
-    public async Task<SlotDto> CreateAsync(CreateSlotRequest request)
+    public async Task<List<SlotDto>> CreateAsync(CreateSlotRequest request)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(request.WorkspaceId) ?? throw new NotFoundException("Workspace", request.WorkspaceId);
 
@@ -47,14 +47,34 @@ public class SlotService : ISlotService
             }
         }
 
-        var slot = new Slot(workspace, request.StartDate, request.EndDate, request.StartTime, request.EndTime, eventCategories, null, null, null, null)
+        var slot = new Slot(request.Name, request.Description, workspace, request.StartDate, request.EndDate, request.StartTime, request.EndTime, eventCategories, null, null, null, null)
         {
             Workspace = workspace
         };
 
-        await _slotRepository.CreateAsync(slot);
-        
-        return _mapper.Map<SlotDto>(slot);
+        if (request.RepetitionNumber != null && request.RepetitionInterval != null && request.RepetitionEndDate != null) {
+            List<Slot> slots = [slot];
+            var repetitionStartDate = Repetition.IncrementDateOnly(request.StartDate, (Enums.Interval)request.RepetitionInterval, (int)request.RepetitionNumber);
+            var repetitionEndDate = Repetition.IncrementDateOnly(request.EndDate, (Enums.Interval)request.RepetitionInterval, (int)request.RepetitionNumber);
+
+            while (repetitionStartDate <= request.RepetitionEndDate)
+            {
+                var repetitionSlot = new Slot(request.Name, request.Description, workspace, repetitionStartDate, repetitionEndDate, request.StartTime, request.EndTime, eventCategories, request.RepetitionInterval, request.RepetitionNumber, slot, request.RepetitionEndDate)
+                {
+                    Workspace = workspace
+                };
+                slots.Add(repetitionSlot);
+
+                repetitionStartDate = Repetition.IncrementDateOnly(request.StartDate, (Enums.Interval)request.RepetitionInterval, (int)request.RepetitionNumber);
+                repetitionEndDate = Repetition.IncrementDateOnly(request.EndDate, (Enums.Interval)request.RepetitionInterval, (int)request.RepetitionNumber);
+            }
+            await _slotRepository.CreateMultipleAsync(slots);
+
+            return [.. slots.Select(_mapper.Map<SlotDto>)];  
+        } else {
+            await _slotRepository.CreateAsync(slot);
+            return [_mapper.Map<SlotDto>(slot)];
+        }
     }
 
     // public async Task<SlotDto?> UpdateAsync(string id, UpdateSlotRequest request)
@@ -104,7 +124,7 @@ public class SlotService : ISlotService
 
     private static List<Slot>? CanAddSlotToRoom(Room room, Slot slot)
     {
-        // TODO si garder ce fonctionnement refactoriser cette partie et return qu'elle slot ou evenement pose probleme
+        // TODO si garder ce fonctionnement refactoriser cette partie et return quel slot ou evenement pose probleme
         var roomSlots = room.Slots.Where(existingSlot => existingSlot.DeletedAt == null &&
             (existingSlot.StartDate <= slot.StartDate && existingSlot.EndDate >= slot.EndDate && existingSlot.StartTime <= slot.StartTime && existingSlot.EndTime >= slot.EndTime ||
 
@@ -134,7 +154,7 @@ public class SlotService : ISlotService
             }
         }
 
-        var mainSlot = new Slot(workspace, request.StartDate, request.EndDate, request.StartTime, request.EndTime, eventCategories, request.RepetitionInterval, request.RepetitionNumber,
+        var mainSlot = new Slot(request.Name, request.Description, workspace, request.StartDate, request.EndDate, request.StartTime, request.EndTime, eventCategories, request.RepetitionInterval, request.RepetitionNumber,
             null, request.RepetitionEndDate)
         {
             Workspace = workspace
@@ -146,7 +166,7 @@ public class SlotService : ISlotService
 
         while (repetitionStartDate < request.RepetitionEndDate)
         {
-            var slot = new Slot(workspace, repetitionStartDate, repetitionEndDate, request.StartTime, request.EndTime, eventCategories, null, null, mainSlot, null)
+            var slot = new Slot(request.Name, request.Description, workspace, repetitionStartDate, repetitionEndDate, request.StartTime, request.EndTime, eventCategories, null, null, mainSlot, null)
             {
                 Workspace = workspace
             };
@@ -158,5 +178,10 @@ public class SlotService : ISlotService
         await _slotRepository.CreateMultipleAsync(slots);
 
         return slots.Select(x => _mapper.Map<SlotDto>(x)).ToList();  
+    }
+
+    public async Task<List<SlotDto>> GetByWorkpaceIdAsync(string id) {
+        var res = await _slotRepository.GetByWorkpaceIdAsync(id);
+        return _mapper.Map<List<SlotDto>>(res);
     }
 }

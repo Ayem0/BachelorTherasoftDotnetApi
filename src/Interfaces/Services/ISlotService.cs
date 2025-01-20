@@ -10,9 +10,10 @@ namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 public interface ISlotService
 {
     Task<SlotDto> GetByIdAsync(string id);
-    Task<SlotDto> CreateAsync(CreateSlotRequest request);
+    Task<List<SlotDto>> CreateAsync(CreateSlotRequest request);
     // Task<ActionResult<SlotDto>> UpdateAsync(string id, DateOnly? newStartDate, DateOnly? newEndDate, TimeOnly? newStartTime, TimeOnly? newEndTime);
     Task<bool> DeleteAsync(string id);
     Task<bool> AddSlotToRoom(string slotId, string roomId);
     Task<List<SlotDto>> CreateWithRepetitionAsync(CreateSlotWithRepetitionRequest request);
+    Task<List<SlotDto>> GetByWorkpaceIdAsync(string id);
 }

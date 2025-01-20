@@ -22,4 +22,10 @@ public class SlotRepository : BaseMySqlRepository<Slot>, ISlotRepository
             .Where(r => r.MainSlotId == id && r.DeletedAt == null && r.EventCategories.All(s => s.DeletedAt == null))
             .ToListAsync();
     }
+
+    public async Task<List<Slot>> GetByWorkpaceIdAsync(string id) {
+        return await _context.Slot
+            .Where(x => x.WorkspaceId == id && x.Workspace.DeletedAt == null && x.DeletedAt == null && x.MainSlotId == null)
+            .ToListAsync();
+    }
 }

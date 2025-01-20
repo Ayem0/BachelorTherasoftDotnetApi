@@ -21,4 +21,10 @@ public class TagRepository : BaseMySqlRepository<Tag>, ITagRepository
             .Where(x => x.Id == id && x.DeletedAt == null && x.Workspace.DeletedAt == null)
             .FirstOrDefaultAsync();
     }
+    public async Task<List<Tag>> GetByWorkpaceIdAsync(string id)
+    {
+        return await _context.Tag
+            .Where(x => x.WorkspaceId == id && x.DeletedAt == null && x.Workspace.DeletedAt == null)
+            .ToListAsync();
+    }
 }

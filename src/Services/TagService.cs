@@ -57,4 +57,9 @@ public class TagService : ITagService
 
         return _mapper.Map<TagDto>(tag);
     }
+
+    public async Task<List<TagDto>> GetByWorkpsaceIdAsync(string id) {
+        var res = await _tagRepository.GetByWorkpaceIdAsync(id);
+        return _mapper.Map<List<TagDto>>(res);
+    }
 }

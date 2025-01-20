@@ -11,5 +11,6 @@ public interface IParticipantCategoryService
     Task<ParticipantCategoryDto> CreateAsync(CreateParticipantCategoryRequest req);
     Task<bool> DeleteAsync(string id);
     Task<ParticipantCategoryDto> UpdateAsync(string id, UpdateParticipantCategoryRequest req);
+    Task<List<ParticipantCategoryDto>> GetByWorkspaceIdAsync(string id);
 }
     

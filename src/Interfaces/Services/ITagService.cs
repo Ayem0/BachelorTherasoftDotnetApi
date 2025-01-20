@@ -13,4 +13,5 @@ public interface ITagService
     Task<TagDto> CreateAsync(CreateTagRequest request);
     Task<bool> DeleteAsync(string id);
     Task<TagDto> UpdateAsync(string id, UpdateTagRequest request);
+    Task<List<TagDto>> GetByWorkpsaceIdAsync(string id);
 }

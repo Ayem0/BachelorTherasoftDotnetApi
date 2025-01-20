@@ -1,5 +1,4 @@
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
-using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -77,7 +76,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Get locations by workspace id.
         /// </summary>
-        [HttpGet("Workspace")]
+        [HttpGet("workspace")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

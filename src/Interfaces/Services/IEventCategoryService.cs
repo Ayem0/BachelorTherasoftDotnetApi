@@ -13,4 +13,5 @@ public interface IEventCategoryService
     Task<EventCategoryDto> CreateAsync(CreateEventCategoryRequest req);
     Task<bool> DeleteAsync(string id);
     Task<EventCategoryDto> UpdateAsync(string id, UpdateEventCategoryRequest req);
+    Task<List<EventCategoryDto>> GetByWorkspaceIdAsync(string id);
 }

@@ -57,4 +57,11 @@ public class EventCategoryService : IEventCategoryService
 
         return _mapper.Map<EventCategoryDto>(eventCategory);
     }
+
+    public async Task<List<EventCategoryDto>> GetByWorkspaceIdAsync(string id)
+    {
+        var eventCategory = await _eventCategoryRepository.GetByWorkpaceIdAsync(id);
+
+        return _mapper.Map<List<EventCategoryDto>>(eventCategory);
+    }
 }

@@ -26,7 +26,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetById([FromQuery] string id, [FromQuery] string workspaceId)
+        public async Task<IActionResult> GetById([FromQuery] string id)
         {
             var tag = await _tagService.GetByIdAsync(id);
             return Ok(tag);
@@ -39,7 +39,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create([FromBody] CreateTagRequest request, [FromQuery] string workspaceId)
+        public async Task<IActionResult> Create([FromBody] CreateTagRequest request)
         {
             var res = await _tagService.CreateAsync(request);
             return CreatedAtAction("Create", res);
@@ -53,7 +53,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [WorkspaceAuthorize("Tag")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete([FromQuery] string id, [FromQuery] string workspaceId)
+        public async Task<IActionResult> Delete([FromQuery] string id)
         {
             var res = await _tagService.DeleteAsync(id);
             return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Tag with id '{id} not found.'"});
@@ -73,6 +73,19 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             if (request.Name == null && request.Description == null && request.Color == null && request.Name == null) return BadRequest(new ProblemDetails(){ Title = "At least one field is required."});
             var tag = await _tagService.UpdateAsync(id, request);
             return Ok(tag);
+        }
+
+        /// <summary>
+        /// Get tags by workspace id.
+        /// </summary>
+        [HttpGet("workspace")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetByWorkspace([FromQuery] string workspaceId)
+        {
+            var tags = await _tagService.GetByWorkpsaceIdAsync(workspaceId);
+            return Ok(tags);
         }
     }
 }

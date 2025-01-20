@@ -6,15 +6,13 @@ namespace BachelorTherasoftDotnetApi.src.Models;
 // TODO voir si possible de modeliser mieux les créneaux + voir comment en faire les horaires d'ouvertures maybe champs eventCategories a null mais en vrai un bool c mieux
 public class Slot : BaseModel, BaseAuthorizationModel
 {
-    public Slot(Workspace workspace, DateOnly startDate, DateOnly endDate, TimeOnly startTime, TimeOnly endTime, List<EventCategory> eventCategories, Interval? repetitionInterval, 
+    public Slot(string name, string? description, Workspace workspace, DateOnly startDate, DateOnly endDate, TimeOnly startTime, TimeOnly endTime, List<EventCategory> eventCategories, Interval? repetitionInterval, 
         int? repetitionNumber, Slot? mainSlot, DateOnly? repetitionEndDate)
     {
-        // EventCategories = eventCategories;
         Workspace = workspace;
         WorkspaceId = workspace.Id;
-        // Rooms = rooms;
-        // StartTime = startTime;
-        // EndTime = endTime;
+        Name = name;
+        Description = description;
         StartDate = startDate;
         EndDate = endDate;
         StartTime = startTime;
@@ -27,9 +25,11 @@ public class Slot : BaseModel, BaseAuthorizationModel
         RepetitionEndDate = repetitionEndDate;
     }
 
-    public Slot(string workspaceId, DateOnly startDate, DateOnly endDate, TimeOnly startTime, TimeOnly endTime, Interval? repetitionInterval, 
+    public Slot(string name, string? description, string workspaceId, DateOnly startDate, DateOnly endDate, TimeOnly startTime, TimeOnly endTime, Interval? repetitionInterval, 
     int? repetitionNumber, string? mainSlotId, DateOnly? repetitionEndDate)
     {
+        Name = name;
+        Description = description;
         WorkspaceId = workspaceId;
         StartDate = startDate;
         EndDate = endDate;
@@ -40,7 +40,8 @@ public class Slot : BaseModel, BaseAuthorizationModel
         MainSlotId = mainSlotId;
         RepetitionEndDate = repetitionEndDate;
     }
-
+    public string Name { get; set; }
+    public string? Description { get; set; }
     public required Workspace Workspace { get; set; }
     public string WorkspaceId { get; set; }
     public List<Room> Rooms { get; set; } = [];

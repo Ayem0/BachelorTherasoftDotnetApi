@@ -21,10 +21,23 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("")]
         [Authorize]
+        [WorkspaceAuthorize("Slot")]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById([FromQuery] string id)
         {
             var res = await _SlotService.GetByIdAsync(id);
+            return Ok(res);
+        }
+
+        /// <summary>
+        /// Get a Slot by id.
+        /// </summary>
+        [HttpGet("workspace")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetByWorkspaceId([FromQuery] string workspaceId)
+        {
+            var res = await _SlotService.GetByWorkpaceIdAsync(workspaceId);
             return Ok(res);
         }
 

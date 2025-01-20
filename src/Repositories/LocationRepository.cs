@@ -64,13 +64,13 @@ public class LocationRepository : ILocationRepository
         }   
     }
 
-    public async Task<Location[]> GetByWorkspaceIdAsync(string id)
+    public async Task<List<Location>> GetByWorkspaceIdAsync(string id)
     {
         try
         {    
             return await _context.Location
                 .Where(x => x.WorkspaceId == id && x.DeletedAt == null)
-                .ToArrayAsync();
+                .ToListAsync();
                 
         }
         catch (Exception ex)

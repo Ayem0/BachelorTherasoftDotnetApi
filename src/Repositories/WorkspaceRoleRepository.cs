@@ -14,6 +14,12 @@ public class WorkspaceRoleRepository : BaseMySqlRepository<WorkspaceRole>, IWork
     {
     }
 
+    public async Task<List<WorkspaceRole>> GetByWorkspaceIdAsync(string id) {
+        return await _context.WorkspaceRole
+            .Where(x => x.WorkspaceId == id && x.Workspace.DeletedAt == null && x.DeletedAt == null)
+            .ToListAsync();
+    }
+
     // public async new Task<WorkspaceRole?> GetByIdAsync(string id)
     // {
     //     return await _context.WorkspaceRole

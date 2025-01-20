@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BachelorTherasoftDotnetApi.Migrations
 {
     [DbContext(typeof(MySqlDbContext))]
-    [Migration("20250117205726_Initial")]
+    [Migration("20250120152857_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -536,6 +536,9 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("date");
 
@@ -544,6 +547,10 @@ namespace BachelorTherasoftDotnetApi.Migrations
 
                     b.Property<string>("MainSlotId")
                         .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<DateOnly?>("RepetitionEndDate")
                         .HasColumnType("date");

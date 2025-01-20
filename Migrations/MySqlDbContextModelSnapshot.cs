@@ -533,6 +533,9 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("date");
 
@@ -541,6 +544,10 @@ namespace BachelorTherasoftDotnetApi.Migrations
 
                     b.Property<string>("MainSlotId")
                         .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<DateOnly?>("RepetitionEndDate")
                         .HasColumnType("date");

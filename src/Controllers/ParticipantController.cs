@@ -22,8 +22,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("")]
         [Authorize]
+        [WorkspaceAuthorize("Participant")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        
         public async Task<IActionResult> GetById([FromQuery] string id)
         {
             var res =  await _participantService.GetByIdAsync(id);
@@ -73,6 +75,19 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
 
             var res = await _participantService.UpdateAsync(id, req);
 
+            return Ok(res);
+        }
+
+        /// <summary>
+        /// Get a Participant by id.
+        /// </summary>
+        [HttpGet("workspace")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetByWorkspaceId([FromQuery] string workspaceId)
+        {
+            var res =  await _participantService.GetByWorkspaceIdAsync(workspaceId);
             return Ok(res);
         }
     }

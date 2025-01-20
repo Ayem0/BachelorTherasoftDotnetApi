@@ -1,5 +1,4 @@
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
-using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -96,6 +95,19 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> GetById([FromQuery] string id)
         {
             var res = await _workspaceRoleService.GetByIdAsync(id);
+            return Ok(res);
+        }
+
+        /// <summary>
+        /// Gets workspace roles by workspace id.
+        /// </summary>
+        [HttpGet("workspace")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetByWorkspaceId([FromQuery] string workspaceId)
+        {
+            var res = await _workspaceRoleService.GetByWorkspaceIdAsync(workspaceId);
             return Ok(res);
         }
     }

@@ -47,11 +47,11 @@ public class WorkspaceAuthorizationService : IWorkspaceAuthorizationService
     public async Task<BaseAuthorizationModel?> GetEntityById(string tableName, string id) 
     {
         return tableName switch
-        {
+        {          
             "Workspace" => await _workspaceRepository.GetJoinUsersByIdAsync(id),
             "WorkspaceRole" => await _workspaceRoleRepository.GetEntityByIdAsync(id),
             "Tag" => await _tagRepository.GetEntityByIdAsync(id),
-            "Participant" => await _participantRepository.GetEntityByIdAsync(id) ,
+            "Participant" => await _participantRepository.GetEntityByIdAsync(id),
             "ParticipantCategory" => await _participantCategoryRepository.GetEntityByIdAsync(id),
             "EventCategory" => await _eventCategoryRepository.GetEntityByIdAsync(id),
             "Slot" => await _slotRepository.GetEntityByIdAsync(id),

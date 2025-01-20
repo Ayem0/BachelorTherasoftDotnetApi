@@ -98,4 +98,10 @@ public class WorkspaceRoleService : IWorkspaceRoleService
 
         return _mapper.Map<WorkspaceRoleDto>(workspaceRole);
     }
+
+    public async Task<List<WorkspaceRoleDto>> GetByWorkspaceIdAsync(string id) 
+    {
+        var roles = await _workspaceRoleRepository.GetByWorkspaceIdAsync(id);
+        return _mapper.Map<List<WorkspaceRoleDto>>(roles);
+    }
 }

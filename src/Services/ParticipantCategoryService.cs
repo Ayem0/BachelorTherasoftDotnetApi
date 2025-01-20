@@ -56,4 +56,9 @@ public class ParticipantCategoryService : IParticipantCategoryService
 
         return _mapper.Map<ParticipantCategoryDto>(participantCategory);
     }
+
+    public async Task<List<ParticipantCategoryDto>> GetByWorkspaceIdAsync(string id) {
+        var res = await _participantCategoryRepository.GetByWorkpaceIdAsync(id);
+        return _mapper.Map<List<ParticipantCategoryDto>>(res);
+    }
 }

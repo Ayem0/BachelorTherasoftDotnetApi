@@ -10,4 +10,5 @@ public interface IParticipantService
     Task<ParticipantDto> CreateAsync(CreateParticipantRequest request);
     Task<bool> DeleteAsync(string id);
     Task<ParticipantDto> UpdateAsync(string id, UpdateParticipantRequest request);
+    Task<List<ParticipantDto>> GetByWorkspaceIdAsync(string id);
 }

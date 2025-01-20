@@ -79,4 +79,10 @@ public class ParticipantService : IParticipantService
 
         return _mapper.Map<ParticipantDto>(participant);
     }
+
+    public async Task<List<ParticipantDto>> GetByWorkspaceIdAsync(string id) 
+    {
+        var res = await _participantRepository.GetByWorkpaceIdAsync(id);
+        return _mapper.Map<List<ParticipantDto>>(res);
+    }
 }

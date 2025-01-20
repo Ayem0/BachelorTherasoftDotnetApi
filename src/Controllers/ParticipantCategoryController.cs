@@ -22,6 +22,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("")]
         [Authorize]
+        [WorkspaceAuthorize("ParticipantCategory")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById([FromQuery] string id)
@@ -70,6 +71,19 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
             var res =  await _participantCategoryService.UpdateAsync(id, request);
+            return Ok(res);
+        }
+
+        /// <summary>
+        /// Get a ParticipantCategory by id.
+        /// </summary>
+        [HttpGet("workspace")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetByWorkspaceId([FromQuery] string workspaceId)
+        {
+            var res = await _participantCategoryService.GetByWorkspaceIdAsync(workspaceId);
             return Ok(res);
         }
     }

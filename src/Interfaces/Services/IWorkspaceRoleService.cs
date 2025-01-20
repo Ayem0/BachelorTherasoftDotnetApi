@@ -15,4 +15,5 @@ public interface IWorkspaceRoleService
     // Task< RemoveRoleFromMemberAsync(string id, string userId);
     Task<bool> DeleteAsync(string id);
     Task<WorkspaceRoleDto> UpdateAsync(string id, UpdateWorkspaceRoleRequest request);
+    Task<List<WorkspaceRoleDto>> GetByWorkspaceIdAsync(string id);
 }

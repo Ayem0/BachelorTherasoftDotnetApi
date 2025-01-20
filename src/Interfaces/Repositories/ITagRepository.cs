@@ -8,5 +8,6 @@ public interface ITagRepository : IBaseRepository<Tag>
 {
     // new Task<Tag?> GetByIdAsync(string id);
     Task<Tag?> GetByIdJoinWorkspaceAsync(string id);
+    Task<List<Tag>> GetByWorkpaceIdAsync(string id);
 
 }
