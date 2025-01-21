@@ -11,4 +11,5 @@ public interface ILocationRepository
     Task<bool> DeleteAsync(string id);
     Task<Location?> GetDetailsByIdAsync(string id);
     Task<List<Location>> GetByWorkspaceIdAsync(string id);
+    Task<Location?> GetByIdJoinWorkspaceAsync(string id);
 }

@@ -19,7 +19,6 @@ public class RoomRepository : IRoomRepository
     {
         try
         {    
-            Room.CreatedAt = DateTime.UtcNow;
             _context.Room.Add(Room);
             var res = await _context.SaveChangesAsync();
             return Room ?? throw new DbException(DbAction.Create, "Room");
@@ -55,6 +54,21 @@ public class RoomRepository : IRoomRepository
             return await _context.Room
                 .Where(x => x.Id == id && x.DeletedAt == null)
                 .FirstOrDefaultAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting Room with Id '{id}' : {ex.Message}");
+            throw new DbException(DbAction.Read, "Room", id);
+        }   
+    }
+
+    public async Task<List<Room>?> GetByAreaIdAsync(string id)
+    {
+        try
+        {    
+            return await _context.Room
+                .Where(x => x.AreaId == id && x.DeletedAt == null && x.Area.DeletedAt == null)
+                .ToListAsync();
         }
         catch (Exception ex)
         {

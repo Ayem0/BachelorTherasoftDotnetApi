@@ -19,7 +19,6 @@ public class WorkspaceRepository : IWorkspaceRepository
     {
         try
         {    
-            workspace.CreatedAt = DateTime.UtcNow;
             _context.Workspace.Add(workspace);
             var res = await _context.SaveChangesAsync();
             return workspace ?? throw new DbException(DbAction.Create, "Workspace");

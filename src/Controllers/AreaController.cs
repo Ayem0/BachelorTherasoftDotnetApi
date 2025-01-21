@@ -19,13 +19,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
     public class AreaController : ControllerBase
     {
         private readonly IAreaService _areaService;
-        private readonly IUserService _userService;
-        private readonly ILocationService _locationService;
-        public AreaController(IAreaService areaService, ILocationService locationService, IUserService userService)
+        public AreaController(IAreaService areaService)
         {
             _areaService = areaService;
-            _locationService = locationService;
-            _userService = userService;
         }
 
         /// <summary>
@@ -92,7 +88,6 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("Location")]
         [Authorize]
-        [WorkspaceAuthorize("Area")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAreasByLocationId([FromQuery] string id)

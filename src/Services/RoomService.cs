@@ -23,7 +23,7 @@ public class RoomService : IRoomService
 
     public async Task<RoomDto> CreateAsync(CreateRoomRequest request)
     {
-        var area = await _areaRepository.GetEntityByIdAsync(request.AreaId) ?? throw new NotFoundException("Area", request.AreaId);
+        var area = await _areaRepository.GetByIdJoinWorkspaceAsync(request.AreaId) ?? throw new NotFoundException("Area", request.AreaId);
 
         var room = new Room(area.Workspace, area, request.Name, request.Description) { Area = area, Workspace = area.Workspace };
 
@@ -42,6 +42,11 @@ public class RoomService : IRoomService
         var room = await _roomRepository.GetByIdAsync(id) ?? throw new NotFoundException("Room", id);
 
         return _mapper.Map<RoomDto>(room);
+    }
+
+    public async Task<List<RoomDto>> GetByAreaIdAsync(string id) {
+        var rooms = await _roomRepository.GetByAreaIdAsync(id);
+        return _mapper.Map<List<RoomDto>>(rooms);
     }
 
     public async Task<RoomDto> UpdateAsync(string id, UpdateRoomRequest request)

@@ -14,4 +14,5 @@ public interface IRoomService
     Task<RoomDto> CreateAsync(CreateRoomRequest request);
     Task<bool> DeleteAsync(string id);
     Task<RoomDto> UpdateAsync(string id, UpdateRoomRequest request);
+    Task<List<RoomDto>> GetByAreaIdAsync(string id);
 }

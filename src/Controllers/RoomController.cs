@@ -33,6 +33,19 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         }
 
         /// <summary>
+        /// Get a Room by id.
+        /// </summary>
+        [HttpGet("area")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetByAreaId([FromQuery] string areaId)
+        {
+            var res = await _roomService.GetByAreaIdAsync(areaId);
+            return Ok(res);
+        }
+
+        /// <summary>
         /// Creates a Room.
         /// </summary>
         [HttpPost("")]

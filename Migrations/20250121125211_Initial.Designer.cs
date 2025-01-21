@@ -3,6 +3,7 @@ using System;
 using BachelorTherasoftDotnetApi.src.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -11,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BachelorTherasoftDotnetApi.Migrations
 {
     [DbContext(typeof(MySqlDbContext))]
-    [Migration("20250120152857_Initial")]
+    [Migration("20250121125211_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -22,13 +23,12 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Area", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
@@ -65,9 +65,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
@@ -95,9 +92,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
@@ -128,9 +122,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
@@ -193,9 +184,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
@@ -256,9 +244,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
@@ -309,9 +294,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<string>("Country")
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
@@ -341,9 +323,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
@@ -368,9 +347,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
 
                     b.Property<string>("Country")
                         .HasColumnType("longtext");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime(6)");
@@ -423,9 +399,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<string>("Color")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
@@ -496,9 +469,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
@@ -530,9 +500,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
@@ -543,7 +510,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .HasColumnType("date");
 
                     b.Property<TimeOnly>("EndTime")
-                        .HasColumnType("time");
+                        .HasColumnType("time(6)");
 
                     b.Property<string>("MainSlotId")
                         .HasColumnType("varchar(255)");
@@ -565,7 +532,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .HasColumnType("date");
 
                     b.Property<TimeOnly>("StartTime")
-                        .HasColumnType("time");
+                        .HasColumnType("time(6)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");
@@ -591,9 +558,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<string>("Color")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
@@ -661,7 +625,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -710,9 +674,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
@@ -735,9 +696,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
@@ -814,6 +772,8 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("ClaimType")
                         .HasColumnType("longtext");
 
@@ -836,6 +796,8 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("longtext");
@@ -964,7 +926,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .IsRequired();
 
                     b.HasOne("BachelorTherasoftDotnetApi.src.Models.Workspace", "Workspace")
-                        .WithMany()
+                        .WithMany("Areas")
                         .HasForeignKey("WorkspaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1023,7 +985,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .IsRequired();
 
                     b.HasOne("BachelorTherasoftDotnetApi.src.Models.Workspace", "Workspace")
-                        .WithMany()
+                        .WithMany("Events")
                         .HasForeignKey("WorkspaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1148,7 +1110,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .IsRequired();
 
                     b.HasOne("BachelorTherasoftDotnetApi.src.Models.Workspace", "Workspace")
-                        .WithMany()
+                        .WithMany("Rooms")
                         .HasForeignKey("WorkspaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1380,13 +1342,19 @@ namespace BachelorTherasoftDotnetApi.Migrations
 
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Workspace", b =>
                 {
+                    b.Navigation("Areas");
+
                     b.Navigation("EventCategories");
+
+                    b.Navigation("Events");
 
                     b.Navigation("Locations");
 
                     b.Navigation("ParticipantCategories");
 
                     b.Navigation("Participants");
+
+                    b.Navigation("Rooms");
 
                     b.Navigation("Slots");
 

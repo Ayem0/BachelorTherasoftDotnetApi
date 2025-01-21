@@ -25,5 +25,8 @@ public class Workspace : BaseModel, BaseAuthorizationModel
         public List<ParticipantCategory> ParticipantCategories { get; set; } = [];
         public List<Participant> Participants { get; set; } = [];
         public List<Tag> Tags { get; set; } = [];
-        public string? WorkspaceId => Id; 
+        public List<Room> Rooms { get; set; } = [];
+        public List<Area> Areas { get; set; } = [];
+        public List<Event> Events { get; set; } = [];
+        public string WorkspaceId => Id; 
 }

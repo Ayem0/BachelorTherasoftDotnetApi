@@ -28,4 +28,12 @@ public class AreaRepository : BaseMySqlRepository<Area>, IAreaRepository
             .Where(a => a.LocationId == id && a.DeletedAt == null)
             .ToListAsync();
     }
+
+    public async Task<Area?> GetByIdJoinWorkspaceAsync(string id)
+    {
+        return await _context.Area
+            .Include(w => w.Workspace)
+            .Where(w => w.Id == id && w.DeletedAt == null && w.Location.DeletedAt == null && w.Workspace.DeletedAt == null)
+            .FirstOrDefaultAsync();
+    }
 }

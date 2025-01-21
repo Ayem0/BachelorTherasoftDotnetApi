@@ -57,7 +57,6 @@ public class BaseMySqlRepository<T> : IBaseRepository<T> where T : BaseModel
     {
         try
         {
-            entity.CreatedAt = DateTime.UtcNow;
             _dbSet.Add(entity);
 
             await _context.SaveChangesAsync();
@@ -104,16 +103,9 @@ public class BaseMySqlRepository<T> : IBaseRepository<T> where T : BaseModel
     {
         try
         {
-            foreach (var entity in entities)
-            {
-                entity.CreatedAt = DateTime.UtcNow;
-            }
-
             _dbSet.AddRange(entities);
 
             await _context.SaveChangesAsync();
-
-           
         }
         catch (Exception ex)
         {

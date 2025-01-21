@@ -20,7 +20,6 @@ public class LocationRepository : ILocationRepository
     {
         try
         {    
-            location.CreatedAt = DateTime.UtcNow;
             _context.Location.Add(location);
             var res = await _context.SaveChangesAsync();
             return location ?? throw new DbException(DbAction.Create, "Location");
@@ -54,7 +53,23 @@ public class LocationRepository : ILocationRepository
         try
         {    
             return await _context.Location
-                .Where(x => x.Id == id && x.DeletedAt == null)
+                .Where(x => x.Id == id && x.DeletedAt == null && x.Workspace.DeletedAt == null)
+                .FirstOrDefaultAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting location with Id '{id}' : {ex.Message}");
+            throw new DbException(DbAction.Read, "Location", id);
+        }   
+    }
+
+    public async Task<Location?> GetByIdJoinWorkspaceAsync(string id)
+    {
+        try
+        {    
+            return await _context.Location
+                .Include(x => x.Workspace)
+                .Where(x => x.Id == id && x.DeletedAt == null && x.Workspace.DeletedAt == null)
                 .FirstOrDefaultAsync();
         }
         catch (Exception ex)

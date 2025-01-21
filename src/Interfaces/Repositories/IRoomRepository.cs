@@ -10,5 +10,6 @@ public interface IRoomRepository
     Task<Room> UpdateAsync(Room room);
     Task<bool> DeleteAsync(string id);
     Task<Room?> GetJoinEventsSlotsByIdAsync(string id);
+    Task<List<Room>?> GetByAreaIdAsync(string id);
 }
 

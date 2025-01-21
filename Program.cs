@@ -12,6 +12,7 @@ using BachelorTherasoftDotnetApi.src.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using MySqlConnector;
 using System.Reflection;
 
 
@@ -56,10 +57,19 @@ builder.Services.AddSwaggerGen(o =>
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     o.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
-// MySQL service
+// // MySQL service
+// builder.Services.AddDbContext<MySqlDbContext>( 
+//     options => options.UseMySql(builder.Configuration.GetConnectionString("MySQL")!)
+// );
+
 builder.Services.AddDbContext<MySqlDbContext>( 
-    options => options.UseMySQL(builder.Configuration.GetConnectionString("MySQL")!)
-);
+    options => options.UseMySql(
+        new MySqlConnection(builder.Configuration.GetConnectionString("MySQL")),
+        new MySqlServerVersion(new Version(8, 0, 38)),
+        options => options.EnableRetryOnFailure()
+    ));
+
+
 // Identity service
 builder.Services.AddIdentityApiEndpoints<User>(options => {
     // options.SignIn.RequireConfirmedEmail = true;
