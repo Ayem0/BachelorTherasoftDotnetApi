@@ -33,8 +33,20 @@ public class EventRepository : BaseMySqlRepository<Event>, IEventRepository
                 .ThenInclude(r => r.Area)
                     .ThenInclude(a => a.Location)
                         .ThenInclude(l => l.Workspace)
-            .Where(e => e.Id == id && e.DeletedAt == null && e.Room.DeletedAt == null && e.Room.Area.DeletedAt == null && 
+            .Where(e => e.Id == id && e.DeletedAt == null && e.Room.DeletedAt == null && e.Room.Area.DeletedAt == null &&
                 e.Room.Area.Location.DeletedAt == null)
             .FirstOrDefaultAsync();
+    }
+
+    public async Task<List<Event>> GetByRangeAndUserIdAsync(string id, DateTime start, DateTime end)
+    {
+        return await _context.Event
+            .Include(x => x.Users)
+            .Where(e => e.StartDate >= start && e.EndDate <= end && e.Users.Select(x => x.UserId).Contains(id) && e.DeletedAt == null).ToListAsync();
+    }
+
+    public async Task<List<Event>> GetByRangeAndRoomIdAsync(string id, DateTime start, DateTime end)
+    {
+        return await _context.Event.Where(e => e.StartDate >= start && e.EndDate <= end && e.DeletedAt == null).ToListAsync();
     }
 }

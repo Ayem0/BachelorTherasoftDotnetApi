@@ -14,4 +14,6 @@ public interface IEventService
     Task<bool> DeleteAsync(string id);
     Task<EventDto> UpdateAsync(string id, UpdateEventRequest req);
     Task<List<EventDto>?> CreateWithRepetitionAsync(CreateEventWithRepetitionRequest request);
+    Task<List<EventDto>> GetByRangeAndUserIdAsync(string id, DateTime start, DateTime end);
+    Task<List<EventDto>> GetByRangeAndRoomIdAsync(string id, DateTime start, DateTime end);
 }

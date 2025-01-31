@@ -22,7 +22,7 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.WorkspaceRoles, opt => opt.MapFrom(src => src.WorkspaceRoles))
             .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags))
             .ForMember(dest => dest.Users, opt => opt.MapFrom(src => src.Users));
-            // .ForMember(dest => dest.Users, opt => opt.MapFrom(src => src.Users.Select(u => u.User)));
+        // .ForMember(dest => dest.Users, opt => opt.MapFrom(src => src.Users.Select(u => u.User)));
 
         // CreateMap<WorkspaceUser, UserDto>()
         //     .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.User.Id))

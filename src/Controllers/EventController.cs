@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
@@ -25,7 +26,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById([FromQuery] string id)
         {
-            var res =  await _eventService.GetByIdAsync(id);
+            var res = await _eventService.GetByIdAsync(id);
             return Ok(res);
         }
 
@@ -53,8 +54,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromQuery] string id)
         {
-            var res =  await _eventService.DeleteAsync(id);
-            return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Event with id '{id} not found.'"});
+            var res = await _eventService.DeleteAsync(id);
+            return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"Event with id '{id} not found.'" });
         }
 
         /// <summary>
@@ -69,7 +70,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res =  await _eventService.UpdateAsync(id, request);
+            var res = await _eventService.UpdateAsync(id, request);
             return Ok(res);
         }
 
@@ -86,6 +87,35 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
 
             var res = await _eventService.CreateWithRepetitionAsync(request);
             return CreatedAtAction(null, res);
+        }
+
+        /// <summary>
+        /// Get events by range and room id.
+        /// </summary>
+        [HttpGet("room")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetByRoomId([FromQuery] string id, [FromQuery] DateTime start, [FromQuery] DateTime end)
+        {
+            var res = await _eventService.GetByRangeAndRoomIdAsync(id, start, end);
+            return Ok(res);
+        }
+
+        /// <summary>
+        /// Get events by range and user id.
+        /// </summary>
+        [HttpGet("user")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetByUser([FromQuery] DateTime start, [FromQuery] DateTime end)
+        {
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+            var res = await _eventService.GetByRangeAndUserIdAsync(userId, start, end);
+            return Ok(res);
         }
     }
 }

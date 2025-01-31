@@ -66,7 +66,7 @@ public class EventService : IEventService
 
         await _eventRepository.CreateAsync(eventToAdd);
 
-        return _mapper.Map<EventDto>(eventToAdd);   
+        return _mapper.Map<EventDto>(eventToAdd);
     }
 
     public async Task<bool> DeleteAsync(string id)
@@ -82,7 +82,7 @@ public class EventService : IEventService
     }
 
     public async Task<EventDto> UpdateAsync(string id, UpdateEventRequest req)
-    { 
+    {
         var eventToUpdate = await _eventRepository.GetByIdJoinRelationsAsync(id) ?? throw new NotFoundException("Event", id);
 
         if (req.NewRoomId != null)
@@ -251,6 +251,19 @@ public class EventService : IEventService
 
         await _eventRepository.CreateMultipleAsync(events);
 
-        return events.Select(x => _mapper.Map<EventDto>(x)).ToList();  
+        return _mapper.Map<List<EventDto>>(events);
+    }
+
+
+    public async Task<List<EventDto>> GetByRangeAndUserIdAsync(string id, DateTime start, DateTime end)
+    {
+        var res = await _eventRepository.GetByRangeAndUserIdAsync(id, start, end);
+        return _mapper.Map<List<EventDto>>(res);
+    }
+
+    public async Task<List<EventDto>> GetByRangeAndRoomIdAsync(string id, DateTime start, DateTime end)
+    {
+        var res = await _eventRepository.GetByRangeAndRoomIdAsync(id, start, end);
+        return _mapper.Map<List<EventDto>>(res);
     }
 }
