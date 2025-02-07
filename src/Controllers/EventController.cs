@@ -40,8 +40,10 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Create([FromBody] CreateEventRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
 
-            var res = await _eventService.CreateAsync(request);
+            var res = await _eventService.CreateAsync(userId, request);
             return CreatedAtAction(null, res);
         }
 

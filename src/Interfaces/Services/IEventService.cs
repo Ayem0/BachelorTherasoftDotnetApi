@@ -10,7 +10,7 @@ namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 public interface IEventService
 {
     Task<EventDto> GetByIdAsync(string id);
-    Task<EventDto?> CreateAsync(CreateEventRequest req);
+    Task<EventDto?> CreateAsync(string userId, CreateEventRequest req);
     Task<bool> DeleteAsync(string id);
     Task<EventDto> UpdateAsync(string id, UpdateEventRequest req);
     Task<List<EventDto>?> CreateWithRepetitionAsync(CreateEventWithRepetitionRequest request);

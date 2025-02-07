@@ -39,6 +39,7 @@ public class AutoMapperProfile : Profile
         CreateMap<User, UserDto>();
         CreateMap<Area, AreaDto>();
         CreateMap<Room, RoomDto>();
-        CreateMap<Event, EventDto>();
+        CreateMap<Event, EventDto>()
+        .ForMember(dest => dest.Users, opt => opt.MapFrom(src => src.Users.Select(x => x.User)));
     }
 }

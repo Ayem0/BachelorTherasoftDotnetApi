@@ -33,7 +33,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         }
 
         /// <summary>
-        /// Get a Room by id.
+        /// Get rooms by area id.
         /// </summary>
         [HttpGet("area")]
         [Authorize]
@@ -42,6 +42,19 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> GetByAreaId([FromQuery] string areaId)
         {
             var res = await _roomService.GetByAreaIdAsync(areaId);
+            return Ok(res);
+        }
+
+        /// <summary>
+        /// Get rooms by workspace id.
+        /// </summary>
+        [HttpGet("workspace")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetByWorkspaceId([FromQuery] string id)
+        {
+            var res = await _roomService.GetByWorkspaceIdAsync(id);
             return Ok(res);
         }
 
@@ -70,7 +83,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Delete([FromQuery] string id)
         {
             var res = await _roomService.DeleteAsync(id);
-            return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Room with id '{id} not found.'"});
+            return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"Room with id '{id} not found.'" });
         }
 
         /// <summary>

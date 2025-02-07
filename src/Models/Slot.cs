@@ -6,7 +6,7 @@ namespace BachelorTherasoftDotnetApi.src.Models;
 // TODO voir si possible de modeliser mieux les créneaux + voir comment en faire les horaires d'ouvertures maybe champs eventCategories a null mais en vrai un bool c mieux
 public class Slot : BaseModel, BaseAuthorizationModel
 {
-    public Slot(string name, string? description, Workspace workspace, DateOnly startDate, DateOnly endDate, TimeOnly startTime, TimeOnly endTime, List<EventCategory> eventCategories, Interval? repetitionInterval, 
+    public Slot(string name, string? description, Workspace workspace, DateOnly startDate, DateOnly endDate, TimeOnly startTime, TimeOnly endTime, List<EventCategory> eventCategories, Interval? repetitionInterval,
         int? repetitionNumber, Slot? mainSlot, DateOnly? repetitionEndDate)
     {
         Workspace = workspace;
@@ -25,7 +25,7 @@ public class Slot : BaseModel, BaseAuthorizationModel
         RepetitionEndDate = repetitionEndDate;
     }
 
-    public Slot(string name, string? description, string workspaceId, DateOnly startDate, DateOnly endDate, TimeOnly startTime, TimeOnly endTime, Interval? repetitionInterval, 
+    public Slot(string name, string? description, string workspaceId, DateOnly startDate, DateOnly endDate, TimeOnly startTime, TimeOnly endTime, Interval? repetitionInterval,
     int? repetitionNumber, string? mainSlotId, DateOnly? repetitionEndDate)
     {
         Name = name;
@@ -49,7 +49,7 @@ public class Slot : BaseModel, BaseAuthorizationModel
     public DateOnly EndDate { get; set; }
     public TimeOnly StartTime { get; set; }
     public TimeOnly EndTime { get; set; }
-    public List<EventCategory>? EventCategories { get; set; }
+    public List<EventCategory> EventCategories { get; set; } = [];
     public Interval? RepetitionInterval { get; set; }
     public int? RepetitionNumber { get; set; }
     public Slot? MainSlot { get; set; }

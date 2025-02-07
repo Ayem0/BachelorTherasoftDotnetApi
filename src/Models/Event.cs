@@ -5,7 +5,7 @@ namespace BachelorTherasoftDotnetApi.src.Models;
 
 public class Event : BaseModel, BaseAuthorizationModel
 {
-    public Event(Workspace workspace, string? description, DateTime startDate, DateTime endDate, Room room, EventCategory eventCategory, List<Participant> participants, 
+    public Event(Workspace workspace, string? description, DateTime startDate, DateTime endDate, Room room, EventCategory eventCategory, List<Participant> participants, List<EventUser> users,
         List<Tag> tags, Interval? repetitionInterval, int? repetitionNumber, Event? mainEvent, DateOnly? repetitionEndDate)
     {
         Workspace = workspace;
@@ -24,9 +24,9 @@ public class Event : BaseModel, BaseAuthorizationModel
         MainEvent = mainEvent;
         MainEventId = mainEvent?.Id;
         RepetitionEndDate = repetitionEndDate;
-        // TODO ajouter la liste des Users
+        Users = users;
     }
-    public Event(string workspaceId, string? description, DateTime startDate, DateTime endDate, string roomId, string eventCategoryId, Interval? repetitionInterval, 
+    public Event(string workspaceId, string? description, DateTime startDate, DateTime endDate, string roomId, string eventCategoryId, Interval? repetitionInterval,
     int? repetitionNumber, string? mainEventId, DateOnly? repetitionEndDate)
     {
         WorkspaceId = workspaceId;

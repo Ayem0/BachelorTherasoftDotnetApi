@@ -7,6 +7,7 @@ using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
 using BachelorTherasoftDotnetApi.Utils;
+using Microsoft.AspNetCore.Identity;
 using MongoDB.Driver.Linq;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
@@ -18,24 +19,28 @@ public class EventService : IEventService
     private readonly IEventCategoryRepository _eventCategoryRepository;
     private readonly IParticipantRepository _participantRepository;
     private readonly ITagRepository _tagRepository;
+    private readonly IWorkspaceRepository _workspaceRepository;
+    private readonly UserManager<User> _userManager;
     private readonly IMapper _mapper;
     public EventService(IEventRepository eventRepository, IEventCategoryRepository eventCategoryRepository, IRoomRepository roomRepository, IMapper mapper,
-        IParticipantRepository participantRepository, ITagRepository tagRepository)
+        IParticipantRepository participantRepository, ITagRepository tagRepository, IWorkspaceRepository workspaceRepository, UserManager<User> userManager)
     {
         _eventRepository = eventRepository;
         _roomRepository = roomRepository;
         _eventCategoryRepository = eventCategoryRepository;
         _participantRepository = participantRepository;
         _tagRepository = tagRepository;
+        _workspaceRepository = workspaceRepository;
         _mapper = mapper;
+        _userManager = userManager;
     }
 
-    public async Task<EventDto?> CreateAsync(CreateEventRequest req)
+    public async Task<EventDto?> CreateAsync(string userId, CreateEventRequest req)
     {
         var room = await _roomRepository.GetJoinEventsSlotsByIdAsync(req.RoomId) ?? throw new NotFoundException("Room", req.RoomId);
-
+        var workspace = await _workspaceRepository.GetByIdAsync(room.WorkspaceId) ?? throw new NotFoundException("Workspace", room.WorkspaceId);
         var eventCategory = await _eventCategoryRepository.GetEntityByIdAsync(req.EventCategoryId) ?? throw new NotFoundException("EventCategory", req.EventCategoryId);
-
+        var user = await _userManager.FindByIdAsync(userId) ?? throw new NotFoundException("User", userId);
         List<Participant> participants = [];
         // TODO refactor ceci en une requete et voir tous ceux qui manque / si il y a des doublons et les renvoyé avec l'erreur
         for (int i = 0; i < req.ParticipantIds?.Count; i++)
@@ -54,15 +59,22 @@ public class EventService : IEventService
             if (!tags.Contains(tag)) tags.Add(tag);
         }
 
-        var eventToAdd = new Event(room.Workspace, req.Description, req.StartDate, req.EndDate, room, eventCategory, participants, tags, null, null, null, null)
+        var eventToAdd = new Event(workspace, req.Description, req.StartDate, req.EndDate, room, eventCategory, participants, [], tags, null, null, null, null)
         {
-            Workspace = room.Workspace,
+            Workspace = workspace,
             Room = room,
             EventCategory = eventCategory
         };
         var canAdd = CanAddEvent(room, eventToAdd);
         // TODO faire en sorte de retourner si c'est un probleme de slot ou un probleme d'event
         if (!canAdd) throw new BadRequestException("Cannot add event.", "Cannot add event.");
+
+        var eventUser = new EventUser(user, eventToAdd)
+        {
+            Event = eventToAdd,
+            User = user
+        };
+        eventToAdd.Users.Add(eventUser);
 
         await _eventRepository.CreateAsync(eventToAdd);
 
@@ -173,15 +185,16 @@ public class EventService : IEventService
         }
 
         var roomEvents = room.Events.Where(existingEvent => existingEvent.DeletedAt == null &&
+            // event with same date or starting before and ending after
             (existingEvent.StartDate <= @event.StartDate && existingEvent.EndDate >= @event.EndDate ||
-
+            // event starting after and ending before
             existingEvent.StartDate > @event.StartDate && existingEvent.EndDate < @event.EndDate ||
-
+            // event starting before and ending before
             existingEvent.StartDate < @event.StartDate && existingEvent.EndDate > @event.StartDate && existingEvent.EndDate < @event.EndDate ||
+            // event starting after and ending after
+            existingEvent.StartDate > @event.StartDate && existingEvent.EndDate > @event.EndDate && existingEvent.StartDate < @event.EndDate)).ToList();
 
-            existingEvent.EndDate < @event.EndDate && existingEvent.StartDate > @event.StartDate && existingEvent.StartDate < @event.EndDate)).ToList();
-
-        return roomEvents.Count <= 0;
+        return roomEvents.Count == 0;
 
     }
 
@@ -212,7 +225,7 @@ public class EventService : IEventService
             if (!tags.Contains(tag)) tags.Add(tag);
         }
 
-        var mainEvent = new Event(room.Workspace, request.Description, request.StartDate, request.EndDate, room, eventCategory, participants, tags,
+        var mainEvent = new Event(room.Workspace, request.Description, request.StartDate, request.EndDate, room, eventCategory, participants, [], tags,
             request.RepetitionInterval, request.RepetitionNumber, null, request.RepetitionEndDate)
         {
             Workspace = room.Workspace,
@@ -231,7 +244,7 @@ public class EventService : IEventService
 
         while (DateOnly.FromDateTime(repetitionStartDate) < request.RepetitionEndDate)
         {
-            var @event = new Event(room.Workspace, request.Description, repetitionStartDate, repetitionEndDate, room, eventCategory, participants, tags,
+            var @event = new Event(room.Workspace, request.Description, repetitionStartDate, repetitionEndDate, room, eventCategory, participants, [], tags,
                 null, null, mainEvent, null)
             {
                 Workspace = room.Workspace,

@@ -44,8 +44,15 @@ public class RoomService : IRoomService
         return _mapper.Map<RoomDto>(room);
     }
 
-    public async Task<List<RoomDto>> GetByAreaIdAsync(string id) {
+    public async Task<List<RoomDto>> GetByAreaIdAsync(string id)
+    {
         var rooms = await _roomRepository.GetByAreaIdAsync(id);
+        return _mapper.Map<List<RoomDto>>(rooms);
+    }
+
+    public async Task<List<RoomDto>> GetByWorkspaceIdAsync(string id)
+    {
+        var rooms = await _roomRepository.GetByWorkspaceIdAsync(id);
         return _mapper.Map<List<RoomDto>>(rooms);
     }
 
