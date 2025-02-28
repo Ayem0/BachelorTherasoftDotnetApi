@@ -22,7 +22,6 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("")]
         [Authorize]
-        [WorkspaceAuthorize("EventCategory")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById([FromQuery] string id)
@@ -34,7 +33,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Creates a EventCategory.
         /// </summary>
-        [HttpPost("")] 
+        [HttpPost("")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -56,7 +55,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Delete([FromQuery] string id)
         {
             var res = await _eventCategoryService.DeleteAsync(id);
-            return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Event category with id '{id} not found.'"});
+            return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"Event category with id '{id} not found.'" });
         }
 
         /// <summary>
@@ -70,9 +69,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            if (request.Name == null && request.Icon == null && request.Color == null && request.Description == null) return BadRequest(new ProblemDetails() { Title = "At least one field is required."});
+            if (request.Name == null && request.Icon == null && request.Color == null && request.Description == null) return BadRequest(new ProblemDetails() { Title = "At least one field is required." });
 
-            var res =  await _eventCategoryService.UpdateAsync(id, request);
+            var res = await _eventCategoryService.UpdateAsync(id, request);
             return Ok(res);
         }
 

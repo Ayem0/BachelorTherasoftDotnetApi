@@ -13,5 +13,7 @@ public class User : IdentityUser
     public List<Workspace> Workspaces { get; set; } = [];
     public List<WorkspaceRole> WorkspaceRoles { get; set; } = [];
     public List<EventUser> Events { get; set; } = [];
+    public List<User> Contacts { get; set; } = [];
+    public List<User> BlockedUsers { get; set; } = [];
 }
 

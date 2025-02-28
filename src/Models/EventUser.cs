@@ -1,8 +1,6 @@
 using BachelorTherasoftDotnetApi.src.Enums;
-using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
-[Keyless]
 public class EventUser
 {
     public EventUser(User user, Event @event)

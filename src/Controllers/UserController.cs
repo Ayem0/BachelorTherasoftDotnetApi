@@ -49,5 +49,73 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
 
             return Ok(user);
         }
+
+        /// <summary>
+        /// Get user contacts
+        /// </summary>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Authorize]
+        [HttpGet("Contact")]
+        public async Task<IActionResult> GetContacts()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+            var contacts = await _userService.GetUserContactsByIdAsync(userId);
+
+            return Ok(contacts);
+        }
+
+        /// <summary>
+        /// Get user contacts
+        /// </summary>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Authorize]
+        [HttpGet("Contact/Remove/{id}")]
+        public async Task<IActionResult> RemoveContact(string id)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+            await _userService.GetUserContactsByIdAsync(userId);
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Get user contacts
+        /// </summary>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Authorize]
+        [HttpGet("Block/{id}")]
+        public async Task<IActionResult> BlockUser(string id)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+            // TODO 
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Get user contacts
+        /// </summary>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Authorize]
+        [HttpGet("Unblock/{id}")]
+        public async Task<IActionResult> UnblockUser(string id)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+            // TODO 
+
+            return Ok();
+        }
     }
 }

@@ -22,7 +22,6 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("")]
         [Authorize]
-        [WorkspaceAuthorize("Tag")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -50,13 +49,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpDelete("")]
         [Authorize]
-        [WorkspaceAuthorize("Tag")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromQuery] string id)
         {
             var res = await _tagService.DeleteAsync(id);
-            return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Tag with id '{id} not found.'"});
+            return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"Tag with id '{id} not found.'" });
         }
 
         /// <summary>
@@ -64,13 +62,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPut("")]
         [Authorize]
-        [WorkspaceAuthorize("Tag")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateTagRequest request)
         {
-            if (request.Name == null && request.Description == null && request.Color == null && request.Name == null) return BadRequest(new ProblemDetails(){ Title = "At least one field is required."});
+            if (request.Name == null && request.Description == null && request.Color == null && request.Name == null) return BadRequest(new ProblemDetails() { Title = "At least one field is required." });
             var tag = await _tagService.UpdateAsync(id, request);
             return Ok(tag);
         }

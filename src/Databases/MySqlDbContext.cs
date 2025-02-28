@@ -29,6 +29,25 @@ public class MySqlDbContext : IdentityDbContext<User, Role, string>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        // Contacts
+        builder.Entity<User>()
+            .HasMany(u => u.Contacts)
+            .WithMany()
+            .UsingEntity<Dictionary<string, object>>(
+            "UserContactUser",
+            j => j.HasOne<User>().WithMany().HasForeignKey("ContactId"),
+            j => j.HasOne<User>().WithMany().HasForeignKey("UserId")
+            );
+
+        builder.Entity<User>()
+            .HasMany(u => u.BlockedUsers)
+            .WithMany()
+            .UsingEntity<Dictionary<string, object>>(
+            "UserBlockedUser",
+            j => j.HasOne<User>().WithMany().HasForeignKey("BlockedUserId"),
+            j => j.HasOne<User>().WithMany().HasForeignKey("UserId")
+            ); ;
+
         // var JsonSerializerOptions = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
         // var dayOfWeekConverter = new ValueConverter<List<DayOfWeek>?, string?>(
         //     v => v == null ? null : JsonSerializer.Serialize(v, JsonSerializerOptions), // Si `v` est null, retourner null
@@ -65,9 +84,11 @@ public class MySqlDbContext : IdentityDbContext<User, Role, string>
         //         t => TimeOnly.FromTimeSpan(t)
         //     );
 
+
+
         // EventUser
         builder.Entity<EventUser>()
-            .HasKey(uw => new { uw.EventId, uw.UserId }); 
+            .HasKey(uw => new { uw.EventId, uw.UserId });
 
         builder.Entity<EventUser>()
             .HasOne(uw => uw.User)

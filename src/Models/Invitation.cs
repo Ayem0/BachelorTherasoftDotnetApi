@@ -30,6 +30,19 @@ public class Invitation : BaseModel
         Receiver = receiver;
     }
 
+    public Invitation(User sender, User receiver)
+    {
+        InvitationType = InvitationType.Contact;
+        Workspace = null;
+        Event = null;
+        WorkspaceId = null;
+        EventId = null;
+        SenderId = sender.Id;
+        ReceiverId = receiver.Id;
+        Sender = sender;
+        Receiver = receiver;
+    }
+
     public Invitation(InvitationType invitationType, string? workspaceId, string? eventId, string senderId, string receiverId)
     {
         InvitationType = invitationType;
@@ -38,7 +51,7 @@ public class Invitation : BaseModel
         SenderId = senderId;
         ReceiverId = receiverId;
     }
-    public InvitationType InvitationType { get; set; } 
+    public InvitationType InvitationType { get; set; }
     public Workspace? Workspace { get; set; }
     public string? WorkspaceId { get; set; }
     public Event? Event { get; set; }

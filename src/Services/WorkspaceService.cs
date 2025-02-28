@@ -36,13 +36,6 @@ public class WorkspaceService : IWorkspaceService
         return _mapper.Map<List<WorkspaceDto>>(workspaces);
     }
 
-    public async Task<WorkspaceDetailsDto> GetDetailsByIdAsync(string id)
-    {
-        var workspace = await _workspaceRepository.GetDetailsByIdAsync(id) ?? throw new NotFoundException("Workspace", id);
-
-        return _mapper.Map<WorkspaceDetailsDto>(workspace);
-    }
-
     public async Task<WorkspaceDto> CreateAsync(string userId, CreateWorkspaceRequest request)
     {
         var user = await _userManager.FindByIdAsync(userId) ?? throw new NotFoundException("User", userId);
@@ -80,11 +73,18 @@ public class WorkspaceService : IWorkspaceService
     {
         var workspace = await _workspaceRepository.GetByIdAsync(id) ?? throw new NotFoundException("Workspace", id);
 
-        workspace.Name = req.NewName ?? workspace.Name;
-        workspace.Description = req.NewDescription ?? workspace.Description;
+        workspace.Name = req.Name ?? workspace.Name;
+        workspace.Description = req.Description ?? workspace.Description;
 
         await _workspaceRepository.UpdateAsync(workspace);
 
         return _mapper.Map<WorkspaceDto>(workspace);
+    }
+
+    public async Task<List<UserDto>> GetMembersByIdAsync(string id)
+    {
+        var workspace = await _workspaceRepository.GetJoinUsersByIdAsync(id) ?? throw new NotFoundException("Workspace", id);
+        var members = workspace.Users;
+        return _mapper.Map<List<UserDto>>(members);
     }
 }

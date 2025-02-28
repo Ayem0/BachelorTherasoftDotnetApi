@@ -13,7 +13,4 @@ public class UserDto
     public string? LastName { get; set; }
     [Required]
     public string Email { get; set; } = string.Empty;
-    
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public List<WorkspaceDto>? Workspaces { get; set; }
 }

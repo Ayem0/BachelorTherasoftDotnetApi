@@ -22,13 +22,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("")]
         [Authorize]
-        [WorkspaceAuthorize("Participant")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        
+
         public async Task<IActionResult> GetById([FromQuery] string id)
         {
-            var res =  await _participantService.GetByIdAsync(id);
+            var res = await _participantService.GetByIdAsync(id);
             return Ok(res);
         }
 
@@ -57,7 +56,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Delete([FromQuery] string id)
         {
             var res = await _participantService.DeleteAsync(id);
-            return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Participant with id '{id} not found.'"});
+            return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"Participant with id '{id} not found.'" });
         }
 
         /// <summary>
@@ -69,9 +68,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateParticipantRequest req)
         {
-            if (req.Address == null && req.FirstName == null && req.LastName == null && req.City == null && req.DateOfBirth == null 
+            if (req.Address == null && req.FirstName == null && req.LastName == null && req.City == null && req.DateOfBirth == null
                 && req.Country == null && req.Email == null && req.ParticipantCategoryId == null && req.Description == null)
-                return BadRequest(new ProblemDetails() { Title = "At least one field is required."});
+                return BadRequest(new ProblemDetails() { Title = "At least one field is required." });
 
             var res = await _participantService.UpdateAsync(id, req);
 
@@ -87,7 +86,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByWorkspaceId([FromQuery] string workspaceId)
         {
-            var res =  await _participantService.GetByWorkspaceIdAsync(workspaceId);
+            var res = await _participantService.GetByWorkspaceIdAsync(workspaceId);
             return Ok(res);
         }
     }

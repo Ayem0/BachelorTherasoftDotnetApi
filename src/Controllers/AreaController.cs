@@ -33,7 +33,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById([FromQuery] string id)
         {
-            var res =  await _areaService.GetByIdAsync(id);
+            var res = await _areaService.GetByIdAsync(id);
             return Ok(res);
         }
 
@@ -62,7 +62,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Delete([FromQuery] string id)
         {
             var res = await _areaService.DeleteAsync(id);
-            return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Area with id '{id} not found.'"});
+            return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"Area with id '{id} not found.'" });
         }
 
         /// <summary>
@@ -70,16 +70,15 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPut("")]
         [Authorize]
-        [WorkspaceAuthorize("Area")]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateAreaRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            if (request.NewDescription == null && request.NewName == null) return BadRequest(new ProblemDetails() { Title = "At least one field is required."});
+            if (request.NewDescription == null && request.NewName == null) return BadRequest(new ProblemDetails() { Title = "At least one field is required." });
 
-            var res =  await _areaService.UpdateAsync(id, request);
+            var res = await _areaService.UpdateAsync(id, request);
             return Ok(res);
         }
 
@@ -91,7 +90,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAreasByLocationId([FromQuery] string id)
-        {   
+        {
             var areas = await _areaService.GetAreasByLocationIdAsync(id);
             return Ok(areas);
         }

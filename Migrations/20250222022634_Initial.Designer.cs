@@ -3,7 +3,6 @@ using System;
 using BachelorTherasoftDotnetApi.src.Databases;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -12,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BachelorTherasoftDotnetApi.Migrations
 {
     [DbContext(typeof(MySqlDbContext))]
-    [Migration("20250121125211_Initial")]
+    [Migration("20250222022634_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -22,8 +21,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
-
-            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Area", b =>
                 {
@@ -510,7 +507,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .HasColumnType("date");
 
                     b.Property<TimeOnly>("EndTime")
-                        .HasColumnType("time(6)");
+                        .HasColumnType("time");
 
                     b.Property<string>("MainSlotId")
                         .HasColumnType("varchar(255)");
@@ -532,7 +529,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .HasColumnType("date");
 
                     b.Property<TimeOnly>("StartTime")
-                        .HasColumnType("time(6)");
+                        .HasColumnType("time");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");
@@ -625,7 +622,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -772,8 +769,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<string>("ClaimType")
                         .HasColumnType("longtext");
 
@@ -796,8 +791,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("longtext");
@@ -885,6 +878,36 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.HasIndex("SlotsId");
 
                     b.ToTable("RoomSlot");
+                });
+
+            modelBuilder.Entity("UserBlockedUser", b =>
+                {
+                    b.Property<string>("BlockedUserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("BlockedUserId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserBlockedUser");
+                });
+
+            modelBuilder.Entity("UserContactUser", b =>
+                {
+                    b.Property<string>("ContactId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("ContactId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserContactUser");
                 });
 
             modelBuilder.Entity("UserWorkspace", b =>
@@ -1266,6 +1289,36 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.HasOne("BachelorTherasoftDotnetApi.src.Models.Slot", null)
                         .WithMany()
                         .HasForeignKey("SlotsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("UserBlockedUser", b =>
+                {
+                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("BlockedUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("UserContactUser", b =>
+                {
+                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("ContactId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BachelorTherasoftDotnetApi.src.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

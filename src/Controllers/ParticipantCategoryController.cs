@@ -22,7 +22,6 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("")]
         [Authorize]
-        [WorkspaceAuthorize("ParticipantCategory")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById([FromQuery] string id)
@@ -55,8 +54,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromQuery] string id)
         {
-            var res =  await _participantCategoryService.DeleteAsync(id);
-            return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Participant category with id '{id} not found.'"});
+            var res = await _participantCategoryService.DeleteAsync(id);
+            return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"Participant category with id '{id} not found.'" });
         }
 
         /// <summary>
@@ -70,7 +69,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res =  await _participantCategoryService.UpdateAsync(id, request);
+            var res = await _participantCategoryService.UpdateAsync(id, request);
             return Ok(res);
         }
 

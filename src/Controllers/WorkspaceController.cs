@@ -27,7 +27,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("")]
         [Authorize]
-        [WorkspaceAuthorize("Workspace")]
+
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById([FromQuery] string id)
@@ -48,30 +48,16 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return Unauthorized();
-            
+
             var res = await _workspaceService.GetByUserIdAsync(userId);
             return Ok(res);
         }
-
-         /// <summary>
-        /// Get a workspace with details by id.
-        /// </summary>
-        [HttpGet("Details")]
-        [Authorize]
-        [WorkspaceAuthorize("Workspace")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetDetailsByworkspaceId([FromQuery] string id)
-        {
-            var res = await _workspaceService.GetDetailsByIdAsync(id);
-            return Ok(res);
-        }   
 
         /// <summary>
         /// Creates a workspace.
         /// </summary>
         [HttpPost("")]
-        [Authorize]        
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -79,28 +65,28 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var userworkspaceId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userworkspaceId == null) return Unauthorized();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
 
-            var res = await _workspaceService.CreateAsync(userworkspaceId, request);
-            
+            var res = await _workspaceService.CreateAsync(userId, request);
+
             return CreatedAtAction(null, res);
         }
 
-       
+
         /// <summary>
         /// Deletes a workspace.
         /// </summary>
         [HttpDelete("")]
         [Authorize]
-        [WorkspaceAuthorize("Workspace")]
+
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]        
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromQuery] string id)
         {
             var res = await _workspaceService.DeleteAsync(id);
 
-            return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Workspace with id '{id} not found.'"});
+            return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"Workspace with id '{id} not found.'" });
         }
 
         /// <summary>
@@ -108,22 +94,21 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPut("")]
         [Authorize]
-        [WorkspaceAuthorize("Workspace")]
+
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateWorkspaceRequest request)
         {
-            if (request.NewName == null && request.NewDescription == null) return BadRequest(new ProblemDetails() { Title = "At least one field is required."});
+            if (request.Name == null && request.Description == null) return BadRequest(new ProblemDetails() { Title = "At least one field is required." });
 
             var res = await _workspaceService.UpdateAsync(id, request);
             // await _workspaceHub.NotifyWorkspaceGroup(res.workspaceId, $"WORKSPACE {res.Name} UPDATED");
             await _workspaceHub.Clients.Group(res.Id).SendAsync("WorkspaceUpdated", $"WORKSPACE {res.Name} UPDATED");
-            Console.WriteLine("WORKSPACE UPDATED ------------------------------------------------------------");
             return Ok(res);
         }
 
 
-         // /// <summary>
+        // /// <summary>
         // /// Removes a member from a workspace.
         // /// </summary>
         // [HttpDelete("Member")]

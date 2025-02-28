@@ -4,4 +4,5 @@ public enum InvitationType
 {
     Workspace = 0,
     Event = 1,
+    Contact = 2
 }

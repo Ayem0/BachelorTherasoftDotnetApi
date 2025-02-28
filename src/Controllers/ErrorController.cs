@@ -36,6 +36,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
                     problemDetails.Title = badRequestException.Title;
                     problemDetails.Detail = badRequestException.Details;
                     break;
+
+                case ForbiddenException forbiddenException:
+                    problemDetails.Status = StatusCodes.Status403Forbidden;
+                    problemDetails.Title = "Forbidden";
+                    break;
             }
 
             return StatusCode(problemDetails.Status.Value, problemDetails);

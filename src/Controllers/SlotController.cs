@@ -21,7 +21,6 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("")]
         [Authorize]
-        [WorkspaceAuthorize("Slot")]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById([FromQuery] string id)
         {
@@ -65,7 +64,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> Delete([FromQuery] string id)
         {
             var res = await _SlotService.DeleteAsync(id);
-            return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Slot with id '{id} not found.'"});
+            return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"Slot with id '{id} not found.'" });
         }
 
 
@@ -90,9 +89,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [HttpPost("Room")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddSlotToRoom([FromQuery] string slotId,[FromQuery] string roomId)
+        public async Task<IActionResult> AddSlotToRoom([FromQuery] string slotId, [FromQuery] string roomId)
         {
-            var res =  await _SlotService.AddSlotToRoom(slotId, roomId);
+            var res = await _SlotService.AddSlotToRoom(slotId, roomId);
             return res ? NoContent() : BadRequest();
         }
 
