@@ -1,7 +1,5 @@
 
-using AutoMapper;
 using BachelorTherasoftDotnetApi.src.Databases;
-using BachelorTherasoftDotnetApi.src.Dtos;
 using BachelorTherasoftDotnetApi.src.Hubs;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
@@ -9,7 +7,6 @@ using BachelorTherasoftDotnetApi.src.Models;
 using BachelorTherasoftDotnetApi.src.Repositories;
 using BachelorTherasoftDotnetApi.src.Services;
 using BachelorTherasoftDotnetApi.src.Utils;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 // using MySqlConnector;
@@ -59,7 +56,7 @@ builder.Services.AddSwaggerGen(o =>
 });
 // MySQL service
 builder.Services.AddDbContext<MySqlDbContext>(
-    options => options.UseMySQL(builder.Configuration.GetConnectionString("MySQL")!)
+    (sp, options) => options.UseMySQL(builder.Configuration.GetConnectionString("MySQL")!).AddInterceptors(sp.GetRequiredService<SoftDeleteInterceptor>())
 );
 
 // builder.Services.AddDbContext<MySqlDbContext>(
@@ -145,10 +142,20 @@ builder.Services.AddScoped<IInvitationService, InvitationService>();
 builder.Services.AddScoped<ISlotService, SlotService>();
 // builder.Services.AddScoped<IEventMemberService, EventMemberService>();
 
+// Soft delete interceptor
+builder.Services.AddScoped<SoftDeleteInterceptor>();
 
 // Utils Services
 // builder.Services.AddScoped<IRepetitionService, RepetitionService>();
+// AutoMapper
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+// Logger
+builder.Services.AddLogging(loggingBuilder =>
+{
+    loggingBuilder.ClearProviders();
+    loggingBuilder.AddConsole();
+    loggingBuilder.AddDebug();
+});
 
 var app = builder.Build();
 

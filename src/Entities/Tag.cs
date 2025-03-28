@@ -2,30 +2,31 @@
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class Area : BaseModel, BaseAuthorizationModel
+public class Tag : BaseEntity, BaseAuthorizationModel
 {
-    public Area(Workspace workspace, Location location, string name, string? description)
+    public Tag(Workspace workspace, string name, string icon, string color, string? description)
     {
-        Location = location;
-        LocationId = location.Id;
         Workspace = workspace;
         WorkspaceId = workspace.Id;
         Name = name;
+        Icon = icon;
         Description = description;
+        Color = color;
     }
-    public Area(string workspaceId, string locationId, string name, string? description)
+    public Tag(string workspaceId, string name, string icon, string color, string? description)
     {
         WorkspaceId = workspaceId;
-        LocationId = locationId;
         Name = name;
+        Icon = icon;
         Description = description;
+        Color = color;
     }
+
     public string WorkspaceId { get; set; }
     public required Workspace Workspace { get; set; }
-    public string LocationId { get; set; }
-    public required Location Location { get; set; }
     public string Name { get; set; }
+    public string Icon { get; set; }
+    public string Color { get; set; }
     public string? Description { get; set; }
-    public List<Room> Rooms { get; set; } = [];
+    public List<Event> Events { get; set; } = [];
 }
-

@@ -81,10 +81,11 @@ public class WorkspaceService : IWorkspaceService
         return _mapper.Map<WorkspaceDto>(workspace);
     }
 
-    public async Task<List<UserDto>> GetMembersByIdAsync(string id)
+    public async Task<List<MemberDto>> GetMembersByIdAsync(string workspaceId)
     {
-        var workspace = await _workspaceRepository.GetJoinUsersByIdAsync(id) ?? throw new NotFoundException("Workspace", id);
+        var workspace = await _workspaceRepository.GetJoinUsersByIdAsync(workspaceId) ?? throw new NotFoundException("Workspace", workspaceId);
         var members = workspace.Users;
-        return _mapper.Map<List<UserDto>>(members);
+        return [.. members.Select(x => new MemberDto { Id = x.Id, FirstName = x.FirstName ?? "", LastName = x.LastName ?? "", WorkspaceId = workspaceId })];
+
     }
 }

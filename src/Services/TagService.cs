@@ -14,7 +14,7 @@ public class TagService : ITagService
     private readonly ITagRepository _tagRepository;
     private readonly IWorkspaceRepository _workspaceRepository;
     private readonly IMapper _mapper;
-    public TagService(ITagRepository tagRepository, IWorkspaceRepository workspaceRepository,  IMapper mapper)
+    public TagService(ITagRepository tagRepository, IWorkspaceRepository workspaceRepository, IMapper mapper)
     {
         _tagRepository = tagRepository;
         _workspaceRepository = workspaceRepository;
@@ -25,8 +25,8 @@ public class TagService : ITagService
     {
         var workspace = await _workspaceRepository.GetByIdAsync(request.WorkspaceId) ?? throw new NotFoundException("Workspace", request.WorkspaceId);
 
-        var tag = new Tag(workspace, request.Name, request.Icon, request.Color, request.Description){ Workspace = workspace };
-        
+        var tag = new Tag(workspace, request.Name, request.Icon, request.Color, request.Description) { Workspace = workspace };
+
         await _tagRepository.CreateAsync(tag);
 
         return _mapper.Map<TagDto>(tag);
@@ -39,15 +39,15 @@ public class TagService : ITagService
 
     public async Task<TagDto> GetByIdAsync(string id)
     {
-        var tag = await _tagRepository.GetEntityByIdAsync(id)?? throw new NotFoundException("Tag", id);
-        
+        var tag = await _tagRepository.GetByIdAsync(id) ?? throw new NotFoundException("Tag", id);
+
         return _mapper.Map<TagDto>(tag);
     }
 
     public async Task<TagDto> UpdateAsync(string id, UpdateTagRequest req)
     {
-        var tag = await _tagRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Tag", id);
-        
+        var tag = await _tagRepository.GetByIdAsync(id) ?? throw new NotFoundException("Tag", id);
+
         tag.Name = req.Name ?? tag.Name;
         tag.Icon = req.Icon ?? tag.Icon;
         tag.Description = req.Description ?? tag.Description;
@@ -58,7 +58,8 @@ public class TagService : ITagService
         return _mapper.Map<TagDto>(tag);
     }
 
-    public async Task<List<TagDto>> GetByWorkpsaceIdAsync(string id) {
+    public async Task<List<TagDto>> GetByWorkpsaceIdAsync(string id)
+    {
         var res = await _tagRepository.GetByWorkpaceIdAsync(id);
         return _mapper.Map<List<TagDto>>(res);
     }

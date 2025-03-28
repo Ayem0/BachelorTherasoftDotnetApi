@@ -2,7 +2,7 @@
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class Message : BaseModel
+public class Message : BaseEntity
 {
     public required string MemberId { get; set; }
     public required string ConversationId { get; set; }

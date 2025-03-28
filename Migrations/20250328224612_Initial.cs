@@ -69,6 +69,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "varchar(255)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
@@ -85,6 +86,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     Id = table.Column<string>(type: "varchar(255)", nullable: false),
                     Name = table.Column<string>(type: "longtext", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
@@ -263,6 +265,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     Name = table.Column<string>(type: "longtext", nullable: false),
                     WorkspaceId = table.Column<string>(type: "varchar(255)", nullable: false),
                     Icon = table.Column<string>(type: "longtext", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
@@ -288,6 +291,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     Icon = table.Column<string>(type: "longtext", nullable: false),
                     Color = table.Column<string>(type: "longtext", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
@@ -314,6 +318,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     Address = table.Column<string>(type: "longtext", nullable: true),
                     City = table.Column<string>(type: "longtext", nullable: true),
                     Country = table.Column<string>(type: "longtext", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
@@ -339,6 +344,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     Description = table.Column<string>(type: "longtext", nullable: true),
                     Color = table.Column<string>(type: "longtext", nullable: false),
                     Icon = table.Column<string>(type: "longtext", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
@@ -370,6 +376,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     RepetitionNumber = table.Column<int>(type: "int", nullable: true),
                     MainSlotId = table.Column<string>(type: "varchar(255)", nullable: true),
                     RepetitionEndDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
@@ -400,6 +407,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     Icon = table.Column<string>(type: "longtext", nullable: false),
                     Color = table.Column<string>(type: "longtext", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
@@ -448,6 +456,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     WorkspaceId = table.Column<string>(type: "varchar(255)", nullable: false),
                     Name = table.Column<string>(type: "longtext", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
@@ -472,6 +481,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     LocationId = table.Column<string>(type: "varchar(255)", nullable: false),
                     Name = table.Column<string>(type: "longtext", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
@@ -509,6 +519,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     Country = table.Column<string>(type: "longtext", nullable: true),
                     Description = table.Column<string>(type: "longtext", nullable: true),
                     DateOfBirth = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
@@ -589,6 +600,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     AreaId = table.Column<string>(type: "varchar(255)", nullable: false),
                     Name = table.Column<string>(type: "longtext", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
@@ -625,6 +637,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     MainEventId = table.Column<string>(type: "varchar(255)", nullable: true),
                     RepetitionEndDate = table.Column<DateOnly>(type: "date", nullable: true),
                     WorkspaceId = table.Column<string>(type: "varchar(255)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
@@ -689,6 +702,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     Id = table.Column<string>(type: "varchar(255)", nullable: false),
                     EventId = table.Column<string>(type: "varchar(255)", nullable: false),
                     DocumentCategoryId = table.Column<string>(type: "varchar(255)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
@@ -799,6 +813,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     EventId = table.Column<string>(type: "varchar(255)", nullable: true),
                     SenderId = table.Column<string>(type: "varchar(255)", nullable: false),
                     ReceiverId = table.Column<string>(type: "varchar(255)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },

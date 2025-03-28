@@ -2,16 +2,16 @@
 
 // namespace BachelorTherasoftDotnetApi.src.Dtos.Models;
 
-// public class MemberDto
-// {
-//     public MemberDto(Member member)
-//     {
-//         UserId = member.UserId;
-//         WorkspaceId = member.WorkspaceId;
-//         Id = member.Id;
-//     }
-//     public string Id { get; set; }
-//     public string UserId { get; set; }
-//     public string WorkspaceId { get; set; }
-    
-// }
+using System.ComponentModel.DataAnnotations;
+
+public class MemberDto
+{
+    [Required]
+    public string Id { get; set; } = string.Empty;
+    [Required]
+    public string WorkspaceId { get; set; } = string.Empty;
+    [Required]
+    public string FirstName { get; set; } = string.Empty;
+    [Required]
+    public string LastName { get; set; } = string.Empty;
+}

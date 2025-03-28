@@ -27,9 +27,9 @@ public class ParticipantService : IParticipantService
     {
         var workspace = await _workspaceRepository.GetByIdAsync(request.WorkspaceId) ?? throw new NotFoundException("Workspace", request.WorkspaceId);
 
-        var participantCategory = await _participantCategoryRepository.GetEntityByIdAsync(request.ParticipantCategoryId) ?? throw new NotFoundException("ParticipantCategory", request.ParticipantCategoryId);
+        var participantCategory = await _participantCategoryRepository.GetByIdAsync(request.ParticipantCategoryId) ?? throw new NotFoundException("ParticipantCategory", request.ParticipantCategoryId);
 
-        var participant = new Participant(workspace, participantCategory, request.FirstName, request.LastName, request.Description, request.Email, request.PhoneNumber, 
+        var participant = new Participant(workspace, participantCategory, request.FirstName, request.LastName, request.Description, request.Email, request.PhoneNumber,
             request.Address, request.City, request.Country, request.DateOfBirth)
         {
             ParticipantCategory = participantCategory,
@@ -48,18 +48,18 @@ public class ParticipantService : IParticipantService
 
     public async Task<ParticipantDto> GetByIdAsync(string id)
     {
-        var participant = await _participantRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Participant", id);
+        var participant = await _participantRepository.GetByIdAsync(id) ?? throw new NotFoundException("Participant", id);
 
         return _mapper.Map<ParticipantDto>(participant);
     }
 
     public async Task<ParticipantDto> UpdateAsync(string id, UpdateParticipantRequest request)
     {
-        var participant = await _participantRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Participant", id);
+        var participant = await _participantRepository.GetByIdAsync(id) ?? throw new NotFoundException("Participant", id);
 
         if (request.ParticipantCategoryId != null)
         {
-            var participantCategory = await _participantCategoryRepository.GetEntityByIdAsync(request.ParticipantCategoryId) 
+            var participantCategory = await _participantCategoryRepository.GetByIdAsync(request.ParticipantCategoryId)
                 ?? throw new NotFoundException("ParticipantCategory", request.ParticipantCategoryId);
 
             participant.ParticipantCategory = participantCategory;
@@ -80,7 +80,7 @@ public class ParticipantService : IParticipantService
         return _mapper.Map<ParticipantDto>(participant);
     }
 
-    public async Task<List<ParticipantDto>> GetByWorkspaceIdAsync(string id) 
+    public async Task<List<ParticipantDto>> GetByWorkspaceIdAsync(string id)
     {
         var res = await _participantRepository.GetByWorkpaceIdAsync(id);
         return _mapper.Map<List<ParticipantDto>>(res);

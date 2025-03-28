@@ -10,44 +10,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
 
-public class InvitationRepository : IInvitationRepository
+public class InvitationRepository : BaseRepository<Invitation>, IInvitationRepository
 {
-    private readonly MySqlDbContext _context;
-    public InvitationRepository(MySqlDbContext context)
+    public InvitationRepository(MySqlDbContext context, ILogger<Invitation> logger) : base(context, logger)
     {
-        _context = context;
-    }
-
-    public async Task<bool> DeleteAsync(string id)
-    {
-        try
-        {
-            var res = await _context.Invitatition
-                .Where(x => x.Id == id && x.DeletedAt == null)
-                .ExecuteUpdateAsync(x => x.SetProperty(x => x.DeletedAt, DateTime.UtcNow));
-
-            return res > 0;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error deleting workspace with Id '{id}' : {ex.Message}");
-            throw new DbException(DbAction.Delete, "Workspace", id);
-        }
-    }
-
-    public async Task<Invitation?> GetByIdAsync(string id)
-    {
-        try
-        {
-            return await _context.Invitatition
-                .Where(x => x.Id == id && x.DeletedAt == null)
-                .FirstOrDefaultAsync();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error getting workspace with Id '{id}' : {ex.Message}");
-            throw new DbException(DbAction.Read, "Workspace", id);
-        }
     }
 
     public async Task<List<Invitation>> GetByReceiverUserIdAsync(string userId)
@@ -64,36 +30,6 @@ public class InvitationRepository : IInvitationRepository
         {
             Console.WriteLine($"Error getting invitations by userid '{userId}' : {ex.Message}");
             throw new DbException(DbAction.Read, "invitations", userId);
-        }
-    }
-
-    public async Task<Invitation> UpdateAsync(Invitation invitation)
-    {
-        try
-        {
-            invitation.UpdatedAt = DateTime.UtcNow;
-            var res = await _context.SaveChangesAsync();
-            return res > 0 ? invitation : throw new DbException(DbAction.Update, "invitation", invitation.Id);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error updating invitation with Id '{invitation.Id}' : {ex.Message}");
-            throw new DbException(DbAction.Update, "invitation", invitation.Id);
-        }
-    }
-
-    public async Task<Invitation> CreateAsync(Invitation invitation)
-    {
-        try
-        {
-            _context.Invitatition.Add(invitation);
-            var res = await _context.SaveChangesAsync();
-            return res > 0 ? invitation : throw new DbException(DbAction.Create, "invitation");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error creating invitation : {ex.Message}");
-            throw new DbException(DbAction.Create, "invitation");
         }
     }
 

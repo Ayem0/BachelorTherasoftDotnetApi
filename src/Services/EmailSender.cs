@@ -8,7 +8,7 @@ namespace BachelorTherasoftDotnetApi.src.Services;
 
 public class EmailSender : IEmailSender
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<EmailSender> _logger;
 
     public EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor, ILogger<EmailSender> logger)
     {

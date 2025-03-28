@@ -119,5 +119,21 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             var res = await _eventService.GetByRangeAndUserIdAsync(userId, start, end);
             return Ok(res);
         }
+
+
+        /// <summary>
+        /// Get events by range and user id.
+        /// </summary>
+        [HttpGet("dialog")] // TODO find better name
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Get([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] List<string> userIds, [FromQuery] string roomId)
+        {
+            var res = await _eventService.GetEventsByUserIdsAndRoomIdAsync(userIds, roomId, start, end);
+
+            return Ok(res);
+        }
+
     }
 }

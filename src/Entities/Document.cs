@@ -2,7 +2,7 @@ using BachelorTherasoftDotnetApi.src.Base;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class Document : BaseModel
+public class Document : BaseEntity
 {
     public required string EventId { get; set; }
     public required Event Event { get; set; }

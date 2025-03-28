@@ -25,11 +25,11 @@ public class EventCategoryService : IEventCategoryService
     {
         var workspace = await _workspaceRepository.GetByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
 
-        var eventCategory = new EventCategory(workspace, req.Name, req.Icon, req.Color, req.Description){ Workspace = workspace };
+        var eventCategory = new EventCategory(workspace, req.Name, req.Icon, req.Color, req.Description) { Workspace = workspace };
 
         await _eventCategoryRepository.CreateAsync(eventCategory);
 
-        return _mapper.Map<EventCategoryDto>(eventCategory);  
+        return _mapper.Map<EventCategoryDto>(eventCategory);
     }
 
     public async Task<bool> DeleteAsync(string id)
@@ -39,14 +39,14 @@ public class EventCategoryService : IEventCategoryService
 
     public async Task<EventCategoryDto> GetByIdAsync(string id)
     {
-        var eventCategory = await _eventCategoryRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("EventCategory", id);
+        var eventCategory = await _eventCategoryRepository.GetByIdAsync(id) ?? throw new NotFoundException("EventCategory", id);
 
         return _mapper.Map<EventCategoryDto>(eventCategory);
     }
 
     public async Task<EventCategoryDto> UpdateAsync(string id, UpdateEventCategoryRequest req)
     {
-        var eventCategory = await _eventCategoryRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("EventCategory", id);
+        var eventCategory = await _eventCategoryRepository.GetByIdAsync(id) ?? throw new NotFoundException("EventCategory", id);
 
         eventCategory.Name = req.Name ?? eventCategory.Name;
         eventCategory.Icon = req.Icon ?? eventCategory.Icon;

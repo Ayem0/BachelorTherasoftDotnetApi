@@ -28,7 +28,7 @@ public class WorkspaceRoleService : IWorkspaceRoleService
 
     // public async Task<ActionResult> AddRoleToMemberAsync(string id, string userId)
     // {
-    //     var workspaceRole = await _workspaceRoleRepository.GetEntityByIdAsync(id);
+    //     var workspaceRole = await _workspaceRoleRepository.GetByIdAsync(id);
     //     if (workspace == null) return Response.NotFound(id, "WorkspaceRole");
 
     //     var user = await _userManager.FindByIdAsync(userId);
@@ -40,7 +40,7 @@ public class WorkspaceRoleService : IWorkspaceRoleService
     //         workspace.Users.Add(user);
     //         var res2 = await _workspaceRoleRepository.UpdateAsync(workspace);
     //         if (!res2.Success) return Response.BadRequest(res2.Message, res2.Details);
-            
+
     //         return Response.Ok("Successfully added role to member.");
     //     }
     //     return Response.BadRequest("Member already has this role.", null);
@@ -64,14 +64,14 @@ public class WorkspaceRoleService : IWorkspaceRoleService
 
     public async Task<WorkspaceRoleDto> GetByIdAsync(string id)
     {
-        var workspaceRole = await _workspaceRoleRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("WorkspaceRole", id);
+        var workspaceRole = await _workspaceRoleRepository.GetByIdAsync(id) ?? throw new NotFoundException("WorkspaceRole", id);
 
         return _mapper.Map<WorkspaceRoleDto>(workspaceRole);
     }
 
     // public async Task<ActionResult> RemoveRoleFromMemberAsync(string id, string userId)
     // {
-    //     var workspaceRole = await _workspaceRoleRepository.GetEntityByIdAsync(id); // TODO a changer par une requete qui join les users
+    //     var workspaceRole = await _workspaceRoleRepository.GetByIdAsync(id); // TODO a changer par une requete qui join les users
     //     if (workspaceRole == null) return Response.NotFound(id, "WorkspaceRole");
 
     //     var user = await _userManager.FindByIdAsync(userId);
@@ -89,7 +89,7 @@ public class WorkspaceRoleService : IWorkspaceRoleService
 
     public async Task<WorkspaceRoleDto> UpdateAsync(string id, UpdateWorkspaceRoleRequest request)
     {
-        var workspaceRole = await _workspaceRoleRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("WorkspaceRole", id);
+        var workspaceRole = await _workspaceRoleRepository.GetByIdAsync(id) ?? throw new NotFoundException("WorkspaceRole", id);
 
         workspaceRole.Name = request.Name ?? workspaceRole.Name;
         workspaceRole.Description = request.Description ?? workspaceRole.Description;
@@ -99,7 +99,7 @@ public class WorkspaceRoleService : IWorkspaceRoleService
         return _mapper.Map<WorkspaceRoleDto>(workspaceRole);
     }
 
-    public async Task<List<WorkspaceRoleDto>> GetByWorkspaceIdAsync(string id) 
+    public async Task<List<WorkspaceRoleDto>> GetByWorkspaceIdAsync(string id)
     {
         var roles = await _workspaceRoleRepository.GetByWorkspaceIdAsync(id);
         return _mapper.Map<List<WorkspaceRoleDto>>(roles);

@@ -16,4 +16,5 @@ public interface IEventService
     Task<List<EventDto>?> CreateWithRepetitionAsync(CreateEventWithRepetitionRequest request);
     Task<List<EventDto>> GetByRangeAndUserIdAsync(string id, DateTime start, DateTime end);
     Task<List<EventDto>> GetByRangeAndRoomIdAsync(string id, DateTime start, DateTime end);
+    Task<List<EventDto>> GetEventsByUserIdsAndRoomIdAsync(List<string> userIds, string roomId, DateTime start, DateTime end);
 }

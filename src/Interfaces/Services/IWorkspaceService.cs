@@ -13,5 +13,5 @@ public interface IWorkspaceService
     // Task<bool> RemoveMemberAsync(string id, string userId);
     Task<bool> DeleteAsync(string id);
     Task<WorkspaceDto> UpdateAsync(string id, UpdateWorkspaceRequest request);
-    Task<List<UserDto>> GetMembersByIdAsync(string id);
+    Task<List<MemberDto>> GetMembersByIdAsync(string id);
 }

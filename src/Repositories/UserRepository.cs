@@ -1,4 +1,5 @@
 using System;
+using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Databases;
 using BachelorTherasoftDotnetApi.src.Enums;
 using BachelorTherasoftDotnetApi.src.Exceptions;
@@ -8,12 +9,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
 
-public class UserRepository : IUserRepository
+public class UserRepository : BaseRepository<User>, IUserRepository
 {
-    private readonly MySqlDbContext _context;
-    public UserRepository(MySqlDbContext context)
+    public UserRepository(MySqlDbContext context, ILogger<User> logger) : base(context, logger)
     {
-        _context = context;
     }
     public async Task<User?> GetByIdJoinWorkspaceAsync(string id)
     {
@@ -28,36 +27,6 @@ public class UserRepository : IUserRepository
         {
             Console.WriteLine($"Error getting user with Id '{id}' : {ex.Message}");
             return null;
-        }
-    }
-
-    public async Task<User?> GetByIdAsync(string id)
-    {
-        try
-        {
-            return await _context.Users
-                .Where(x => x.Id == id && x.DeletedAt == null)
-                .FirstOrDefaultAsync();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error getting user with Id '{id}' : {ex.Message}");
-            return null;
-        }
-    }
-
-    public async Task<User> UpdateAsync(User user)
-    {
-        try
-        {
-            user.UpdatedAt = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
-            return user;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error updating user with Id '{user.Id}' : {ex.Message}");
-            throw new DbException(DbAction.Update, "User", user.Id);
         }
     }
 

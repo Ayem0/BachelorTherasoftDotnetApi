@@ -25,10 +25,10 @@ public class AreaService : IAreaService
     {
         var location = await _locationRepository.GetByIdJoinWorkspaceAsync(request.LocationId) ?? throw new NotFoundException("Location", request.LocationId);
 
-        var area = new Area(location.Workspace, location, request.Name, request.Description){ Location = location, Workspace = location.Workspace };
-        
+        var area = new Area(location.Workspace, location, request.Name, request.Description) { Location = location, Workspace = location.Workspace };
+
         await _areaRepository.CreateAsync(area);
-        
+
         return _mapper.Map<AreaDto>(area);
     }
 
@@ -40,26 +40,27 @@ public class AreaService : IAreaService
 
     public async Task<AreaDto> GetByIdAsync(string id)
     {
-        var area = await _areaRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Area", id);
+        var area = await _areaRepository.GetByIdAsync(id) ?? throw new NotFoundException("Area", id);
 
         return _mapper.Map<AreaDto>(area);
     }
 
     public async Task<AreaDto> UpdateAsync(string id, UpdateAreaRequest req)
     {
-        var area = await _areaRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Area", id);
+        var area = await _areaRepository.GetByIdAsync(id) ?? throw new NotFoundException("Area", id);
 
-        area.Name = req.NewName ?? area.Name;
-        area.Description = req.NewDescription ?? area.Description;
+        area.Name = req.Name ?? area.Name;
+        area.Description = req.Description ?? area.Description;
 
         await _areaRepository.UpdateAsync(area);
-        
+
         return _mapper.Map<AreaDto>(area);
     }
 
-    public async Task<List<AreaDto>> GetAreasByLocationIdAsync(string locationId) {
+    public async Task<List<AreaDto>> GetAreasByLocationIdAsync(string locationId)
+    {
         var areas = await _areaRepository.GetAreasByLocationIdAsync(locationId);
-        
+
         return _mapper.Map<List<AreaDto>>(areas);
     }
 }

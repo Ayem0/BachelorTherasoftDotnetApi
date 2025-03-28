@@ -24,11 +24,11 @@ public class ParticipantCategoryService : IParticipantCategoryService
     public async Task<ParticipantCategoryDto> CreateAsync(CreateParticipantCategoryRequest request)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(request.WorkspaceId) ?? throw new NotFoundException("Workspace", request.WorkspaceId);
-        var participantCategory = new ParticipantCategory(workspace, request.Name, request.Description, request.Color, request.Icon ) { Workspace = workspace };
+        var participantCategory = new ParticipantCategory(workspace, request.Name, request.Description, request.Color, request.Icon) { Workspace = workspace };
 
         await _participantCategoryRepository.CreateAsync(participantCategory);
-        
-        return _mapper.Map<ParticipantCategoryDto>(participantCategory); 
+
+        return _mapper.Map<ParticipantCategoryDto>(participantCategory);
     }
 
     public async Task<bool> DeleteAsync(string id)
@@ -38,14 +38,14 @@ public class ParticipantCategoryService : IParticipantCategoryService
 
     public async Task<ParticipantCategoryDto?> GetByIdAsync(string id)
     {
-        var participantCategory = await _participantCategoryRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("PariticipantCategory", id);
+        var participantCategory = await _participantCategoryRepository.GetByIdAsync(id) ?? throw new NotFoundException("PariticipantCategory", id);
 
         return _mapper.Map<ParticipantCategoryDto>(participantCategory);
     }
 
     public async Task<ParticipantCategoryDto> UpdateAsync(string id, UpdateParticipantCategoryRequest req)
     {
-        var participantCategory = await _participantCategoryRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("ParticipantCategory", id);
+        var participantCategory = await _participantCategoryRepository.GetByIdAsync(id) ?? throw new NotFoundException("ParticipantCategory", id);
 
         participantCategory.Name = req.Name ?? participantCategory.Name;
         participantCategory.Icon = req.Icon ?? participantCategory.Icon;
@@ -57,7 +57,8 @@ public class ParticipantCategoryService : IParticipantCategoryService
         return _mapper.Map<ParticipantCategoryDto>(participantCategory);
     }
 
-    public async Task<List<ParticipantCategoryDto>> GetByWorkspaceIdAsync(string id) {
+    public async Task<List<ParticipantCategoryDto>> GetByWorkspaceIdAsync(string id)
+    {
         var res = await _participantCategoryRepository.GetByWorkpaceIdAsync(id);
         return _mapper.Map<List<ParticipantCategoryDto>>(res);
     }

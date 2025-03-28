@@ -44,14 +44,14 @@ public class LocationService : ILocationService
     }
 
     public async Task<LocationDto> UpdateAsync(string id, UpdateLocationRequest req)
-    {       
+    {
         var location = await _locationRepository.GetByIdAsync(id) ?? throw new NotFoundException("Location", id);
 
-        location.Name = req.NewName ?? location.Name;
-        location.Description = req.NewDescription ?? location.Description;
-        location.Address = req.NewAddress ?? location.Address;
-        location.City = req.NewCity ?? location.City;
-        location.Country = req.NewCountry ?? location.Country;
+        location.Name = req.Name ?? location.Name;
+        location.Description = req.Description ?? location.Description;
+        location.Address = req.Address ?? location.Address;
+        location.City = req.City ?? location.City;
+        location.Country = req.Country ?? location.Country;
 
         await _locationRepository.UpdateAsync(location);
 

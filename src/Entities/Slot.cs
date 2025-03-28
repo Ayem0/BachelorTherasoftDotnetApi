@@ -4,7 +4,7 @@ using BachelorTherasoftDotnetApi.src.Enums;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 // TODO voir si possible de modeliser mieux les créneaux + voir comment en faire les horaires d'ouvertures maybe champs eventCategories a null mais en vrai un bool c mieux
-public class Slot : BaseModel, BaseAuthorizationModel
+public class Slot : BaseEntity, BaseAuthorizationModel
 {
     public Slot(string name, string? description, Workspace workspace, DateOnly startDate, DateOnly endDate, TimeOnly startTime, TimeOnly endTime, List<EventCategory> eventCategories, Interval? repetitionInterval,
         int? repetitionNumber, Slot? mainSlot, DateOnly? repetitionEndDate)

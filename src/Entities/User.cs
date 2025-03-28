@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using BachelorTherasoftDotnetApi.src.Base;
+using Microsoft.AspNetCore.Identity;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class User : IdentityUser
+public class User : IdentityUser, IBaseEntity
 {
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; } = DateTime.UtcNow;
     public DateTime? DeletedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public DateTime? DisabledAt { get; set; }

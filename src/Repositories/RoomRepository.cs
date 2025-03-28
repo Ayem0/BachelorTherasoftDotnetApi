@@ -1,3 +1,4 @@
+using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Databases;
 using BachelorTherasoftDotnetApi.src.Enums;
 using BachelorTherasoftDotnetApi.src.Exceptions;
@@ -7,59 +8,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
 
-public class RoomRepository : IRoomRepository
+public class RoomRepository : BaseRepository<Room>, IRoomRepository
 {
-    private readonly MySqlDbContext _context;
-    public RoomRepository(MySqlDbContext context)
+    public RoomRepository(MySqlDbContext context, ILogger<Room> logger) : base(context, logger)
     {
-        _context = context;
-    }
-
-    public async Task<Room> CreateAsync(Room Room)
-    {
-        try
-        {
-            _context.Room.Add(Room);
-            var res = await _context.SaveChangesAsync();
-            return Room ?? throw new DbException(DbAction.Create, "Room");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error creating Room : {ex.Message}");
-            throw new DbException(DbAction.Create, "Room");
-        }
-    }
-
-    public async Task<bool> DeleteAsync(string id)
-    {
-        try
-        {
-            var res = await _context.Room
-                .Where(x => x.Id == id && x.DeletedAt == null)
-                .ExecuteUpdateAsync(x => x.SetProperty(x => x.DeletedAt, DateTime.UtcNow));
-
-            return res > 0;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error deleting Room with Id '{id}' : {ex.Message}");
-            throw new DbException(DbAction.Delete, "Room", id);
-        }
-    }
-
-    public async Task<Room?> GetByIdAsync(string id)
-    {
-        try
-        {
-            return await _context.Room
-                .Where(x => x.Id == id && x.DeletedAt == null)
-                .FirstOrDefaultAsync();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error getting Room with Id '{id}' : {ex.Message}");
-            throw new DbException(DbAction.Read, "Room", id);
-        }
     }
 
     public async Task<List<Room>?> GetByAreaIdAsync(string id)
@@ -106,21 +58,6 @@ public class RoomRepository : IRoomRepository
         {
             Console.WriteLine($"Error getting Room with Id '{id}' : {ex.Message}");
             throw new DbException(DbAction.Read, "Room", id);
-        }
-    }
-
-    public async Task<Room> UpdateAsync(Room Room)
-    {
-        try
-        {
-            Room.UpdatedAt = DateTime.UtcNow;
-            var res = await _context.SaveChangesAsync();
-            return res > 0 ? Room : throw new DbException(DbAction.Update, "Room", Room.Id);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error updating Room with Id '{Room.Id}' : {ex.Message}");
-            throw new DbException(DbAction.Update, "Room", Room.Id);
         }
     }
 }

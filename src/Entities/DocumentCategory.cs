@@ -3,7 +3,7 @@ using BachelorTherasoftDotnetApi.src.Base;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class DocumentCategory : BaseModel
+public class DocumentCategory : BaseEntity
 {
     public required string Name { get; set; }
     public required string WorkspaceId { get; set; }

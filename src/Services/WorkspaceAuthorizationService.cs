@@ -19,10 +19,10 @@ public class WorkspaceAuthorizationService : IWorkspaceAuthorizationService
     private readonly IEventCategoryRepository _eventCategoryRepository;
     private readonly IParticipantCategoryRepository _participantCategoryRepository;
     public WorkspaceAuthorizationService(
-        ILocationRepository locationRepository, 
-        ITagRepository tagRepository, 
-        IWorkspaceRoleRepository workspaceRoleRepository, 
-        IWorkspaceRepository workspaceRepository, 
+        ILocationRepository locationRepository,
+        ITagRepository tagRepository,
+        IWorkspaceRoleRepository workspaceRoleRepository,
+        IWorkspaceRepository workspaceRepository,
         ISlotRepository slotRepository,
         IParticipantRepository participantRepository,
         IEventCategoryRepository eventCategoryRepository,
@@ -30,7 +30,8 @@ public class WorkspaceAuthorizationService : IWorkspaceAuthorizationService
         IAreaRepository areaRepository,
         IRoomRepository roomRepository,
         IEventRepository eventRepository
-    ){
+    )
+    {
         _locationRepository = locationRepository;
         _workspaceRepository = workspaceRepository;
         _workspaceRoleRepository = workspaceRoleRepository;
@@ -42,22 +43,22 @@ public class WorkspaceAuthorizationService : IWorkspaceAuthorizationService
         _roomRepository = roomRepository;
         _eventRepository = eventRepository;
         _areaRepository = areaRepository;
-}
+    }
 
-    public async Task<BaseAuthorizationModel?> GetEntityById(string tableName, string id) 
+    public async Task<BaseAuthorizationModel?> GetEntityById(string tableName, string id)
     {
         return tableName switch
-        {          
+        {
             "Workspace" => await _workspaceRepository.GetJoinUsersByIdAsync(id),
-            "WorkspaceRole" => await _workspaceRoleRepository.GetEntityByIdAsync(id),
-            "Tag" => await _tagRepository.GetEntityByIdAsync(id),
-            "Participant" => await _participantRepository.GetEntityByIdAsync(id),
-            "ParticipantCategory" => await _participantCategoryRepository.GetEntityByIdAsync(id),
-            "EventCategory" => await _eventCategoryRepository.GetEntityByIdAsync(id),
-            "Slot" => await _slotRepository.GetEntityByIdAsync(id),
-            "Event" => await _eventRepository.GetEntityByIdAsync(id),
+            "WorkspaceRole" => await _workspaceRoleRepository.GetByIdAsync(id),
+            "Tag" => await _tagRepository.GetByIdAsync(id),
+            "Participant" => await _participantRepository.GetByIdAsync(id),
+            "ParticipantCategory" => await _participantCategoryRepository.GetByIdAsync(id),
+            "EventCategory" => await _eventCategoryRepository.GetByIdAsync(id),
+            "Slot" => await _slotRepository.GetByIdAsync(id),
+            "Event" => await _eventRepository.GetByIdAsync(id),
             "Room" => await _roomRepository.GetByIdAsync(id),
-            "Area" => await _areaRepository.GetEntityByIdAsync(id),
+            "Area" => await _areaRepository.GetByIdAsync(id),
             "Location" => await _locationRepository.GetByIdAsync(id),
             _ => null,
         };

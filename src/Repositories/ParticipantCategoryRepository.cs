@@ -7,13 +7,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
 
-public class ParticipantCategoryRepository : BaseMySqlRepository<ParticipantCategory>, IParticipantCategoryRepository
+public class ParticipantCategoryRepository : BaseRepository<ParticipantCategory>, IParticipantCategoryRepository
 {
-    public ParticipantCategoryRepository(MySqlDbContext context) : base(context)
+    public ParticipantCategoryRepository(MySqlDbContext context, ILogger<ParticipantCategory> logger) : base(context, logger)
     {
     }
 
-    public async Task<List<ParticipantCategory>> GetByWorkpaceIdAsync(string id) {
+    public async Task<List<ParticipantCategory>> GetByWorkpaceIdAsync(string id)
+    {
         return await _context.ParticipantCategory
             .Where(x => x.WorkspaceId == id && x.Workspace.DeletedAt == null && x.DeletedAt == null)
             .ToListAsync();

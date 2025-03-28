@@ -4,13 +4,9 @@ using BachelorTherasoftDotnetApi.src.Models;
 
 namespace BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 
-public interface IInvitationRepository
+public interface IInvitationRepository : IBaseRepository<Invitation>
 {
     Task<List<Invitation>> GetByReceiverUserIdAsync(string userId);
-    Task<Invitation?> GetByIdAsync(string id);
-    Task<Invitation> UpdateAsync(Invitation invitation);
-    Task<Invitation> CreateAsync(Invitation invitation);
-    Task<bool> DeleteAsync(string id);
     Task<Invitation?> GetByWorkspaceIdAndReceiverId(string workspaceId, string receiverId);
     Task<Invitation?> GetByIdJoinWorkspaceAndReceiver(string id);
     Task<Invitation?> GetByIdJoinSenderAndReceiver(string id);

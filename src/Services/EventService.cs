@@ -39,13 +39,13 @@ public class EventService : IEventService
     {
         var room = await _roomRepository.GetJoinEventsSlotsByIdAsync(req.RoomId) ?? throw new NotFoundException("Room", req.RoomId);
         var workspace = await _workspaceRepository.GetByIdAsync(room.WorkspaceId) ?? throw new NotFoundException("Workspace", room.WorkspaceId);
-        var eventCategory = await _eventCategoryRepository.GetEntityByIdAsync(req.EventCategoryId) ?? throw new NotFoundException("EventCategory", req.EventCategoryId);
+        var eventCategory = await _eventCategoryRepository.GetByIdAsync(req.EventCategoryId) ?? throw new NotFoundException("EventCategory", req.EventCategoryId);
         var user = await _userManager.FindByIdAsync(userId) ?? throw new NotFoundException("User", userId);
         List<Participant> participants = [];
         // TODO refactor ceci en une requete et voir tous ceux qui manque / si il y a des doublons et les renvoyé avec l'erreur
         for (int i = 0; i < req.ParticipantIds?.Count; i++)
         {
-            var participant = await _participantRepository.GetEntityByIdAsync(req.ParticipantIds[i]) ?? throw new NotFoundException("Participant", req.RoomId);
+            var participant = await _participantRepository.GetByIdAsync(req.ParticipantIds[i]) ?? throw new NotFoundException("Participant", req.RoomId);
 
             if (!participants.Contains(participant)) participants.Add(participant);
         }
@@ -54,7 +54,7 @@ public class EventService : IEventService
         // TODO refactor ceci en une requete et voir tous ceux qui manque / si il y a des doublons et les renvoyé avec l'erreur
         for (int i = 0; i < req.TagIds?.Count; i++)
         {
-            var tag = await _tagRepository.GetEntityByIdAsync(req.TagIds[i]) ?? throw new NotFoundException("Tag", req.TagIds[i]);
+            var tag = await _tagRepository.GetByIdAsync(req.TagIds[i]) ?? throw new NotFoundException("Tag", req.TagIds[i]);
 
             if (!tags.Contains(tag)) tags.Add(tag);
         }
@@ -88,7 +88,7 @@ public class EventService : IEventService
 
     public async Task<EventDto> GetByIdAsync(string id)
     {
-        var eventToGet = await _eventRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("Event", id);
+        var eventToGet = await _eventRepository.GetByIdAsync(id) ?? throw new NotFoundException("Event", id);
 
         return _mapper.Map<EventDto>(eventToGet);
     }
@@ -107,7 +107,7 @@ public class EventService : IEventService
 
         if (req.NewEventCategoryId != null)
         {
-            var eventCategory = await _eventCategoryRepository.GetEntityByIdAsync(id) ?? throw new NotFoundException("EventCategory", req.NewEventCategoryId);
+            var eventCategory = await _eventCategoryRepository.GetByIdAsync(id) ?? throw new NotFoundException("EventCategory", req.NewEventCategoryId);
 
             eventToUpdate.EventCategory = eventCategory;
             eventToUpdate.EventCategoryId = eventCategory.Id;
@@ -120,7 +120,7 @@ public class EventService : IEventService
             var participantToAdd = eventToUpdate.Participants.Find(x => x.Id == req.NewParticipantIds[i]);
             if (participantToAdd == null)
             {
-                var participant = await _participantRepository.GetEntityByIdAsync(req.NewParticipantIds[i]) ?? throw new NotFoundException("Participant", req.NewParticipantIds[i]);
+                var participant = await _participantRepository.GetByIdAsync(req.NewParticipantIds[i]) ?? throw new NotFoundException("Participant", req.NewParticipantIds[i]);
                 participants.Add(participant);
             }
             else
@@ -136,7 +136,7 @@ public class EventService : IEventService
             var tagToAdd = eventToUpdate.Tags.Find(x => x.Id == req.NewTagIds[i]);
             if (tagToAdd == null)
             {
-                var tag = await _tagRepository.GetEntityByIdAsync(req.NewTagIds[i]) ?? throw new NotFoundException("Tag", req.NewTagIds[i]);
+                var tag = await _tagRepository.GetByIdAsync(req.NewTagIds[i]) ?? throw new NotFoundException("Tag", req.NewTagIds[i]);
                 tags.Add(tag);
             }
             else
@@ -203,14 +203,14 @@ public class EventService : IEventService
         var room = await _roomRepository.GetJoinEventsSlotsByIdAsync(request.RoomId);
         if (room == null) return null;
 
-        var eventCategory = await _eventCategoryRepository.GetEntityByIdAsync(request.EventCategoryId);
+        var eventCategory = await _eventCategoryRepository.GetByIdAsync(request.EventCategoryId);
         if (eventCategory == null) return null;
 
         List<Participant> participants = [];
         // TODO refactor ceci en une requete et voir tous ceux qui manque / si il y a des doublons et les renvoyé avec l'erreur
         for (int i = 0; i < request.ParticipantIds?.Count; i++)
         {
-            var participant = await _participantRepository.GetEntityByIdAsync(request.ParticipantIds[i]);
+            var participant = await _participantRepository.GetByIdAsync(request.ParticipantIds[i]);
             if (participant == null) return null;
 
             if (!participants.Contains(participant)) participants.Add(participant);
@@ -219,7 +219,7 @@ public class EventService : IEventService
         List<Tag> tags = [];
         for (int i = 0; i < request.TagIds?.Count; i++)
         {
-            var tag = await _tagRepository.GetEntityByIdAsync(request.TagIds[i]);
+            var tag = await _tagRepository.GetByIdAsync(request.TagIds[i]);
             if (tag == null) return null;
 
             if (!tags.Contains(tag)) tags.Add(tag);
@@ -277,6 +277,12 @@ public class EventService : IEventService
     public async Task<List<EventDto>> GetByRangeAndRoomIdAsync(string id, DateTime start, DateTime end)
     {
         var res = await _eventRepository.GetByRangeAndRoomIdAsync(id, start, end);
+        return _mapper.Map<List<EventDto>>(res);
+    }
+
+    public async Task<List<EventDto>> GetEventsByUserIdsAndRoomIdAsync(List<string> userIds, string roomId, DateTime start, DateTime end)
+    {
+        var res = await _eventRepository.GetEventsByUserIdsAndRoomIdAsync(userIds, roomId, start, end);
         return _mapper.Map<List<EventDto>>(res);
     }
 }

@@ -2,7 +2,7 @@ using BachelorTherasoftDotnetApi.src.Base;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class ParticipantCategory : BaseModel, BaseAuthorizationModel
+public class ParticipantCategory : BaseEntity, BaseAuthorizationModel
 {
     public ParticipantCategory(Workspace workspace, string name, string? description, string color, string icon)
     {

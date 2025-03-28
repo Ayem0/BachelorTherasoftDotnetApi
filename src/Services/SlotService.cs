@@ -28,7 +28,7 @@ public class SlotService : ISlotService
 
     public async Task<SlotDto> GetByIdAsync(string id)
     {
-        var slot = await _slotRepository.GetEntityByIdAsync(id)?? throw new NotFoundException("Slot", id);
+        var slot = await _slotRepository.GetByIdAsync(id) ?? throw new NotFoundException("Slot", id);
 
         return _mapper.Map<SlotDto>(slot);
     }
@@ -42,7 +42,7 @@ public class SlotService : ISlotService
         {
             foreach (var eventCategoryId in request.EventCategoryIds)
             {
-                var eventCategory = await _eventCategoryRepository.GetEntityByIdAsync(eventCategoryId) ?? throw new NotFoundException("EventCategory", eventCategoryId);
+                var eventCategory = await _eventCategoryRepository.GetByIdAsync(eventCategoryId) ?? throw new NotFoundException("EventCategory", eventCategoryId);
                 eventCategories.Add(eventCategory);
             }
         }
@@ -52,7 +52,8 @@ public class SlotService : ISlotService
             Workspace = workspace
         };
 
-        if (request.RepetitionNumber != null && request.RepetitionInterval != null && request.RepetitionEndDate != null) {
+        if (request.RepetitionNumber != null && request.RepetitionInterval != null && request.RepetitionEndDate != null)
+        {
             List<Slot> slots = [slot];
             var repetitionStartDate = Repetition.IncrementDateOnly(request.StartDate, (Enums.Interval)request.RepetitionInterval, (int)request.RepetitionNumber);
             var repetitionEndDate = Repetition.IncrementDateOnly(request.EndDate, (Enums.Interval)request.RepetitionInterval, (int)request.RepetitionNumber);
@@ -70,8 +71,10 @@ public class SlotService : ISlotService
             }
             await _slotRepository.CreateMultipleAsync(slots);
 
-            return [.. slots.Select(_mapper.Map<SlotDto>)];  
-        } else {
+            return [.. slots.Select(_mapper.Map<SlotDto>)];
+        }
+        else
+        {
             await _slotRepository.CreateAsync(slot);
             return [_mapper.Map<SlotDto>(slot)];
         }
@@ -100,7 +103,7 @@ public class SlotService : ISlotService
     {
         var room = await _roomRepository.GetJoinEventsSlotsByIdAsync(roomId) ?? throw new NotFoundException("Room", roomId);
 
-        var slot = await _slotRepository.GetEntityByIdAsync(slotId) ?? throw new NotFoundException("Slot", slotId);
+        var slot = await _slotRepository.GetByIdAsync(slotId) ?? throw new NotFoundException("Slot", slotId);
 
         List<Slot> slots = [slot];
 
@@ -118,7 +121,7 @@ public class SlotService : ISlotService
 
         room.Slots.AddRange(slots);
         await _roomRepository.UpdateAsync(room);
-            
+
         return true;
     }
 
@@ -130,7 +133,7 @@ public class SlotService : ISlotService
 
             existingSlot.StartDate > slot.StartDate && existingSlot.EndDate < slot.EndDate && existingSlot.StartTime > slot.StartTime && existingSlot.EndTime < slot.EndTime ||
 
-            existingSlot.StartDate < slot.StartDate && existingSlot.EndDate > slot.StartDate && existingSlot.EndDate < slot.EndDate  && existingSlot.StartTime < slot.StartTime && existingSlot.EndTime > slot.StartTime && existingSlot.EndTime < slot.EndTime ||
+            existingSlot.StartDate < slot.StartDate && existingSlot.EndDate > slot.StartDate && existingSlot.EndDate < slot.EndDate && existingSlot.StartTime < slot.StartTime && existingSlot.EndTime > slot.StartTime && existingSlot.EndTime < slot.EndTime ||
 
             existingSlot.EndDate < slot.EndDate && existingSlot.StartDate > slot.StartDate && existingSlot.StartDate < slot.EndDate && existingSlot.EndTime < slot.EndTime && existingSlot.StartTime > slot.StartTime && existingSlot.StartTime < slot.EndTime)).ToList();
 
@@ -148,8 +151,8 @@ public class SlotService : ISlotService
         {
             foreach (var eventCategoryId in request.EventCategoryIds) // TODO refactor
             {
-                var eventCategory = await _eventCategoryRepository.GetEntityByIdAsync(eventCategoryId) ?? throw new NotFoundException("EventCategory", eventCategoryId);
-                
+                var eventCategory = await _eventCategoryRepository.GetByIdAsync(eventCategoryId) ?? throw new NotFoundException("EventCategory", eventCategoryId);
+
                 eventCategories.Add(eventCategory);
             }
         }
@@ -177,10 +180,11 @@ public class SlotService : ISlotService
         }
         await _slotRepository.CreateMultipleAsync(slots);
 
-        return slots.Select(x => _mapper.Map<SlotDto>(x)).ToList();  
+        return slots.Select(x => _mapper.Map<SlotDto>(x)).ToList();
     }
 
-    public async Task<List<SlotDto>> GetByWorkpaceIdAsync(string id) {
+    public async Task<List<SlotDto>> GetByWorkpaceIdAsync(string id)
+    {
         var res = await _slotRepository.GetByWorkpaceIdAsync(id);
         return _mapper.Map<List<SlotDto>>(res);
     }

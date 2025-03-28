@@ -9,10 +9,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
 
-public class SlotRepository : BaseMySqlRepository<Slot>, ISlotRepository
+public class SlotRepository : BaseRepository<Slot>, ISlotRepository
 {
-    public SlotRepository(MySqlDbContext context) : base(context)
-    {   
+    public SlotRepository(MySqlDbContext context, ILogger<Slot> logger) : base(context, logger)
+    {
     }
 
     public async Task<List<Slot>> GetRepetitionsById(string id)
@@ -23,7 +23,8 @@ public class SlotRepository : BaseMySqlRepository<Slot>, ISlotRepository
             .ToListAsync();
     }
 
-    public async Task<List<Slot>> GetByWorkpaceIdAsync(string id) {
+    public async Task<List<Slot>> GetByWorkpaceIdAsync(string id)
+    {
         return await _context.Slot
             .Where(x => x.WorkspaceId == id && x.Workspace.DeletedAt == null && x.DeletedAt == null && x.MainSlotId == null)
             .ToListAsync();

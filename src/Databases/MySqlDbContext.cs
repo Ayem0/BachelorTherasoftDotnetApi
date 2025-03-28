@@ -28,7 +28,25 @@ public class MySqlDbContext : IdentityDbContext<User, Role, string>
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+
         base.OnModelCreating(builder);
+        builder.Entity<Workspace>().HasQueryFilter(w => w.DeletedAt == null);
+        builder.Entity<Area>().HasQueryFilter(a => a.DeletedAt == null);
+        builder.Entity<Location>().HasQueryFilter(l => l.DeletedAt == null);
+        builder.Entity<Room>().HasQueryFilter(r => r.DeletedAt == null);
+        builder.Entity<Event>().HasQueryFilter(e => e.DeletedAt == null);
+        builder.Entity<Participant>().HasQueryFilter(p => p.DeletedAt == null);
+        builder.Entity<Tag>().HasQueryFilter(t => t.DeletedAt == null);
+        builder.Entity<Document>().HasQueryFilter(d => d.DeletedAt == null);
+        builder.Entity<DocumentCategory>().HasQueryFilter(dc => dc.DeletedAt == null);
+        builder.Entity<ParticipantCategory>().HasQueryFilter(pc => pc.DeletedAt == null);
+        builder.Entity<EventCategory>().HasQueryFilter(ec => ec.DeletedAt == null);
+        builder.Entity<Slot>().HasQueryFilter(s => s.DeletedAt == null);
+        builder.Entity<WorkspaceRole>().HasQueryFilter(wr => wr.DeletedAt == null);
+        builder.Entity<Invitation>().HasQueryFilter(i => i.DeletedAt == null);
+        builder.Entity<Notification>().HasQueryFilter(n => n.DeletedAt == null);
+
+
         // Contacts
         builder.Entity<User>()
             .HasMany(u => u.Contacts)

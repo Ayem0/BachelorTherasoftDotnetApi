@@ -7,9 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
 
-public class EventRepository : BaseMySqlRepository<Event>, IEventRepository
+public class EventRepository : BaseRepository<Event>, IEventRepository
 {
-    public EventRepository(MySqlDbContext context) : base(context)
+    public EventRepository(MySqlDbContext context, ILogger<Event> logger) : base(context, logger)
     {
     }
 
@@ -48,5 +48,20 @@ public class EventRepository : BaseMySqlRepository<Event>, IEventRepository
     public async Task<List<Event>> GetByRangeAndRoomIdAsync(string id, DateTime start, DateTime end)
     {
         return await _context.Event.Where(e => e.StartDate >= start && e.EndDate <= end && e.DeletedAt == null).ToListAsync();
+    }
+
+    public Task<List<Event>> GetEventsByUserIdsAndRoomIdAsync(List<string> userIds, string roomId, DateTime start, DateTime end)
+    {
+        return _context.Event
+             .Include(e => e.Users)
+             .Where(e =>  // event with same date or starting before and ending after
+            (e.StartDate <= start && e.EndDate >= end ||
+            // event starting after and ending before
+            e.StartDate > start && e.EndDate < end ||
+            // event starting before and ending before
+            e.StartDate < start && e.EndDate > start && e.EndDate < end ||
+            // event starting after and ending after
+            e.StartDate > start && e.EndDate > end && e.StartDate < end)
+             && (e.Users.Select(x => x.UserId).Any(id => userIds.Contains(id)) || e.RoomId == roomId) && e.DeletedAt == null).ToListAsync();
     }
 }

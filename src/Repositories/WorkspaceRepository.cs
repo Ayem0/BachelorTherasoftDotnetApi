@@ -4,62 +4,14 @@ using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 using BachelorTherasoftDotnetApi.src.Exceptions;
 using BachelorTherasoftDotnetApi.src.Enums;
+using BachelorTherasoftDotnetApi.src.Base;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
 
-public class WorkspaceRepository : IWorkspaceRepository
+public class WorkspaceRepository : BaseRepository<Workspace>, IWorkspaceRepository
 {
-    private readonly MySqlDbContext _context;
-    public WorkspaceRepository(MySqlDbContext context)
+    public WorkspaceRepository(MySqlDbContext context, ILogger<Workspace> logger) : base(context, logger)
     {
-        _context = context;
-    }
-
-    public async Task<Workspace> CreateAsync(Workspace workspace)
-    {
-        try
-        {
-            _context.Workspace.Add(workspace);
-            var res = await _context.SaveChangesAsync();
-            return res > 0 ? workspace : throw new DbException(DbAction.Create, "Workspace");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error creating workspace : {ex.Message}");
-            throw new DbException(DbAction.Create, "Workspace");
-        }
-    }
-
-    public async Task<bool> DeleteAsync(string id)
-    {
-        try
-        {
-            var res = await _context.Workspace
-                .Where(x => x.Id == id && x.DeletedAt == null)
-                .ExecuteUpdateAsync(x => x.SetProperty(x => x.DeletedAt, DateTime.UtcNow));
-
-            return res > 0;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error deleting workspace with Id '{id}' : {ex.Message}");
-            throw new DbException(DbAction.Delete, "Workspace", id);
-        }
-    }
-
-    public async Task<Workspace?> GetByIdAsync(string id)
-    {
-        try
-        {
-            return await _context.Workspace
-                .Where(x => x.Id == id && x.DeletedAt == null)
-                .FirstOrDefaultAsync();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error getting workspace with Id '{id}' : {ex.Message}");
-            throw new DbException(DbAction.Read, "Workspace", id);
-        }
     }
 
     public async Task<Workspace[]> GetByUserIdAsync(string id)
@@ -116,21 +68,6 @@ public class WorkspaceRepository : IWorkspaceRepository
         {
             Console.WriteLine($"Error getting workspace with Id '{id}' : {ex.Message}");
             throw new DbException(DbAction.Read, "Workspace", id);
-        }
-    }
-
-    public async Task<Workspace> UpdateAsync(Workspace workspace)
-    {
-        try
-        {
-            workspace.UpdatedAt = DateTime.UtcNow;
-            var res = await _context.SaveChangesAsync();
-            return res > 0 ? workspace : throw new DbException(DbAction.Update, "Workspace", workspace.Id);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error updating workspace with Id '{workspace.Id}' : {ex.Message}");
-            throw new DbException(DbAction.Update, "Workspace", workspace.Id);
         }
     }
 }

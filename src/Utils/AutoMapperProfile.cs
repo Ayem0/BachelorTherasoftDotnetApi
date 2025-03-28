@@ -37,6 +37,11 @@ public class AutoMapperProfile : Profile
         CreateMap<WorkspaceRole, WorkspaceRoleDto>();
         CreateMap<Tag, TagDto>();
         CreateMap<User, UserDto>();
+        CreateMap<User, MemberDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
+            .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
+            .ForMember(dest => dest.WorkspaceId, opt => opt.Ignore()); // WorkspaceId needs to be set manually
         CreateMap<Area, AreaDto>();
         CreateMap<Room, RoomDto>();
         CreateMap<Invitation, InvitationDto>();

@@ -2,7 +2,7 @@
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class Conversation : BaseModel
+public class Conversation : BaseEntity
 {
     public Conversation(List<string> userIds, string? name)
     {

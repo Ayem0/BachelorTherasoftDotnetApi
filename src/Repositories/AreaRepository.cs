@@ -7,9 +7,9 @@ using BachelorTherasoftDotnetApi.src.Dtos.Models;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
 
-public class AreaRepository : BaseMySqlRepository<Area>, IAreaRepository
+public class AreaRepository : BaseRepository<Area>, IAreaRepository
 {
-    public AreaRepository(MySqlDbContext context) : base(context)
+    public AreaRepository(MySqlDbContext context, ILogger<Area> logger) : base(context, logger)
     {
     }
 

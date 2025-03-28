@@ -1,13 +1,12 @@
+using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 
-public interface IUserRepository
+public interface IUserRepository : IBaseRepository<User>
 {
-
-    Task<User?> GetByIdAsync(string id);
     Task<User?> GetByIdJoinWorkspaceAsync(string id);
-    Task<User> UpdateAsync(User user);
     Task<User[]> UpdateMultipleAsync(User[] users);
     Task<User?> GetByIdJoinContactsAndBlockedUsersAsync(string id);
     Task<User?> GetByEmailJoinContactsAndBlockedUsersAsync(string email);

@@ -2,13 +2,13 @@ using BachelorTherasoftDotnetApi.src.Utils;
 
 namespace BachelorTherasoftDotnetApi.src.Base;
 
-public interface IBaseRepository<T> where T : BaseModel
+public interface IBaseRepository<T> where T : class, IBaseEntity
 {
-    Task<T?> GetEntityByIdAsync(string id);
-    // Task<TDto?> GetByIdAsync<TDto>(string id);
-    Task CreateAsync(T entity);
-    Task UpdateAsync(T entity);
+    Task<T?> GetByIdAsync(string id);
+    Task<T> CreateAsync(T entity);
+    Task<T> UpdateAsync(T entity);
     Task<bool> DeleteAsync(string id);
-    Task CreateMultipleAsync(List<T> entities);
+    Task<List<T>> CreateMultipleAsync(List<T> entities);
+    Task<List<T>> UpdateMultipleAsync(List<T> entities);
 }
 

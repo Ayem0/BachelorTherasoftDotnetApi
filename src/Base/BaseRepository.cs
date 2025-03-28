@@ -5,18 +5,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.src.Base;
 
-public class BaseMySqlRepository<T> : IBaseRepository<T> where T : BaseModel
+public class BaseRepository<T> : IBaseRepository<T> where T : class, IBaseEntity
 {
     protected readonly MySqlDbContext _context;
     private readonly DbSet<T> _dbSet;
+    private readonly ILogger<T> _logger;
 
-    public BaseMySqlRepository(MySqlDbContext context)
+    public BaseRepository(MySqlDbContext context, ILogger<T> logger)
     {
         _context = context;
         _dbSet = _context.Set<T>();
+        _logger = logger;
     }
 
-    public async Task<T?> GetEntityByIdAsync(string id)
+    public async Task<T?> GetByIdAsync(string id)
     {
         try
         {
@@ -28,38 +30,15 @@ public class BaseMySqlRepository<T> : IBaseRepository<T> where T : BaseModel
             throw new DbException(DbAction.Read, nameof(T), id);
         }
     }
-    
-    // public async Task<TDto?> GetByIdAsync<TDto>(string id)
-    // {
-    //     IQueryable<T> query = _dbSet;
 
-    //     var navigations = _context.Model.FindEntityType(typeof(T))?.GetNavigations();
-        
-    //     if (navigations != null)
-    //     {
-    //         var properties = typeof(TDto).GetProperties().Select(p => p.Name).ToHashSet();
-            
-    //         foreach (var property in properties)
-    //         {
-    //             if (navigations.Select(x => x.Name).Contains(property))
-    //             {                 
-    //                 query = query.Include(property);
-    //             }
-    //         }
-    //     }
-
-    //     T? entity = await query.Where(x => x.Id == id && x.DeletedAt == null).FirstOrDefaultAsync();
-
-    //     return entity == null ? default :_mapper.Map<TDto>(entity);
-    // }
-
-    public async Task CreateAsync(T entity)
+    public async Task<T> CreateAsync(T entity)
     {
         try
         {
             _dbSet.Add(entity);
 
             await _context.SaveChangesAsync();
+            return entity;
         }
         catch (Exception ex)
         {
@@ -68,14 +47,14 @@ public class BaseMySqlRepository<T> : IBaseRepository<T> where T : BaseModel
         }
     }
 
-    public async Task UpdateAsync(T entity)
+    public async Task<T> UpdateAsync(T entity)
     {
         try
         {
             entity.UpdatedAt = DateTime.UtcNow;
             _dbSet.Update(entity);
-
             await _context.SaveChangesAsync();
+            return entity;
         }
         catch (Exception ex)
         {
@@ -90,7 +69,6 @@ public class BaseMySqlRepository<T> : IBaseRepository<T> where T : BaseModel
         {
             var res = await _dbSet.Where(x => x.Id == id && x.DeletedAt == null).ExecuteUpdateAsync(x => x.SetProperty(x => x.DeletedAt, DateTime.UtcNow));
             return res > 0;
-
         }
         catch (Exception ex)
         {
@@ -99,18 +77,33 @@ public class BaseMySqlRepository<T> : IBaseRepository<T> where T : BaseModel
         }
     }
 
-    public async Task CreateMultipleAsync(List<T> entities)
+    public async Task<List<T>> CreateMultipleAsync(List<T> entities)
     {
         try
         {
             _dbSet.AddRange(entities);
-
             await _context.SaveChangesAsync();
+            return entities;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error creating mutliple {nameof(T)} : {ex.Message}");
             throw new DbException(DbAction.Create, nameof(T));
+        }
+    }
+
+    public async Task<List<T>> UpdateMultipleAsync(List<T> entities)
+    {
+        try
+        {
+            _dbSet.UpdateRange(entities);
+            await _context.SaveChangesAsync();
+            return entities;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating mutliple {nameof(T)} : {ex.Message}");
+            throw new DbException(DbAction.Update, nameof(T));
         }
     }
 }

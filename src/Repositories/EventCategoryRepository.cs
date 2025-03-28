@@ -8,13 +8,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.src.Repositories;
 
-public class EventCategoryRepository : BaseMySqlRepository<EventCategory>, IEventCategoryRepository
+public class EventCategoryRepository : BaseRepository<EventCategory>, IEventCategoryRepository
 {
-    public EventCategoryRepository(MySqlDbContext context) : base(context)
+    public EventCategoryRepository(MySqlDbContext context, ILogger<EventCategory> logger) : base(context, logger)
     {
     }
-    
-    public async Task<List<EventCategory>> GetByWorkpaceIdAsync(string id) {
+
+    public async Task<List<EventCategory>> GetByWorkpaceIdAsync(string id)
+    {
         return await _context.EventCategory
             .Where(x => x.WorkspaceId == id && x.Workspace.DeletedAt == null && x.DeletedAt == null)
             .ToListAsync();
