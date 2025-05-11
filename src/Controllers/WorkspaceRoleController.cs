@@ -27,7 +27,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res =  await _workspaceRoleService.CreateAsync(request);
+            var res = await _workspaceRoleService.CreateAsync(request);
             return CreatedAtAction(null, res);
         }
 
@@ -40,8 +40,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromQuery] string id)
         {
-            var res =  await _workspaceRoleService.DeleteAsync(id);
-            return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"WorkspaceRole with id '{id} not found.'"});
+            var res = await _workspaceRoleService.DeleteAsync(id);
+            return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"WorkspaceRole with id '{id} not found.'" });
 
         }
 
@@ -79,7 +79,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            if (request.Description == null && request.Name == null) return BadRequest(new ProblemDetails(){ Title = "At least one field is required."});
+            if (request.Description == null && request.Name == null) return BadRequest(new ProblemDetails() { Title = "At least one field is required." });
 
             var res = await _workspaceRoleService.UpdateAsync(id, request);
             return Ok(res);
@@ -105,9 +105,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByWorkspaceId([FromQuery] string workspaceId)
+        public async Task<IActionResult> GetByWorkspaceId([FromQuery] string id)
         {
-            var res = await _workspaceRoleService.GetByWorkspaceIdAsync(workspaceId);
+            var res = await _workspaceRoleService.GetByWorkspaceIdAsync(id);
             return Ok(res);
         }
     }

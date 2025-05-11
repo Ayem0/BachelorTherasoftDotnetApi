@@ -15,14 +15,14 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly IInvitationRepository _invitationRepository;
-    private readonly IHubContext<WorkspaceHub> _hubContext;
+    private readonly IHubService _hub;
     private readonly IMapper _mapper;
-    public UserService(IMapper mapper, IUserRepository userRepository, IInvitationRepository invitationRepository, IHubContext<WorkspaceHub> hubContext)
+    public UserService(IMapper mapper, IUserRepository userRepository, IInvitationRepository invitationRepository, IHubService hub)
     {
         _mapper = mapper;
         _userRepository = userRepository;
         _invitationRepository = invitationRepository;
-        _hubContext = hubContext;
+        _hub = hub;
     }
 
     public async Task<UserDto> GetUserInfoAsync(string id)
@@ -48,10 +48,10 @@ public class UserService : IUserService
         };
     }
 
-    public async Task<UserDto> GetUserJoinWorkspacesByIdAsync(string id)
+    public async Task<UserJoinWorkspaceDto> GetUserJoinWorkspacesByIdAsync(string id)
     {
         var user = await _userRepository.GetByIdJoinWorkspaceAsync(id) ?? throw new NotFoundException("User", id);
-        return _mapper.Map<UserDto>(user);
+        return _mapper.Map<UserJoinWorkspaceDto>(user);
     }
 
     public async Task<List<UserDto>> GetUserContactsByIdAsync(string id)

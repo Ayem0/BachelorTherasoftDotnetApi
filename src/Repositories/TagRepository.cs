@@ -16,14 +16,14 @@ public class TagRepository : BaseRepository<Tag>, ITagRepository
 
     public async Task<Tag?> GetByIdJoinWorkspaceAsync(string id)
     {
-        return await _context.Tag
+        return await _dbSet
             .Include(x => x.Workspace)
             .Where(x => x.Id == id && x.DeletedAt == null && x.Workspace.DeletedAt == null)
             .FirstOrDefaultAsync();
     }
     public async Task<List<Tag>> GetByWorkpaceIdAsync(string id)
     {
-        return await _context.Tag
+        return await _dbSet
             .Where(x => x.WorkspaceId == id && x.DeletedAt == null && x.Workspace.DeletedAt == null)
             .ToListAsync();
     }

@@ -6,7 +6,7 @@ namespace BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 
 public interface IUserService
 {
-    Task<UserDto> GetUserJoinWorkspacesByIdAsync(string id);
+    Task<UserJoinWorkspaceDto> GetUserJoinWorkspacesByIdAsync(string id);
     Task<UserDto> GetUserInfoAsync(string id);
     Task<UserDto> UpdateAsync(string id, UpdateUserRequest req);
     Task<List<UserDto>> GetUserContactsByIdAsync(string id);

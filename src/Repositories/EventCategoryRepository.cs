@@ -16,7 +16,7 @@ public class EventCategoryRepository : BaseRepository<EventCategory>, IEventCate
 
     public async Task<List<EventCategory>> GetByWorkpaceIdAsync(string id)
     {
-        return await _context.EventCategory
+        return await _dbSet
             .Where(x => x.WorkspaceId == id && x.Workspace.DeletedAt == null && x.DeletedAt == null)
             .ToListAsync();
     }

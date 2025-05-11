@@ -9,10 +9,8 @@ public class AutoMapperProfile : Profile
 {
     public AutoMapperProfile()
     {
-        // Configure your mappings here
+        // Workspace
         CreateMap<Workspace, WorkspaceDto>();
-
-        // Mapping Workspace to WorkspaceDetailsDto
         CreateMap<Workspace, WorkspaceDetailsDto>()
             .ForMember(dest => dest.Locations, opt => opt.MapFrom(src => src.Locations))
             .ForMember(dest => dest.Slots, opt => opt.MapFrom(src => src.Slots))
@@ -28,24 +26,37 @@ public class AutoMapperProfile : Profile
         //     .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.User.Id))
         //     .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
         //     .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName));
-
+        // Location
         CreateMap<Location, LocationDto>();
         CreateMap<Slot, SlotDto>();
+        // EventCategory
         CreateMap<EventCategory, EventCategoryDto>();
-        CreateMap<Participant, ParticipantDto>();
+        // ParticipantCategory
         CreateMap<ParticipantCategory, ParticipantCategoryDto>();
+        // Participant
+        CreateMap<Participant, ParticipantDto>();
+        CreateMap<Participant, ParticipantJoinCategoryDto>()
+            .ForMember(dest => dest.ParticipantCategory, opt => opt.MapFrom(src => src.ParticipantCategory));
+        // WorkspaceRole
         CreateMap<WorkspaceRole, WorkspaceRoleDto>();
+        // Tag
         CreateMap<Tag, TagDto>();
+        // User
         CreateMap<User, UserDto>();
         CreateMap<User, MemberDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
             .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
-            .ForMember(dest => dest.WorkspaceId, opt => opt.Ignore()); // WorkspaceId needs to be set manually
-        CreateMap<Area, AreaDto>();
-        CreateMap<Room, RoomDto>();
-        CreateMap<Invitation, InvitationDto>();
+            .ForMember(dest => dest.WorkspaceId, opt => opt.Ignore());
+        CreateMap<User, UserJoinWorkspaceDto>();
+        // Event
         CreateMap<Event, EventDto>()
-        .ForMember(dest => dest.Users, opt => opt.MapFrom(src => src.Users.Select(x => x.User)));
+            .ForMember(dest => dest.Members, opt => opt.MapFrom(src => src.Users.Select(x => x.User)));
+        // Area
+        CreateMap<Area, AreaDto>();
+        // Room
+        CreateMap<Room, RoomDto>();
+        // Invitation
+        CreateMap<Invitation, InvitationDto>();
     }
 }

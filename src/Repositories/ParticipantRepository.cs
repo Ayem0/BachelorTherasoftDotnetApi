@@ -14,8 +14,24 @@ public class ParticipantRepository : BaseRepository<Participant>, IParticipantRe
     }
     public async Task<List<Participant>> GetByWorkpaceIdAsync(string id)
     {
-        return await _context.Participant
-            .Where(x => x.WorkspaceId == id && x.Workspace.DeletedAt == null && x.DeletedAt == null)
+        return await _dbSet
+            .Where(x => x.WorkspaceId == id)
             .ToListAsync();
+    }
+
+    public Task<List<Participant>> GetByWorkpaceIdJoinCategoryAsync(string id)
+    {
+        try
+        {
+            return _dbSet
+                .Include(x => x.ParticipantCategory)
+                .Where(x => x.WorkspaceId == id)
+                .ToListAsync();
+        }
+        catch (Exception)
+        {
+            _logger.LogError("Error while getting participants by workspace id with category join.");
+            throw;
+        }
     }
 }

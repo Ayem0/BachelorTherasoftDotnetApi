@@ -18,7 +18,7 @@ public class WorkspaceRepository : BaseRepository<Workspace>, IWorkspaceReposito
     {
         try
         {
-            return await _context.Workspace
+            return await _dbSet
                 .Where(x => x.Users.Any(x => x.Id == id && x.DeletedAt == null) && x.DeletedAt == null)
                 .ToArrayAsync();
 
@@ -34,7 +34,7 @@ public class WorkspaceRepository : BaseRepository<Workspace>, IWorkspaceReposito
     {
         try
         {
-            return await _context.Workspace
+            return await _dbSet
                 .Include(x => x.Users.Where(y => y.DeletedAt == null))
                 .Include(x => x.Locations.Where(y => y.DeletedAt == null))
                     .ThenInclude(x => x.Areas.Where(y => y.DeletedAt == null))
@@ -59,7 +59,7 @@ public class WorkspaceRepository : BaseRepository<Workspace>, IWorkspaceReposito
     {
         try
         {
-            return await _context.Workspace
+            return await _dbSet
                 .Where(x => x.Id == id && x.DeletedAt == null)
                 .Include(x => x.Users.Where(y => y.DeletedAt == null))
                 .FirstOrDefaultAsync();

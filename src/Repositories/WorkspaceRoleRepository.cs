@@ -16,7 +16,7 @@ public class WorkspaceRoleRepository : BaseRepository<WorkspaceRole>, IWorkspace
 
     public async Task<List<WorkspaceRole>> GetByWorkspaceIdAsync(string id)
     {
-        return await _context.WorkspaceRole
+        return await _dbSet
             .Where(x => x.WorkspaceId == id && x.Workspace.DeletedAt == null && x.DeletedAt == null)
             .ToListAsync();
     }

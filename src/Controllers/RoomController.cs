@@ -39,9 +39,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByAreaId([FromQuery] string areaId)
+        public async Task<IActionResult> GetByAreaId([FromQuery] string id)
         {
-            var res = await _roomService.GetByAreaIdAsync(areaId);
+            var res = await _roomService.GetByAreaIdAsync(id);
             return Ok(res);
         }
 

@@ -79,9 +79,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetByWorkspace([FromQuery] string workspaceId)
+        public async Task<IActionResult> GetByWorkspace([FromQuery] string id)
         {
-            var tags = await _tagService.GetByWorkpsaceIdAsync(workspaceId);
+            var tags = await _tagService.GetByWorkspaceIdAsync(id);
             return Ok(tags);
         }
     }

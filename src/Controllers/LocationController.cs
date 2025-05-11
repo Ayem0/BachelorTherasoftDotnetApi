@@ -53,8 +53,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromQuery] string id)
         {
-            var res =  await _locationService.DeleteAsync(id);
-            return res ? NoContent(): NotFound(new ProblemDetails() { Title = $"Location with id '{id} not found.'"});
+            var res = await _locationService.DeleteAsync(id);
+            return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"Location with id '{id} not found.'" });
         }
 
         /// <summary>
@@ -80,9 +80,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByWorkspace([FromQuery] string workspaceId)
-        {   
-            var res = await _locationService.GetByWorkspaceIdAsync(workspaceId);
+        public async Task<IActionResult> GetByWorkspace([FromQuery] string id)
+        {
+            var res = await _locationService.GetByWorkspaceIdAsync(id);
             return Ok(res);
         }
     }

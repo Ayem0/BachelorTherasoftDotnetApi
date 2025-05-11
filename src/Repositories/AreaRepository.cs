@@ -15,7 +15,7 @@ public class AreaRepository : BaseRepository<Area>, IAreaRepository
 
     public async Task<Area?> GetByIdJoinRoomsAsync(string id)
     {
-        return await _context.Area
+        return await _dbSet
             .Include(w => w.Rooms)
             .Where(w => w.Id == id && w.DeletedAt == null && w.Location.DeletedAt == null && w.Location.Workspace.DeletedAt == null
                 && w.Rooms.All(x => x.DeletedAt == null))
@@ -24,14 +24,14 @@ public class AreaRepository : BaseRepository<Area>, IAreaRepository
 
     public async Task<List<Area>> GetAreasByLocationIdAsync(string id)
     {
-        return await _context.Area
+        return await _dbSet
             .Where(a => a.LocationId == id && a.DeletedAt == null)
             .ToListAsync();
     }
 
     public async Task<Area?> GetByIdJoinWorkspaceAsync(string id)
     {
-        return await _context.Area
+        return await _dbSet
             .Include(w => w.Workspace)
             .Where(w => w.Id == id && w.DeletedAt == null && w.Location.DeletedAt == null && w.Workspace.DeletedAt == null)
             .FirstOrDefaultAsync();

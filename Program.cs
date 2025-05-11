@@ -16,6 +16,9 @@ using System.Reflection;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+// Logger
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -56,7 +59,7 @@ builder.Services.AddSwaggerGen(o =>
 });
 // MySQL service
 builder.Services.AddDbContext<MySqlDbContext>(
-    (sp, options) => options.UseMySQL(builder.Configuration.GetConnectionString("MySQL")!).AddInterceptors(sp.GetRequiredService<SoftDeleteInterceptor>())
+    (sp, options) => options.UseMySQL(builder.Configuration.GetConnectionString("MySQL")!)
 );
 
 // builder.Services.AddDbContext<MySqlDbContext>(
@@ -103,6 +106,7 @@ builder.Services.AddAuthorization();
 
 // SignalR
 builder.Services.AddSignalR();
+builder.Services.AddScoped<IHubService, HubService>();
 
 // Custom Repositories
 builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
@@ -143,19 +147,12 @@ builder.Services.AddScoped<ISlotService, SlotService>();
 // builder.Services.AddScoped<IEventMemberService, EventMemberService>();
 
 // Soft delete interceptor
-builder.Services.AddScoped<SoftDeleteInterceptor>();
+// builder.Services.AddScoped<SoftDeleteInterceptor>();
 
 // Utils Services
 // builder.Services.AddScoped<IRepetitionService, RepetitionService>();
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
-// Logger
-builder.Services.AddLogging(loggingBuilder =>
-{
-    loggingBuilder.ClearProviders();
-    loggingBuilder.AddConsole();
-    loggingBuilder.AddDebug();
-});
 
 var app = builder.Build();
 
@@ -172,7 +169,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapIdentityApi<User>();
 app.MapControllers();
-app.MapHub<GlobalHub>("/global");
-app.MapHub<WorkspaceHub>("/workspace");
+app.MapHub<GlobalHub>("/hub");
 
 app.Run();

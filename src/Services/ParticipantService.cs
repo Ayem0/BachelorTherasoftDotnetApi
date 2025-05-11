@@ -23,7 +23,7 @@ public class ParticipantService : IParticipantService
         _mapper = mapper;
     }
 
-    public async Task<ParticipantDto> CreateAsync(CreateParticipantRequest request)
+    public async Task<ParticipantJoinCategoryDto> CreateAsync(CreateParticipantRequest request)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(request.WorkspaceId) ?? throw new NotFoundException("Workspace", request.WorkspaceId);
 
@@ -38,7 +38,7 @@ public class ParticipantService : IParticipantService
 
         await _participantRepository.CreateAsync(participant);
 
-        return _mapper.Map<ParticipantDto>(participant);
+        return _mapper.Map<ParticipantJoinCategoryDto>(participant);
     }
 
     public async Task<bool> DeleteAsync(string id)
@@ -53,19 +53,15 @@ public class ParticipantService : IParticipantService
         return _mapper.Map<ParticipantDto>(participant);
     }
 
-    public async Task<ParticipantDto> UpdateAsync(string id, UpdateParticipantRequest request)
+    public async Task<ParticipantJoinCategoryDto> UpdateAsync(string id, UpdateParticipantRequest request)
     {
         var participant = await _participantRepository.GetByIdAsync(id) ?? throw new NotFoundException("Participant", id);
 
-        if (request.ParticipantCategoryId != null)
-        {
-            var participantCategory = await _participantCategoryRepository.GetByIdAsync(request.ParticipantCategoryId)
-                ?? throw new NotFoundException("ParticipantCategory", request.ParticipantCategoryId);
-
-            participant.ParticipantCategory = participantCategory;
-            participant.ParticipantCategoryId = participantCategory.Id;
-        }
-
+        participant.ParticipantCategory = request.ParticipantCategoryId != null
+            ? await _participantCategoryRepository.GetByIdAsync(request.ParticipantCategoryId)
+            ?? throw new NotFoundException("ParticipantCategory", request.ParticipantCategoryId)
+            : participant.ParticipantCategory;
+        participant.ParticipantCategoryId = request.ParticipantCategoryId ?? participant.ParticipantCategoryId;
         participant.FirstName = request.FirstName ?? participant.FirstName;
         participant.LastName = request.LastName ?? participant.LastName;
         participant.Email = request.Email ?? participant.Email;
@@ -77,12 +73,18 @@ public class ParticipantService : IParticipantService
 
         await _participantRepository.UpdateAsync(participant);
 
-        return _mapper.Map<ParticipantDto>(participant);
+        return _mapper.Map<ParticipantJoinCategoryDto>(participant);
     }
 
     public async Task<List<ParticipantDto>> GetByWorkspaceIdAsync(string id)
     {
         var res = await _participantRepository.GetByWorkpaceIdAsync(id);
         return _mapper.Map<List<ParticipantDto>>(res);
+    }
+
+    public async Task<List<ParticipantJoinCategoryDto>> GetByWorkspaceIdJoinCategoryAsync(string id)
+    {
+        var res = await _participantRepository.GetByWorkpaceIdJoinCategoryAsync(id);
+        return _mapper.Map<List<ParticipantJoinCategoryDto>>(res);
     }
 }

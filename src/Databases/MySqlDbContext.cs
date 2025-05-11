@@ -46,6 +46,21 @@ public class MySqlDbContext : IdentityDbContext<User, Role, string>
         builder.Entity<Invitation>().HasQueryFilter(i => i.DeletedAt == null);
         builder.Entity<Notification>().HasQueryFilter(n => n.DeletedAt == null);
 
+        builder.Entity<Area>().HasKey(x => x.Id);
+        builder.Entity<Workspace>().HasKey(x => x.Id);
+        builder.Entity<Location>().HasKey(x => x.Id);
+        builder.Entity<Room>().HasKey(x => x.Id);
+        builder.Entity<Event>().HasKey(x => x.Id);
+        builder.Entity<Participant>().HasKey(x => x.Id);
+        builder.Entity<Tag>().HasKey(x => x.Id);
+        builder.Entity<Document>().HasKey(x => x.Id);
+        builder.Entity<DocumentCategory>().HasKey(x => x.Id);
+        builder.Entity<ParticipantCategory>().HasKey(x => x.Id);
+        builder.Entity<EventCategory>().HasKey(x => x.Id);
+        builder.Entity<Slot>().HasKey(x => x.Id);
+        builder.Entity<WorkspaceRole>().HasKey(x => x.Id);
+        builder.Entity<Invitation>().HasKey(x => x.Id);
+        builder.Entity<Notification>().HasKey(x => x.Id);
 
         // Contacts
         builder.Entity<User>()
@@ -72,35 +87,35 @@ public class MySqlDbContext : IdentityDbContext<User, Role, string>
         //     v => v == null ? null : JsonSerializer.Deserialize<List<DayOfWeek>>(v, JsonSerializerOptions) // Si la chaîne est null, retourner null
         // );
 
-        //  // Configuration pour DateOnly
-        // builder.Entity<Slot>()
-        //     .Property(s => s.StartDate)
-        //     .HasConversion(
-        //         d => d.ToDateTime(TimeOnly.MinValue), // Conversion de DateOnly vers DateTime
-        //         d => DateOnly.FromDateTime(d)        // Conversion de DateTime vers DateOnly
-        //     );
+        // Configuration pour DateOnly
+        builder.Entity<Slot>()
+            .Property(s => s.StartDate)
+            .HasConversion(
+                d => d.ToDateTime(TimeOnly.MinValue), // Conversion de DateOnly vers DateTime
+                d => DateOnly.FromDateTime(d)        // Conversion de DateTime vers DateOnly
+            );
 
-        // builder.Entity<Slot>()
-        //     .Property(s => s.EndDate)
-        //     .HasConversion(
-        //         d => d.ToDateTime(TimeOnly.MinValue),
-        //         d => DateOnly.FromDateTime(d)
-        //     );
+        builder.Entity<Slot>()
+            .Property(s => s.EndDate)
+            .HasConversion(
+                d => d.ToDateTime(TimeOnly.MinValue),
+                d => DateOnly.FromDateTime(d)
+            );
 
         // // Configuration pour TimeOnly
-        // builder.Entity<Slot>()
-        //     .Property(s => s.StartTime)
-        //     .HasConversion(
-        //         t => TimeOnly.ToTimeSpan(),          // Conversion de TimeOnly vers TimeSpan
-        //         t => TimeOnly.FromTimeSpan(t)       // Conversion de TimeSpan vers TimeOnly
-        //     );
+        builder.Entity<Slot>()
+            .Property(s => s.StartTime)
+            .HasConversion(
+                t => t.ToTimeSpan(),          // Conversion de TimeOnly vers TimeSpan
+                t => TimeOnly.FromTimeSpan(t)       // Conversion de TimeSpan vers TimeOnly
+            );
 
-        // builder.Entity<Slot>()
-        //     .Property(s => s.EndTime)
-        //     .HasConversion(
-        //         t => TimeOnly.ToTimeSpan(),
-        //         t => TimeOnly.FromTimeSpan(t)
-        //     );
+        builder.Entity<Slot>()
+            .Property(s => s.EndTime)
+            .HasConversion(
+                t => t.ToTimeSpan(),
+                t => TimeOnly.FromTimeSpan(t)
+            );
 
 
 

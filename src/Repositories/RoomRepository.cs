@@ -18,7 +18,7 @@ public class RoomRepository : BaseRepository<Room>, IRoomRepository
     {
         try
         {
-            return await _context.Room
+            return await _dbSet
                 .Where(x => x.AreaId == id && x.DeletedAt == null && x.Area.DeletedAt == null)
                 .ToListAsync();
         }
@@ -33,7 +33,7 @@ public class RoomRepository : BaseRepository<Room>, IRoomRepository
     {
         try
         {
-            return await _context.Room
+            return await _dbSet
                 .Where(x => x.WorkspaceId == id && x.DeletedAt == null && x.Area.DeletedAt == null && x.Workspace.DeletedAt == null)
                 .ToListAsync();
         }
@@ -48,7 +48,7 @@ public class RoomRepository : BaseRepository<Room>, IRoomRepository
     {
         try
         {
-            return await _context.Room
+            return await _dbSet
                 .Include(x => x.Events.Where(y => y.DeletedAt == null))
                 .Include(x => x.Slots.Where(y => y.DeletedAt == null))
                 .Where(x => x.Id == id && x.DeletedAt == null)

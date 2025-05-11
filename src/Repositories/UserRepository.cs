@@ -18,7 +18,7 @@ public class UserRepository : BaseRepository<User>, IUserRepository
     {
         try
         {
-            return await _context.Users
+            return await _dbSet
                 .Include(u => u.Workspaces)
                 .Where(x => x.Id == id && x.DeletedAt == null && x.Workspaces.All(w => w.DeletedAt == null))
                 .FirstOrDefaultAsync();
@@ -30,29 +30,11 @@ public class UserRepository : BaseRepository<User>, IUserRepository
         }
     }
 
-    public async Task<User[]> UpdateMultipleAsync(User[] users)
-    {
-        try
-        {
-            foreach (User user in users)
-            {
-                user.UpdatedAt = DateTime.UtcNow;
-            }
-            await _context.SaveChangesAsync();
-            return users;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error updating users with Id '{string.Join(", ", users.Select(x => x.Id))}' : {ex.Message}");
-            throw new DbException(DbAction.Update, "Users", string.Join(", ", users.Select(x => x.Id)));
-        }
-    }
-
     public async Task<User?> GetByIdJoinContactsAndBlockedUsersAsync(string id)
     {
         try
         {
-            return await _context.Users
+            return await _dbSet
                 .Where(u => u.Id == id && u.DeletedAt == null)
                 .Include(u => u.Contacts.Where(c => c.DeletedAt == null))
                 .Include(u => u.BlockedUsers.Where(b => b.DeletedAt == null))
@@ -69,7 +51,7 @@ public class UserRepository : BaseRepository<User>, IUserRepository
     {
         try
         {
-            return await _context.Users
+            return await _dbSet
                 .Where(u => u.Email == email && u.DeletedAt == null)
                 .Include(u => u.BlockedUsers.Where(b => b.DeletedAt == null))
                 .Include(u => u.Contacts.Where(c => c.DeletedAt == null))
@@ -86,7 +68,7 @@ public class UserRepository : BaseRepository<User>, IUserRepository
     {
         try
         {
-            return await _context.Users
+            return await _dbSet
                 .Where(u => u.Id == id)
                 .Include(u => u.Contacts)
                 .SelectMany(u => u.Contacts.Where(c => c.DeletedAt == null))

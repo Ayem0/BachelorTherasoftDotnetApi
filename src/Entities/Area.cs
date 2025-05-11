@@ -2,7 +2,7 @@
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class Area : BaseEntity, BaseAuthorizationModel
+public class Area : BaseEntity, BaseAuthorizationModel, IBaseEntity
 {
     public Area(Workspace workspace, Location location, string name, string? description)
     {

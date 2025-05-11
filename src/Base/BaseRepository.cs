@@ -7,9 +7,9 @@ namespace BachelorTherasoftDotnetApi.src.Base;
 
 public class BaseRepository<T> : IBaseRepository<T> where T : class, IBaseEntity
 {
-    protected readonly MySqlDbContext _context;
-    private readonly DbSet<T> _dbSet;
-    private readonly ILogger<T> _logger;
+    private readonly MySqlDbContext _context;
+    protected readonly DbSet<T> _dbSet;
+    protected readonly ILogger<T> _logger;
 
     public BaseRepository(MySqlDbContext context, ILogger<T> logger)
     {

@@ -15,7 +15,7 @@ public class ParticipantCategoryRepository : BaseRepository<ParticipantCategory>
 
     public async Task<List<ParticipantCategory>> GetByWorkpaceIdAsync(string id)
     {
-        return await _context.ParticipantCategory
+        return await _dbSet
             .Where(x => x.WorkspaceId == id && x.Workspace.DeletedAt == null && x.DeletedAt == null)
             .ToListAsync();
     }

@@ -15,11 +15,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
     public class WorkspaceController : ControllerBase
     {
         private readonly IWorkspaceService _workspaceService;
-        private readonly IHubContext<WorkspaceHub> _workspaceHub;
-        public WorkspaceController(IWorkspaceService workspaceService, IHubContext<WorkspaceHub> workspaceHub)
+        public WorkspaceController(IWorkspaceService workspaceService)
         {
             _workspaceService = workspaceService;
-            _workspaceHub = workspaceHub;
         }
 
         /// <summary>
@@ -103,7 +101,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
 
             var res = await _workspaceService.UpdateAsync(id, request);
             // await _workspaceHub.NotifyWorkspaceGroup(res.workspaceId, $"WORKSPACE {res.Name} UPDATED");
-            await _workspaceHub.Clients.Group(res.Id).SendAsync("WorkspaceUpdated", $"WORKSPACE {res.Name} UPDATED");
+            // await _workspaceHub.Clients.Group(res.Id).SendAsync("WorkspaceUpdated", $"WORKSPACE {res.Name} UPDATED");
             return Ok(res);
         }
 

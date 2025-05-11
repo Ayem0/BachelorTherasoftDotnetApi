@@ -19,7 +19,7 @@ public class InvitationService : IInvitationService
     private readonly IUserRepository _userRepository;
     private readonly IEventRepository _eventRepository;
     private readonly UserManager<User> _userManager;
-    private readonly IHubContext<WorkspaceHub> _hubContext;
+    private readonly IHubService _hub;
     private readonly IMapper _mapper;
     public InvitationService(
         IInvitationRepository invitationRepository,
@@ -27,7 +27,7 @@ public class InvitationService : IInvitationService
         IEventRepository eventRepository,
         UserManager<User> userManager,
         IMapper mapper,
-        IHubContext<WorkspaceHub> hubContext,
+        IHubService hub,
         IUserRepository userRepository
     )
     {
@@ -36,49 +36,65 @@ public class InvitationService : IInvitationService
         _eventRepository = eventRepository;
         _mapper = mapper;
         _userManager = userManager;
-        _hubContext = hubContext;
+        _hub = hub;
         _userRepository = userRepository;
     }
+
     // Contact
     public async Task<InvitationDto> CreateContactInvitationAsync(string senderId, string receiverEmail)
     {
         var sender = await _userRepository.GetByIdJoinContactsAndBlockedUsersAsync(senderId) ?? throw new NotFoundException("User", senderId);
         var receiver = await _userRepository.GetByEmailJoinContactsAndBlockedUsersAsync(receiverEmail) ?? throw new NotFoundException("User", receiverEmail);
+
         if (sender.Contacts.Any(x => x.Id == receiver.Id) || sender.BlockedUsers.Any(x => x.Id == receiver.Id) ||
             receiver.Contacts.Any(x => x.Id == sender.Id || receiver.BlockedUsers.Any(x => x.Id == sender.Id)))
             throw new BadRequestException("", "");
+
         var invitation = await _invitationRepository.CreateAsync(new Invitation(sender, receiver) { Sender = sender, Receiver = receiver });
         var invitationDto = _mapper.Map<InvitationDto>(invitation);
-        await _hubContext.Clients.User(receiver.Id).SendAsync("ContactInvitationReceived", invitation);
+
+        await _hub.NotififyUsers([receiver.Id, sender.Id], "ContactInvitationCreated", invitation);
+
         return _mapper.Map<InvitationDto>(invitation);
     }
 
     public async Task AcceptContactInvitationAsync(string userId, string id)
     {
         var invitation = await _invitationRepository.GetByIdJoinSenderAndReceiver(id) ?? throw new NotFoundException("Invitation", id);
-        if (invitation.ReceiverId != userId) throw new ForbiddenException();
+
+        if (invitation.ReceiverId != userId)
+            throw new ForbiddenException();
+
         invitation.Sender.Contacts.Add(invitation.Receiver);
         invitation.Receiver.Contacts.Add(invitation.Sender);
         await _userRepository.UpdateMultipleAsync([invitation.Sender, invitation.Receiver]);
+        await _hub.NotififyUser(invitation.SenderId, "ContactAdded", _mapper.Map<UserDto>(invitation.Receiver));
+        await _hub.NotififyUser(invitation.ReceiverId, "ContactAdded", _mapper.Map<UserDto>(invitation.Sender));
+
         await _invitationRepository.DeleteAsync(invitation.Id);
-        await _hubContext.Clients.User(invitation.SenderId).SendAsync("ContactInvitationAccepted", _mapper.Map<UserDto>(invitation.Receiver));
-        await _hubContext.Clients.User(invitation.ReceiverId).SendAsync("ContactAdded", _mapper.Map<UserDto>(invitation.Sender));
+        await _hub.NotififyUsers([invitation.ReceiverId, invitation.SenderId], "ContactInvitationDeleted", invitation.Id);
     }
 
     public async Task CancelContactInvitationAsync(string userId, string id)
     {
         var invitation = await _invitationRepository.GetByIdAsync(id) ?? throw new NotFoundException("Invitation", id);
-        if (invitation.SenderId != userId) throw new ForbiddenException();
-        await _hubContext.Clients.User(invitation.ReceiverId).SendAsync("ContactInvitationCanceled", invitation.Id);
+
+        if (invitation.SenderId != userId)
+            throw new ForbiddenException();
+
         await _invitationRepository.DeleteAsync(id);
+        await _hub.NotififyUsers([invitation.ReceiverId, invitation.SenderId], "ContactInvitationDeleted", invitation.Id);
     }
 
     public async Task RefuseContactInvitationAsync(string userId, string id)
     {
         var invitation = await _invitationRepository.GetByIdAsync(id) ?? throw new NotFoundException("Invitation", id);
-        if (invitation.ReceiverId != userId) throw new ForbiddenException();
+
+        if (invitation.ReceiverId != userId)
+            throw new ForbiddenException();
+
         await _invitationRepository.DeleteAsync(id);
-        await _hubContext.Clients.Client(invitation.SenderId).SendAsync("ContactInvitationRefused", invitation.Id);
+        await _hub.NotififyUsers([invitation.ReceiverId, invitation.SenderId], "ContactInvitationDeleted", invitation.Id);
     }
 
     // Workspace
@@ -86,46 +102,72 @@ public class InvitationService : IInvitationService
     {
         var sender = await _userManager.FindByIdAsync(senderUserId) ?? throw new NotFoundException("User", senderUserId);
         var receiver = await _userManager.FindByIdAsync(req.ReceiverUserId) ?? throw new NotFoundException("User", req.ReceiverUserId);
-        var workspace = await _workspaceRepository.GetByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
+        var workspace = await _workspaceRepository.GetJoinUsersByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
+
+        if (workspace.Users.Any(u => u.Id == receiver.Id))
+            throw new BadRequestException("User is already a member of this workspace.", "User is already a member of this workspace.");
+
         var existingInvitation = await _invitationRepository.GetByWorkspaceIdAndReceiverId(req.WorkspaceId, req.ReceiverUserId);
-        if (existingInvitation != null) throw new BadRequestException("", "");
+
+        if (existingInvitation != null)
+            throw new BadRequestException("", "");
+
         var invitation = await _invitationRepository.CreateAsync(new Invitation(workspace, sender, receiver) { Receiver = receiver, Sender = sender });
         var invitationDto = _mapper.Map<InvitationDto>(invitation);
-        await _hubContext.Clients.User(invitation.ReceiverId).SendAsync("WorkspaceInvitationCreated", invitationDto);
+        await _hub.NotififyGroup(workspace.Id, "WorkspaceInvitationAdded", new { workspaceId = req.WorkspaceId, invitation = invitationDto });
+        await _hub.NotififyUser(receiver.Id, "WorkspaceInvitationReceived", invitationDto);
+
         return invitationDto;
     }
 
     public async Task AcceptWorkspaceInvitationAsync(string userId, string id)
     {
         var invitation = await _invitationRepository.GetByIdJoinWorkspaceAndReceiver(id) ?? throw new NotFoundException("Invitation", id);
-        if (invitation.ReceiverId != userId || invitation.Workspace == null) throw new ForbiddenException();
+
+        if (invitation.ReceiverId != userId || invitation.Workspace == null)
+            throw new ForbiddenException();
+
         invitation.Workspace.Users.Add(invitation.Receiver);
         await _workspaceRepository.UpdateAsync(invitation.Workspace);
-        await _hubContext.Clients.Group(invitation.Workspace.Id).SendAsync("WorkspaceMemberAdded", _mapper.Map<UserDto>(invitation.Receiver));
+        await _hub.NotififyGroup(invitation.Workspace.Id, "UserAdded", _mapper.Map<UserDto>(invitation.Receiver));
+
         await _invitationRepository.DeleteAsync(invitation.Id);
+        await _hub.NotififyGroup(invitation.Workspace.Id, "WorkspaceInvitationDeleted", invitation.Id);
+        await _hub.NotififyUser(invitation.Receiver.Id, "WorkspaceInvitationDeleted", invitation.Id);
     }
 
     public async Task CancelWorkspaceInvitationAsync(string userId, string id)
     {
         var invitation = await _invitationRepository.GetByIdAsync(id) ?? throw new NotFoundException("Invitation", id);
-        if (invitation.WorkspaceId == null) throw new BadRequestException("Bad request", ""); // TODO comment nommer l'erreur
+
+        if (invitation.WorkspaceId == null)
+            throw new BadRequestException("Bad request", ""); // TODO comment nommer l'erreur
+
         var workspace = await _workspaceRepository.GetJoinUsersByIdAsync(invitation.WorkspaceId) ?? throw new NotFoundException("Workspace", id);
-        if (!workspace.Users.Any(x => x.Id == userId)) throw new ForbiddenException();
-        await _hubContext.Clients.User(invitation.ReceiverId).SendAsync("WorkspaceInvitationDeleted", id);
-        await _invitationRepository.DeleteAsync(id);
-        await _hubContext.Clients.Group(invitation.WorkspaceId).SendAsync("WorkspaceInvitationDeleted", invitation.Id);
+
+        if (!workspace.Users.Any(x => x.Id == userId))
+            throw new ForbiddenException();
+
+        await _invitationRepository.DeleteAsync(invitation.Id);
+        await _hub.NotififyUser(invitation.ReceiverId, "WorkspaceInvitationDeleted", invitation.Id);
+        await _hub.NotififyGroup(workspace.Id, "WorkspaceInvitationDeleted", invitation.Id);
     }
 
     public async Task RefuseWorkspaceInvitationAsync(string userId, string id)
     {
         var invitation = await _invitationRepository.GetByIdAsync(id) ?? throw new NotFoundException("Invitation", id);
-        if (invitation.WorkspaceId == null) throw new BadRequestException("Bad request", ""); // TODO comment nommer l'erreur
-        if (invitation.ReceiverId != userId) throw new ForbiddenException();
+
+        if (invitation.WorkspaceId == null)
+            throw new BadRequestException("Bad request", ""); // TODO comment nommer l'erreur
+
+        if (invitation.ReceiverId != userId)
+            throw new ForbiddenException();
+
         await _invitationRepository.DeleteAsync(id);
-        await _hubContext.Clients.Group(invitation.WorkspaceId).SendAsync("WorkspaceInvitationDeleted", invitation.Id);
+        await _hub.NotififyUser(invitation.ReceiverId, "WorkspaceInvitationDeleted", invitation.Id);
+        await _hub.NotififyGroup(invitation.WorkspaceId, "WorkspaceInvitationDeleted", invitation.Id);
     }
 
-    /// <summary>Get all user received invitations</summary>
     public async Task<List<InvitationDto>> GetByReceiverUserIdAsync(string userId)
     {
         var invitations = await _invitationRepository.GetByReceiverUserIdAsync(userId);
@@ -143,7 +185,10 @@ public class InvitationService : IInvitationService
     public async Task<List<InvitationDto>> GetByWorkspaceIdAsync(string userId, string workspaceId)
     {
         var user = await _userRepository.GetByIdJoinWorkspaceAsync(userId) ?? throw new NotFoundException("User", userId);
-        if (!user.Workspaces.Any(w => w.Id == workspaceId)) throw new ForbiddenException();
+
+        if (!user.Workspaces.Any(w => w.Id == workspaceId))
+            throw new ForbiddenException();
+
         var invitations = await _invitationRepository.GetByWorkspaceIdJoinWorkspaceMembersAsync(workspaceId);
 
         return [.. invitations.Select(_mapper.Map<InvitationDto>)];

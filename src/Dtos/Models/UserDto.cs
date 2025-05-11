@@ -14,3 +14,8 @@ public class UserDto
     [Required]
     public string Email { get; set; } = string.Empty;
 }
+
+public class UserJoinWorkspaceDto : UserDto
+{
+    public List<WorkspaceDto> Workspaces = [];
+}

@@ -13,11 +13,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
     public class InvitationController : ControllerBase
     {
         private readonly IInvitationService _invitationService;
-        private readonly IHubContext<WorkspaceHub> _workspaceHub;
-        public InvitationController(IInvitationService invitationService, IHubContext<WorkspaceHub> workspaceHub)
+        private readonly IHubContext<GlobalHub> _hub;
+        public InvitationController(IInvitationService invitationService, IHubContext<GlobalHub> hub)
         {
             _invitationService = invitationService;
-            _workspaceHub = workspaceHub;
+            _hub = hub;
         }
 
         [HttpPost("Workspace/Create")]
@@ -31,8 +31,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             if (userId == req.ReceiverUserId) return BadRequest();
 
             var invitation = await _invitationService.CreateWorkspaceInvitationAsync(userId, req);
-            await _workspaceHub.Clients.User(req.ReceiverUserId).SendAsync("WorkspaceInvitationReceived", invitation);
-            await _workspaceHub.Clients.Group(req.WorkspaceId).SendAsync("WorkspaceInvitationAdded", invitation);
+            await _hub.Clients.User(req.ReceiverUserId).SendAsync("WorkspaceInvitationAdded", invitation);
+            await _hub.Clients.Group(req.WorkspaceId).SendAsync("WorkspaceInvitationAdded", invitation);
             return CreatedAtAction(null, invitation);
         }
 

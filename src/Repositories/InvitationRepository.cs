@@ -20,7 +20,7 @@ public class InvitationRepository : BaseRepository<Invitation>, IInvitationRepos
     {
         try
         {
-            return await _context.Invitatition
+            return await _dbSet
                 .Where(x => x.ReceiverId == userId && x.DeletedAt == null)
                 .Include(x => x.Sender)
                 .ToListAsync();
@@ -37,7 +37,7 @@ public class InvitationRepository : BaseRepository<Invitation>, IInvitationRepos
     {
         try
         {
-            return await _context.Invitatition
+            return await _dbSet
                 .Where(i => i.DeletedAt == null && i.WorkspaceId == workspaceId && i.ReceiverId == receiverId)
                 .FirstOrDefaultAsync();
         }
@@ -52,7 +52,7 @@ public class InvitationRepository : BaseRepository<Invitation>, IInvitationRepos
     {
         try
         {
-            return await _context.Invitatition
+            return await _dbSet
                 .Where(x => x.Id == id && x.DeletedAt == null)
                 .Include(x => x.Receiver)
                 .Include(x => x.Workspace)
@@ -69,7 +69,7 @@ public class InvitationRepository : BaseRepository<Invitation>, IInvitationRepos
     {
         try
         {
-            return await _context.Invitatition
+            return await _dbSet
                 .Where(x => x.Id == id && x.DeletedAt == null)
                 .Include(x => x.Sender)
                 .Include(x => x.Receiver)
@@ -86,7 +86,7 @@ public class InvitationRepository : BaseRepository<Invitation>, IInvitationRepos
     {
         try
         {
-            return await _context.Invitatition
+            return await _dbSet
                 .Where(x => x.SenderId == userId && x.InvitationType == InvitationType.Contact && x.DeletedAt == null)
                 .Include(x => x.Receiver)
                 .ToListAsync();
@@ -102,7 +102,7 @@ public class InvitationRepository : BaseRepository<Invitation>, IInvitationRepos
     {
         try
         {
-            return await _context.Invitatition
+            return await _dbSet
                 .Where(x => x.WorkspaceId == workspaceId && x.DeletedAt == null)
                 .Include(x => x.Workspace)
                     .ThenInclude(w => w!.Users)
