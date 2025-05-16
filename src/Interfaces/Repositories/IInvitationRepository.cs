@@ -11,5 +11,5 @@ public interface IInvitationRepository : IBaseRepository<Invitation>
     Task<Invitation?> GetByIdJoinWorkspaceAndReceiver(string id);
     Task<Invitation?> GetByIdJoinSenderAndReceiver(string id);
     Task<List<Invitation>> GetBySenderUserIdAsync(string userId);
-    Task<List<Invitation>> GetByWorkspaceIdJoinWorkspaceMembersAsync(string workspaceId);
+    Task<List<Invitation>> GetByWorkspaceIdJoinSenderAndReceiverAsync(string workspaceId);
 }

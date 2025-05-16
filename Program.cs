@@ -95,7 +95,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
 
 // Cors client
 builder.Services.AddCors(options => options.AddPolicy("Client",
-    policy => policy.WithOrigins("http://localhost:4200", "https://192.168.1.18:4200")
+    policy => policy.WithOrigins("http://localhost:4200", "http://localhost:4444")
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials()

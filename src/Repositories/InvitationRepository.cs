@@ -98,14 +98,14 @@ public class InvitationRepository : BaseRepository<Invitation>, IInvitationRepos
         }
     }
 
-    public async Task<List<Invitation>> GetByWorkspaceIdJoinWorkspaceMembersAsync(string workspaceId)
+    public async Task<List<Invitation>> GetByWorkspaceIdJoinSenderAndReceiverAsync(string workspaceId)
     {
         try
         {
             return await _dbSet
                 .Where(x => x.WorkspaceId == workspaceId && x.DeletedAt == null)
-                .Include(x => x.Workspace)
-                    .ThenInclude(w => w!.Users)
+                .Include(x => x.Sender)
+                .Include(x => x.Receiver)
                 .ToListAsync();
         }
         catch (Exception ex)

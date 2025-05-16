@@ -18,14 +18,12 @@ public class InvitationService : IInvitationService
     private readonly IWorkspaceRepository _workspaceRepository;
     private readonly IUserRepository _userRepository;
     private readonly IEventRepository _eventRepository;
-    private readonly UserManager<User> _userManager;
     private readonly IHubService _hub;
     private readonly IMapper _mapper;
     public InvitationService(
         IInvitationRepository invitationRepository,
         IWorkspaceRepository workspaceRepository,
         IEventRepository eventRepository,
-        UserManager<User> userManager,
         IMapper mapper,
         IHubService hub,
         IUserRepository userRepository
@@ -35,7 +33,6 @@ public class InvitationService : IInvitationService
         _workspaceRepository = workspaceRepository;
         _eventRepository = eventRepository;
         _mapper = mapper;
-        _userManager = userManager;
         _hub = hub;
         _userRepository = userRepository;
     }
@@ -68,10 +65,10 @@ public class InvitationService : IInvitationService
         invitation.Sender.Contacts.Add(invitation.Receiver);
         invitation.Receiver.Contacts.Add(invitation.Sender);
         await _userRepository.UpdateMultipleAsync([invitation.Sender, invitation.Receiver]);
+        await _invitationRepository.DeleteAsync(invitation.Id);
+
         await _hub.NotififyUser(invitation.SenderId, "ContactAdded", _mapper.Map<UserDto>(invitation.Receiver));
         await _hub.NotififyUser(invitation.ReceiverId, "ContactAdded", _mapper.Map<UserDto>(invitation.Sender));
-
-        await _invitationRepository.DeleteAsync(invitation.Id);
         await _hub.NotififyUsers([invitation.ReceiverId, invitation.SenderId], "ContactInvitationDeleted", invitation.Id);
     }
 
@@ -100,8 +97,8 @@ public class InvitationService : IInvitationService
     // Workspace
     public async Task<InvitationDto> CreateWorkspaceInvitationAsync(string senderUserId, CreateWorkspaceInvitationRequest req)
     {
-        var sender = await _userManager.FindByIdAsync(senderUserId) ?? throw new NotFoundException("User", senderUserId);
-        var receiver = await _userManager.FindByIdAsync(req.ReceiverUserId) ?? throw new NotFoundException("User", req.ReceiverUserId);
+        var sender = await _userRepository.GetByIdAsync(senderUserId) ?? throw new NotFoundException("User", senderUserId);
+        var receiver = await _userRepository.GetByIdAsync(req.ReceiverUserId) ?? throw new NotFoundException("User", req.ReceiverUserId);
         var workspace = await _workspaceRepository.GetJoinUsersByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
 
         if (workspace.Users.Any(u => u.Id == receiver.Id))
@@ -114,8 +111,8 @@ public class InvitationService : IInvitationService
 
         var invitation = await _invitationRepository.CreateAsync(new Invitation(workspace, sender, receiver) { Receiver = receiver, Sender = sender });
         var invitationDto = _mapper.Map<InvitationDto>(invitation);
-        await _hub.NotififyGroup(workspace.Id, "WorkspaceInvitationAdded", new { workspaceId = req.WorkspaceId, invitation = invitationDto });
-        await _hub.NotififyUser(receiver.Id, "WorkspaceInvitationReceived", invitationDto);
+        await _hub.NotififyGroup(workspace.Id, "WorkspaceInvitationCreated", invitationDto);
+        await _hub.NotififyUser(receiver.Id, "WorkspaceInvitationCreated", invitationDto);
 
         return invitationDto;
     }
@@ -129,11 +126,10 @@ public class InvitationService : IInvitationService
 
         invitation.Workspace.Users.Add(invitation.Receiver);
         await _workspaceRepository.UpdateAsync(invitation.Workspace);
-        await _hub.NotififyGroup(invitation.Workspace.Id, "UserAdded", _mapper.Map<UserDto>(invitation.Receiver));
-
+        await _hub.NotififyGroup(invitation.Workspace.Id, "WorkspaceUserAdded", new { workspaceId = invitation.Workspace.Id, user = _mapper.Map<UserDto>(invitation.Receiver) });
+        await _hub.NotififyUser(invitation.Receiver.Id, "WorkspaceAdded", _mapper.Map<WorkspaceDto>(invitation.Workspace));
         await _invitationRepository.DeleteAsync(invitation.Id);
         await _hub.NotififyGroup(invitation.Workspace.Id, "WorkspaceInvitationDeleted", invitation.Id);
-        await _hub.NotififyUser(invitation.Receiver.Id, "WorkspaceInvitationDeleted", invitation.Id);
     }
 
     public async Task CancelWorkspaceInvitationAsync(string userId, string id)
@@ -189,7 +185,7 @@ public class InvitationService : IInvitationService
         if (!user.Workspaces.Any(w => w.Id == workspaceId))
             throw new ForbiddenException();
 
-        var invitations = await _invitationRepository.GetByWorkspaceIdJoinWorkspaceMembersAsync(workspaceId);
+        var invitations = await _invitationRepository.GetByWorkspaceIdJoinSenderAndReceiverAsync(workspaceId);
 
         return [.. invitations.Select(_mapper.Map<InvitationDto>)];
     }
