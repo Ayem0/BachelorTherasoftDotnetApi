@@ -9,6 +9,7 @@ using BachelorTherasoftDotnetApi.src.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 // TODO Ajouter la fonctionnalité d'update la location
 
@@ -29,6 +30,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("")]
         [Authorize]
+        [EnableRateLimiting("CompositePolicy")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById([FromQuery] string id)
@@ -42,6 +44,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPost("")]
         [Authorize]
+        [EnableRateLimiting("CompositePolicy")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> Create([FromBody] CreateAreaRequest request)
         {
@@ -57,6 +60,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpDelete("")]
         [Authorize]
+        [EnableRateLimiting("CompositePolicy")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromQuery] string id)
@@ -70,6 +74,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpPut("")]
         [Authorize]
+        [EnableRateLimiting("CompositePolicy")]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateAreaRequest request)
@@ -87,6 +92,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// </summary>
         [HttpGet("Location")]
         [Authorize]
+        [EnableRateLimiting("CompositePolicy")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAreasByLocationId([FromQuery] string id)

@@ -7,56 +7,22 @@ using BachelorTherasoftDotnetApi.src.Models;
 using BachelorTherasoftDotnetApi.src.Repositories;
 using BachelorTherasoftDotnetApi.src.Services;
 using BachelorTherasoftDotnetApi.src.Utils;
+using Google.Apis.Auth.AspNetCore3;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 // using MySqlConnector;
 using System.Reflection;
+using System.Security.Claims;
+using System.Threading.RateLimiting;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-// Logger
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-
+// Controllers
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(o =>
-{
-    o.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
-    {
-        In = ParameterLocation.Header,
-        Name = "Authorization",
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        Type = SecuritySchemeType.Http,
-    });
-    o.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "bearer"
-                }
-            },
-            new string[] {}
-        }
-    });
-    o.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Version = "v1",
-        Title = "Bachelor Therasoft",
-        Description = "An ASP.NET Core Web API for collaborative agenda"
-    });
-    // Ajoute les commentaire du code dans le swagger 
-    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    o.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
-});
+
 // MySQL service
 builder.Services.AddDbContext<MySqlDbContext>(
     (sp, options) => options.UseMySQL(builder.Configuration.GetConnectionString("MySQL")!)
@@ -69,6 +35,58 @@ builder.Services.AddDbContext<MySqlDbContext>(
 //         options => options.EnableRetryOnFailure()
 //     ));
 
+// Redis service
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "SampleInstance";
+});
+
+
+
+
+// Email service
+//builder.Services.AddTransient<IEmailSender, EmailSender>();
+//builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
+
+// Cors client
+builder.Services.AddCors(options => options.AddPolicy("Client",
+    policy => policy.WithOrigins("http://localhost:4200", "http://localhost:4444")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials()
+));
+
+
+
+// Authentication service
+var authSection = builder.Configuration.GetSection("Auth");
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
+    })
+    .AddGoogleOpenIdConnect(options =>
+    {
+        var googleSection = authSection.GetSection("Google");
+        options.ClientId = googleSection["ClientId"]!;
+        options.ClientSecret = googleSection["ClientSecret"]!;
+        options.CallbackPath = "/signin-oidc";
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+        // options.NonceCookie.SameSite = SameSiteMode.None;
+        // options.NonceCookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        options.ProtocolValidator.RequireNonce = false;
+        // options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "sub");
+        // options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
+        // options.ClaimActions.MapJsonKey(ClaimTypes.GivenName, "firstName");
+        // options.ClaimActions.MapJsonKey(ClaimTypes.Surname, "lastName");
+        // options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
+        options.Scope.Add("openid");
+        options.Scope.Add("profile");
+        options.Scope.Add("email");
+    });
+builder.Services.AddAuthorization();
 
 // Identity service
 builder.Services.AddIdentityApiEndpoints<User>(options =>
@@ -83,26 +101,51 @@ builder.Services.AddIdentityApiEndpoints<User>(options =>
     options.Password.RequireUppercase = true;
     options.Lockout.MaxFailedAccessAttempts = 5;
 }).AddEntityFrameworkStores<MySqlDbContext>();
-
-builder.Services.AddStackExchangeRedisCache(options =>
+// Rate Limiting middleware
+builder.Services.AddRateLimiter(options =>
 {
-    options.Configuration = builder.Configuration.GetConnectionString("Redis");
-    options.InstanceName = "SampleInstance";
-});
-// Email service
-//builder.Services.AddTransient<IEmailSender, EmailSender>();
-//builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
+    options.AddPolicy("CompositePolicy", context =>
+    {
+        var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        var user = context.User?.Identity?.IsAuthenticated == true
+                    ? context.User.Identity.Name
+                    : "anonymous";
+        var endpoint = context.Request.Path.ToString().ToLowerInvariant();
+        var method = context.Request.Method;
+        var key = $"{ip}:{user}:{method}:{endpoint}";
+        return RateLimitPartition.GetTokenBucketLimiter(
+            key,
+            key => new TokenBucketRateLimiterOptions
+            {
+                TokenLimit = 50,
+                TokensPerPeriod = 50,
+                ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            }
+        );
+    });
 
-// Cors client
-builder.Services.AddCors(options => options.AddPolicy("Client",
-    policy => policy.WithOrigins("http://localhost:4200", "http://localhost:4444")
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials()
-));
-// Authentication service
-builder.Services.AddAuthentication();
-builder.Services.AddAuthorization();
+    options.AddPolicy("AuthPolicy", context =>
+    {
+        var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        var user = context.User?.Identity?.Name ?? ip;
+        var endpoint = context.Request.Path.ToString().ToLowerInvariant();
+        var method = context.Request.Method;
+        var key = $"{ip}:{user}:{method}:{endpoint}";
+        return RateLimitPartition.GetTokenBucketLimiter(
+            key,
+            _ => new TokenBucketRateLimiterOptions
+            {
+                TokenLimit = 5,
+                TokensPerPeriod = 1,
+                ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+});
 
 // SignalR
 builder.Services.AddSignalR();
@@ -151,8 +194,57 @@ builder.Services.AddScoped<ISlotService, SlotService>();
 
 // Utils Services
 // builder.Services.AddScoped<IRepetitionService, RepetitionService>();
+
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+
+if (builder.Environment.IsDevelopment())
+{
+    Console.WriteLine("DEV MODE");
+    // Logger
+    builder.Logging.ClearProviders();
+    builder.Logging.AddConsole();
+    // Swagger
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen(o =>
+    {
+        o.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
+        {
+            In = ParameterLocation.Header,
+            Name = "Authorization",
+            Scheme = "Bearer",
+            BearerFormat = "JWT",
+            Type = SecuritySchemeType.Http,
+        });
+        o.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+        o.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Version = "v1",
+            Title = "Bachelor Therasoft",
+            Description = "An ASP.NET Core Web API for collaborative agenda"
+        });
+        // Ajoute les commentaire du code dans le swagger 
+        var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        o.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+    });
+}
+else
+{
+    // TODO set the production logger
+}
 
 var app = builder.Build();
 
@@ -167,8 +259,9 @@ app.UseHttpsRedirection();
 app.UseExceptionHandler("/Api/Error");
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapIdentityApi<User>();
+app.UseRateLimiter();
+app.MapGroup("Api/Auth").MapIdentityApi<User>().RequireRateLimiting("AuthPolicy");
 app.MapControllers();
-app.MapHub<GlobalHub>("/hub");
+app.MapHub<GlobalHub>("/Api/Hub");
 
 app.Run();

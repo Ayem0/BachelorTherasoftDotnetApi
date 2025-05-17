@@ -1,3 +1,4 @@
+using System.Text.Json;
 using AutoMapper;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Models;
@@ -6,6 +7,7 @@ using BachelorTherasoftDotnetApi.src.Exceptions;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
@@ -14,11 +16,21 @@ public class AreaService : IAreaService
     private readonly IAreaRepository _areaRepository;
     private readonly ILocationRepository _locationRepository;
     private readonly IMapper _mapper;
-    public AreaService(IAreaRepository areaRepository, ILocationRepository locationRepository, IMapper mapper)
+    private readonly IDistributedCache _cache;
+    private readonly ILogger<AreaService> _logger;
+    public AreaService(
+        IAreaRepository areaRepository,
+        ILocationRepository locationRepository,
+        IMapper mapper,
+        IDistributedCache cache,
+        ILogger<AreaService> logger
+    )
     {
         _areaRepository = areaRepository;
         _locationRepository = locationRepository;
         _mapper = mapper;
+        _cache = cache;
+        _logger = logger;
     }
 
     public async Task<AreaDto> CreateAsync(CreateAreaRequest request)
@@ -40,9 +52,24 @@ public class AreaService : IAreaService
 
     public async Task<AreaDto> GetByIdAsync(string id)
     {
+        var cacheKey = $"area:{id}";
+        var cacheValue = await _cache.GetStringAsync(cacheKey);
+        if (cacheValue != null)
+        {
+            _logger.LogInformation("Area loaded from cache");
+            var fromCache = JsonSerializer.Deserialize<AreaDto>(cacheValue)!;
+            return fromCache;
+        }
+        _logger.LogInformation("Area not loaded from cache");
         var area = await _areaRepository.GetByIdAsync(id) ?? throw new NotFoundException("Area", id);
-
-        return _mapper.Map<AreaDto>(area);
+        var areaDto = _mapper.Map<AreaDto>(area);
+        var serialized = JsonSerializer.Serialize(areaDto);
+        var options = new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5),
+        };
+        await _cache.SetStringAsync(cacheKey, serialized, options);
+        return areaDto;
     }
 
     public async Task<AreaDto> UpdateAsync(string id, UpdateAreaRequest req)
