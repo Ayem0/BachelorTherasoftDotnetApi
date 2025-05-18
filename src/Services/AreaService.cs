@@ -56,11 +56,9 @@ public class AreaService : IAreaService
         var cacheValue = await _cache.GetStringAsync(cacheKey);
         if (cacheValue != null)
         {
-            _logger.LogInformation("Area loaded from cache");
             var fromCache = JsonSerializer.Deserialize<AreaDto>(cacheValue)!;
             return fromCache;
         }
-        _logger.LogInformation("Area not loaded from cache");
         var area = await _areaRepository.GetByIdAsync(id) ?? throw new NotFoundException("Area", id);
         var areaDto = _mapper.Map<AreaDto>(area);
         var serialized = JsonSerializer.Serialize(areaDto);

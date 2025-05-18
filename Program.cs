@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
+
 // using MySqlConnector;
 using System.Reflection;
 using System.Security.Claims;
@@ -39,9 +41,11 @@ builder.Services.AddDbContext<MySqlDbContext>(
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("Redis");
-    options.InstanceName = "SampleInstance";
 });
-
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")!)
+);
+builder.Services.AddSingleton<IRedisService, RedisService>();
 
 
 
