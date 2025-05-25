@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
-    [Route("Api/[controller]")]
+    [Route("Api/Workspace/{workspaceId}")]
     [ApiController]
     public class LocationController : ControllerBase
     {
@@ -19,70 +19,70 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Get a location by id.
         /// </summary>
-        [HttpGet("")]
+        [HttpGet("[controller]/{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById([FromQuery] string id)
+        public async Task<IActionResult> GetById([FromRoute] string workspaceId, [FromRoute] string id)
         {
-            var res = await _locationService.GetByIdAsync(id);
+            var res = await _locationService.GetByIdAsync(workspaceId, id);
             return Ok(res);
         }
 
         /// <summary>
         /// Creates a location.
         /// </summary>
-        [HttpPost("")]
+        [HttpPost("[controller]")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create([FromBody] CreateLocationRequest request)
+        public async Task<IActionResult> Create([FromRoute] string workspaceId, [FromBody] CreateLocationRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _locationService.CreateAsync(request);
+            var res = await _locationService.CreateAsync(workspaceId, request);
             return CreatedAtAction(null, res);
         }
 
         /// <summary>
         /// Deletes a location.
         /// </summary>
-        [HttpDelete("")]
+        [HttpDelete("[controller]/{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete([FromQuery] string id)
+        public async Task<IActionResult> Delete([FromRoute] string workspaceId, [FromRoute] string id)
         {
-            var res = await _locationService.DeleteAsync(id);
+            var res = await _locationService.DeleteAsync(workspaceId, id);
             return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"Location with id '{id} not found.'" });
         }
 
         /// <summary>
         /// Updates a location.
         /// </summary>
-        [HttpPut("")]
+        [HttpPut("[controller]/{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateLocationRequest request)
+        public async Task<IActionResult> Update([FromRoute] string workspaceId, [FromRoute] string id, [FromBody] UpdateLocationRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _locationService.UpdateAsync(id, request);
+            var res = await _locationService.UpdateAsync(workspaceId, id, request);
             return Ok(res);
         }
 
         /// <summary>
         /// Get locations by workspace id.
         /// </summary>
-        [HttpGet("workspace")]
+        [HttpGet("Locations")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByWorkspace([FromQuery] string id)
+        public async Task<IActionResult> GetByWorkspace([FromRoute] string workspaceId)
         {
-            var res = await _locationService.GetByWorkspaceIdAsync(id);
+            var res = await _locationService.GetByWorkspaceIdAsync(workspaceId);
             return Ok(res);
         }
     }

@@ -14,13 +14,13 @@ public class WorkspaceRepository : BaseRepository<Workspace>, IWorkspaceReposito
     {
     }
 
-    public async Task<Workspace[]> GetByUserIdAsync(string id)
+    public async Task<List<Workspace>> GetByUserIdAsync(string id)
     {
         try
         {
             return await _dbSet
                 .Where(x => x.Users.Any(x => x.Id == id && x.DeletedAt == null) && x.DeletedAt == null)
-                .ToArrayAsync();
+                .ToListAsync();
 
         }
         catch (Exception ex)
@@ -46,22 +46,6 @@ public class WorkspaceRepository : BaseRepository<Workspace>, IWorkspaceReposito
                 .Include(x => x.Participants.Where(y => y.DeletedAt == null))
                 .Include(x => x.ParticipantCategories.Where(y => y.DeletedAt == null))
                 .Where(x => x.Id == id && x.DeletedAt == null)
-                .FirstOrDefaultAsync();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error getting workspace with Id '{id}' : {ex.Message}");
-            throw new DbException(DbAction.Read, "Workspace", id);
-        }
-    }
-
-    public async Task<Workspace?> GetJoinUsersByIdAsync(string id)
-    {
-        try
-        {
-            return await _dbSet
-                .Where(x => x.Id == id && x.DeletedAt == null)
-                .Include(x => x.Users.Where(y => y.DeletedAt == null))
                 .FirstOrDefaultAsync();
         }
         catch (Exception ex)

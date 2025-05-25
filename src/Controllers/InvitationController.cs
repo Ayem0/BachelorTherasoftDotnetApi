@@ -8,17 +8,26 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("Api/[controller]")]
     [ApiController]
     public class InvitationController : ControllerBase
     {
         private readonly IInvitationService _invitationService;
-        private readonly IHubContext<GlobalHub> _hub;
-        public InvitationController(IInvitationService invitationService, IHubContext<GlobalHub> hub)
+        public InvitationController(IInvitationService invitationService)
         {
             _invitationService = invitationService;
-            _hub = hub;
         }
+
+
+
+
+
+
+
+
+
+
+
 
         [HttpPost("Workspace/Create")]
         [Authorize]
@@ -31,8 +40,6 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             if (userId == req.ReceiverUserId) return BadRequest();
 
             var invitation = await _invitationService.CreateWorkspaceInvitationAsync(userId, req);
-            await _hub.Clients.User(req.ReceiverUserId).SendAsync("WorkspaceInvitationAdded", invitation);
-            await _hub.Clients.Group(req.WorkspaceId).SendAsync("WorkspaceInvitationAdded", invitation);
             return CreatedAtAction(null, invitation);
         }
 
@@ -95,10 +102,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         public async Task<IActionResult> GetByWorkspaceId(string id)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null) return Unauthorized();
-
-            var invitations = await _invitationService.GetByWorkspaceIdAsync(userId, id);
+            var invitations = await _invitationService.GetByWorkspaceIdAsync(id);
             return Ok(invitations);
         }
 

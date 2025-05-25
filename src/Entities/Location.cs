@@ -4,6 +4,7 @@ namespace BachelorTherasoftDotnetApi.src.Models;
 
 public class Location : BaseEntity, BaseAuthorizationModel
 {
+    public Location() { }
     public Location(Workspace workspace, string name, string? description, string? address, string? city, string? country)
     {
         Workspace = workspace;

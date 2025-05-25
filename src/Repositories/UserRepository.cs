@@ -30,7 +30,7 @@ public class UserRepository : BaseRepository<User>, IUserRepository
         }
     }
 
-    public async Task<User?> GetByIdJoinContactsAndBlockedUsersAsync(string id)
+    public async Task<User?> GetJoinContactsAndBlockedUsersByIdAsync(string id)
     {
         try
         {
@@ -47,7 +47,7 @@ public class UserRepository : BaseRepository<User>, IUserRepository
         }
     }
 
-    public async Task<User?> GetByEmailJoinContactsAndBlockedUsersAsync(string email)
+    public async Task<User?> GetJoinContactsAndBlockedUsersByEmailAsync(string email)
     {
         try
         {
@@ -64,7 +64,7 @@ public class UserRepository : BaseRepository<User>, IUserRepository
         }
     }
 
-    public async Task<List<User>> GetUserContactsByUserIdAsync(string id)
+    public async Task<List<User>> GetContactsByIdAsync(string id)
     {
         try
         {
@@ -78,6 +78,22 @@ public class UserRepository : BaseRepository<User>, IUserRepository
         catch (Exception ex)
         {
             Console.WriteLine($"Error getting contacts from user with id '{id}' : {ex.Message}");
+            throw new DbException(DbAction.Read, "User", id);
+        }
+    }
+
+    public async Task<List<User>> GetByWorkspaceIdAsync(string id)
+    {
+        try
+        {
+            return await _context.Workspace.Where(w => w.Id == id)
+                .SelectMany(u => u.Users)
+                .ToListAsync();
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting users from workspace with id '{id}' : {ex.Message}");
             throw new DbException(DbAction.Read, "User", id);
         }
     }

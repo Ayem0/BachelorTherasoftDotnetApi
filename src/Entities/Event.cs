@@ -5,6 +5,7 @@ namespace BachelorTherasoftDotnetApi.src.Models;
 
 public class Event : BaseEntity, BaseAuthorizationModel
 {
+    public Event() { }
     public Event(Workspace workspace, string? description, DateTime startDate, DateTime endDate, Room room, EventCategory eventCategory, List<Participant> participants, List<EventUser> users,
         List<Tag> tags, Interval? repetitionInterval, int? repetitionNumber, Event? mainEvent, DateOnly? repetitionEndDate)
     {

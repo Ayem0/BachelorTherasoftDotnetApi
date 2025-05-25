@@ -4,6 +4,7 @@ namespace BachelorTherasoftDotnetApi.src.Models;
 
 public class Tag : BaseEntity, BaseAuthorizationModel
 {
+    public Tag() { }
     public Tag(Workspace workspace, string name, string icon, string color, string? description)
     {
         Workspace = workspace;

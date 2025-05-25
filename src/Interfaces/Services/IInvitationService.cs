@@ -15,7 +15,7 @@ public interface IInvitationService
     Task AcceptContactInvitationAsync(string userId, string id);
     Task<List<InvitationDto>> GetByReceiverUserIdAsync(string userId);
     Task<List<InvitationDto>> GetBySenderUserIdAsync(string userId);
-    Task<List<InvitationDto>> GetByWorkspaceIdAsync(string userId, string workspaceId);
+    Task<List<InvitationDto>> GetByWorkspaceIdAsync(string workspaceId);
     Task CancelContactInvitationAsync(string userId, string id);
     Task RefuseContactInvitationAsync(string userId, string id);
 

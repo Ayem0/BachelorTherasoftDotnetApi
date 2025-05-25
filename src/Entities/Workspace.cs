@@ -1,9 +1,11 @@
+using System.Text.Json.Serialization;
 using BachelorTherasoftDotnetApi.src.Base;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class Workspace : BaseEntity, BaseAuthorizationModel
+public class Workspace : BaseEntity
 {
+        public Workspace() { }
         public Workspace(string name, string? description, List<User> users)
         {
                 Name = name;
@@ -28,5 +30,4 @@ public class Workspace : BaseEntity, BaseAuthorizationModel
         public List<Room> Rooms { get; set; } = [];
         public List<Area> Areas { get; set; } = [];
         public List<Event> Events { get; set; } = [];
-        public string WorkspaceId => Id;
 }

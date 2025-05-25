@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
-using BachelorTherasoftDotnetApi.src.Dtos.Models;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -86,8 +85,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         public async Task<IActionResult> CreateWithRepetition([FromBody] CreateEventWithRepetitionRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-
-            var res = await _eventService.CreateWithRepetitionAsync(request);
+            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+            var res = await _eventService.CreateWithRepetitionAsync(userId, request);
             return CreatedAtAction(null, res);
         }
 

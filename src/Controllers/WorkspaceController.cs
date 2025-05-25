@@ -15,21 +15,24 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
     public class WorkspaceController : ControllerBase
     {
         private readonly IWorkspaceService _workspaceService;
-        public WorkspaceController(IWorkspaceService workspaceService)
+        private readonly IUserService _userService;
+        public WorkspaceController(IWorkspaceService workspaceService, IUserService userService)
         {
             _workspaceService = workspaceService;
+            _userService = userService;
         }
 
         /// <summary>
         /// Get a workspace by id.
         /// </summary>
-        [HttpGet("")]
+        [HttpGet("{id}")]
         [Authorize]
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById([FromQuery] string id)
+        public async Task<IActionResult> GetById([FromRoute] string id)
         {
+
             var res = await _workspaceService.GetByIdAsync(id);
             return Ok(res);
         }
@@ -48,6 +51,19 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             if (userId == null) return Unauthorized();
 
             var res = await _workspaceService.GetByUserIdAsync(userId);
+            return Ok(res);
+        }
+
+        /// <summary>
+        /// Get user workspace.
+        /// </summary>
+        [HttpGet("{id}/Users")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetUsers([FromRoute] string id)
+        {
+            var res = await _userService.GetByWorkspaceIdAsync(id);
             return Ok(res);
         }
 
@@ -104,6 +120,8 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             // await _workspaceHub.Clients.Group(res.Id).SendAsync("WorkspaceUpdated", $"WORKSPACE {res.Name} UPDATED");
             return Ok(res);
         }
+
+
 
 
         // /// <summary>

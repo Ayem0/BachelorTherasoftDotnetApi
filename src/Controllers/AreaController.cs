@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
-    [Route("Api/[controller]")]
+    [Route("Api/Workspace/{workspaceId}")]
     [ApiController]
     public class AreaController : ControllerBase
     {
@@ -28,29 +28,29 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Get a Area by id.
         /// </summary>
-        [HttpGet("")]
+        [HttpGet("[controller]/{id}")]
         [Authorize]
         [EnableRateLimiting("CompositePolicy")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById([FromQuery] string id)
+        public async Task<IActionResult> GetById([FromRoute] string id, [FromRoute] string workspaceId)
         {
-            var res = await _areaService.GetByIdAsync(id);
+            var res = await _areaService.GetByIdAsync(workspaceId, id);
             return Ok(res);
         }
 
         /// <summary>
         /// Creates a Area.
         /// </summary>
-        [HttpPost("")]
+        [HttpPost("[controller]")]
         [Authorize]
         [EnableRateLimiting("CompositePolicy")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> Create([FromBody] CreateAreaRequest request)
+        public async Task<IActionResult> Create([FromRoute] string workspaceId, [FromBody] CreateAreaRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _areaService.CreateAsync(request);
+            var res = await _areaService.CreateAsync(workspaceId, request);
 
             return CreatedAtAction(null, res);
         }
@@ -58,46 +58,60 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Deletes a Area.
         /// </summary>
-        [HttpDelete("")]
+        [HttpDelete("[controller]/{id}")]
         [Authorize]
         [EnableRateLimiting("CompositePolicy")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete([FromQuery] string id)
+        public async Task<IActionResult> Delete([FromRoute] string workspaceId, [FromRoute] string id)
         {
-            var res = await _areaService.DeleteAsync(id);
+            var res = await _areaService.DeleteAsync(workspaceId, id);
             return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"Area with id '{id} not found.'" });
         }
 
         /// <summary>
         /// Updates a Area.
         /// </summary>
-        [HttpPut("")]
+        [HttpPut("[controller]/{id}")]
         [Authorize]
         [EnableRateLimiting("CompositePolicy")]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateAreaRequest request)
+        public async Task<IActionResult> Update([FromRoute] string workspaceId, [FromRoute] string id, [FromBody] UpdateAreaRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
             if (request.Description == null && request.Name == null) return BadRequest(new ProblemDetails() { Title = "At least one field is required." });
 
-            var res = await _areaService.UpdateAsync(id, request);
+            var res = await _areaService.UpdateAsync(workspaceId, id, request);
             return Ok(res);
         }
 
         /// <summary>
         /// Get areas by location id.
         /// </summary>
-        [HttpGet("Location")]
+        [HttpGet("Location/{locationId}/Areas")]
         [Authorize]
         [EnableRateLimiting("CompositePolicy")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetAreasByLocationId([FromQuery] string id)
+        public async Task<IActionResult> GetAreasByLocation([FromRoute] string workspaceId, [FromRoute] string locationId)
         {
-            var areas = await _areaService.GetAreasByLocationIdAsync(id);
+            var areas = await _areaService.GetByLocationIdAsync(workspaceId, locationId);
+            return Ok(areas);
+        }
+
+        /// <summary>
+        /// Get areas by location id.
+        /// </summary>
+        [HttpGet("Areas")]
+        [Authorize]
+        [EnableRateLimiting("CompositePolicy")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetAreasByWorkspace([FromRoute] string workspaceId)
+        {
+            var areas = await _areaService.GetByWorkspaceIdAsync(workspaceId);
             return Ok(areas);
         }
     }

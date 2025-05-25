@@ -4,6 +4,7 @@ namespace BachelorTherasoftDotnetApi.src.Models;
 
 public class ParticipantCategory : BaseEntity, BaseAuthorizationModel
 {
+    public ParticipantCategory() { }
     public ParticipantCategory(Workspace workspace, string name, string? description, string color, string icon)
     {
         Workspace = workspace;

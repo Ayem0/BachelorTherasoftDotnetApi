@@ -1,8 +1,10 @@
 using BachelorTherasoftDotnetApi.src.Enums;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
+
 public class EventUser
 {
+    public EventUser() { }
     public EventUser(User user, Event @event)
     {
         User = user;

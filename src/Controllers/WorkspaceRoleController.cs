@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
-    [Route("Api/[controller]")]
+    [Route("Api/Workspace/{workspaceId}")]
     [ApiController]
     public class WorkspaceRoleController : ControllerBase
     {
@@ -20,29 +20,73 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Creates a role for a workspace.
         /// </summary>
-        [HttpPost("")]
+        [HttpPost("[controller]")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> Create([FromBody] CreateWorkspaceRoleRequest request)
+        public async Task<IActionResult> Create([FromRoute] string workspaceId, [FromBody] CreateWorkspaceRoleRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _workspaceRoleService.CreateAsync(request);
+            var res = await _workspaceRoleService.CreateAsync(workspaceId, request);
             return CreatedAtAction(null, res);
         }
 
         /// <summary>
         /// Deletes a role from a workspace.
         /// </summary>
-        [HttpDelete("")]
+        [HttpDelete("[controller]/{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete([FromQuery] string id)
+        public async Task<IActionResult> Delete([FromRoute] string workspaceId, [FromRoute] string id)
         {
-            var res = await _workspaceRoleService.DeleteAsync(id);
+            var res = await _workspaceRoleService.DeleteAsync(workspaceId, id);
             return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"WorkspaceRole with id '{id} not found.'" });
 
+        }
+
+        /// <summary>
+        /// Updates a workspace role.
+        /// </summary>
+        [HttpPut("[controller]/{id}")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Update([FromRoute] string workspaceId, [FromRoute] string id, [FromBody] UpdateWorkspaceRoleRequest request)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
+
+            if (request.Description == null && request.Name == null) return BadRequest(new ProblemDetails() { Title = "At least one field is required." });
+
+            var res = await _workspaceRoleService.UpdateAsync(workspaceId, id, request);
+            return Ok(res);
+        }
+
+        /// <summary>
+        /// Gets a workspace role by id.
+        /// </summary>
+        [HttpGet("[controller]/{id}")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById([FromRoute] string workspaceId, [FromRoute] string id)
+        {
+            var res = await _workspaceRoleService.GetByIdAsync(workspaceId, id);
+            return Ok(res);
+        }
+
+        /// <summary>
+        /// Gets workspace roles by workspace id.
+        /// </summary>
+        [HttpGet("Roles")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetByWorkspaceId([FromRoute] string workspaceId)
+        {
+            var res = await _workspaceRoleService.GetByWorkspaceIdAsync(workspaceId);
+            return Ok(res);
         }
 
         // /// <summary>
@@ -67,48 +111,5 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         //     return await _workspaceRoleService.AddRoleToMemberAsync(workspaceRoleId, memberId);
         // }
 
-        /// <summary>
-        /// Updates a workspace role.
-        /// </summary>
-        [HttpPut("")]
-        [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateWorkspaceRoleRequest request)
-        {
-            if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
-
-            if (request.Description == null && request.Name == null) return BadRequest(new ProblemDetails() { Title = "At least one field is required." });
-
-            var res = await _workspaceRoleService.UpdateAsync(id, request);
-            return Ok(res);
-        }
-
-        /// <summary>
-        /// Gets a workspace role by id.
-        /// </summary>
-        [HttpGet("")]
-        [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById([FromQuery] string id)
-        {
-            var res = await _workspaceRoleService.GetByIdAsync(id);
-            return Ok(res);
-        }
-
-        /// <summary>
-        /// Gets workspace roles by workspace id.
-        /// </summary>
-        [HttpGet("workspace")]
-        [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByWorkspaceId([FromQuery] string id)
-        {
-            var res = await _workspaceRoleService.GetByWorkspaceIdAsync(id);
-            return Ok(res);
-        }
     }
 }

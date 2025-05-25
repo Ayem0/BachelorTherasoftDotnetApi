@@ -1,14 +1,15 @@
 using System;
 using BachelorTherasoftDotnetApi.src.Hubs;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.SignalR;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
 
-public class HubService : IHubService
+public class SocketService : ISocketService
 {
     private readonly IHubContext<GlobalHub> _hub;
     private readonly ILogger _logger;
-    public HubService(IHubContext<GlobalHub> hub, ILogger<HubService> logger)
+    public SocketService(IHubContext<GlobalHub> hub, ILogger<SocketService> logger)
     {
         _hub = hub;
         _logger = logger;

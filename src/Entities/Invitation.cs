@@ -5,6 +5,7 @@ namespace BachelorTherasoftDotnetApi.src.Models;
 
 public class Invitation : BaseEntity
 {
+    public Invitation() { }
     public Invitation(Event @event, User sender, User receiver)
     {
         InvitationType = InvitationType.Event;

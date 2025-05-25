@@ -1,8 +1,8 @@
 using System;
 
-namespace BachelorTherasoftDotnetApi.src.Hubs;
+namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 
-public interface IHubService
+public interface ISocketService
 {
     public Task NotififyUser(string userId, string key, object value);
     public Task NotififyUsers(IEnumerable<string> userIds, string key, object value);

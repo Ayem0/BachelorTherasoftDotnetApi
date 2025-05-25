@@ -8,17 +8,13 @@ using BachelorTherasoftDotnetApi.src.Repositories;
 using BachelorTherasoftDotnetApi.src.Services;
 using BachelorTherasoftDotnetApi.src.Utils;
 using Google.Apis.Auth.AspNetCore3;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
-
-// using MySqlConnector;
 using System.Reflection;
-using System.Security.Claims;
 using System.Threading.RateLimiting;
+// using MySqlConnector;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -51,7 +47,7 @@ builder.Services.AddSingleton<IRedisService, RedisService>();
 
 // Email service
 //builder.Services.AddTransient<IEmailSender, EmailSender>();
-//builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
+// builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 
 // Cors client
 builder.Services.AddCors(options => options.AddPolicy("Client",
@@ -153,7 +149,7 @@ builder.Services.AddRateLimiter(options =>
 
 // SignalR
 builder.Services.AddSignalR();
-builder.Services.AddScoped<IHubService, HubService>();
+builder.Services.AddScoped<ISocketService, SocketService>();
 
 // Custom Repositories
 builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
@@ -186,7 +182,7 @@ builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IParticipantService, ParticipantService>();
 builder.Services.AddScoped<IParticipantCategoryService, ParticipantCategoryService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IWorkspaceAuthorizationService, WorkspaceAuthorizationService>();
+// builder.Services.AddScoped<IWorkspaceAuthorizationService, WorkspaceAuthorizationService>();
 builder.Services.AddScoped<IInvitationService, InvitationService>();
 // builder.Services.AddScoped<IConversationService, ConversationService>();
 // builder.Services.AddScoped<IMemberService, MemberService>();

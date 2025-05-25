@@ -7,7 +7,7 @@ namespace BachelorTherasoftDotnetApi.src.Base;
 
 public class BaseRepository<T> : IBaseRepository<T> where T : class, IBaseEntity
 {
-    private readonly MySqlDbContext _context;
+    protected readonly MySqlDbContext _context;
     protected readonly DbSet<T> _dbSet;
     protected readonly ILogger<T> _logger;
 
@@ -35,6 +35,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class, IBaseEntity
     {
         try
         {
+            entity.Id = Guid.NewGuid().ToString();
             _dbSet.Add(entity);
 
             await _context.SaveChangesAsync();
@@ -63,17 +64,18 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class, IBaseEntity
         }
     }
 
-    public async Task<bool> DeleteAsync(string id)
+    public async Task<bool> DeleteAsync(T entity)
     {
         try
         {
-            var res = await _dbSet.Where(x => x.Id == id && x.DeletedAt == null).ExecuteUpdateAsync(x => x.SetProperty(x => x.DeletedAt, DateTime.UtcNow));
-            return res > 0;
+            entity.DeletedAt = DateTime.UtcNow;
+            _dbSet.Update(entity);
+            return await _context.SaveChangesAsync() > 0;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error deleting {nameof(T)} with ID '{id}' : {ex.Message}");
-            throw new DbException(DbAction.Delete, nameof(T), id);
+            Console.WriteLine($"Error deleting {nameof(T)} with ID '{entity.Id}' : {ex.Message}");
+            throw new DbException(DbAction.Delete, nameof(T), entity.Id);
         }
     }
 
@@ -81,6 +83,10 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class, IBaseEntity
     {
         try
         {
+            foreach (var entity in entities)
+            {
+                entity.Id = Guid.NewGuid().ToString();
+            }
             _dbSet.AddRange(entities);
             await _context.SaveChangesAsync();
             return entities;

@@ -5,6 +5,10 @@ namespace BachelorTherasoftDotnetApi.src.Models;
 
 public class User : IdentityUser, IBaseEntity
 {
+    public User()
+    {
+
+    }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public DateTime CreatedAt { get; } = DateTime.UtcNow;

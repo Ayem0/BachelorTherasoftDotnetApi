@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("Api/Workspace/{workspaceId}")]
     [ApiController]
     public class SlotController : ControllerBase
     {
@@ -19,81 +19,83 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Get a Slot by id.
         /// </summary>
-        [HttpGet("")]
+        [HttpGet("[controller]/{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById([FromQuery] string id)
+        public async Task<IActionResult> GetById([FromRoute] string workspaceId, [FromRoute] string id)
         {
-            var res = await _SlotService.GetByIdAsync(id);
+            var res = await _SlotService.GetByIdAsync(workspaceId, id);
             return Ok(res);
         }
 
         /// <summary>
-        /// Get a Slot by id.
+        /// Get slots.
         /// </summary>
-        [HttpGet("workspace")]
+        [HttpGet("Slots")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByWorkspaceId([FromQuery] string id)
+        public async Task<IActionResult> GetByWorkspaceId([FromRoute] string workspaceId)
         {
-            var res = await _SlotService.GetByWorkpaceIdAsync(id);
+            var res = await _SlotService.GetByWorkspaceIdAsync(workspaceId);
             return Ok(res);
         }
 
         /// <summary>
         /// Creates a Slot.
         /// </summary>
-        [HttpPost("")]
+        [HttpPost("[controller]")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create([FromBody] CreateSlotRequest request)
+        public async Task<IActionResult> Create([FromRoute] string workspaceId, [FromBody] CreateSlotRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _SlotService.CreateAsync(request);
+            var res = await _SlotService.CreateAsync(workspaceId, request);
             return CreatedAtAction(null, res);
         }
 
-        /// <summary>
-        /// Deletes a Slot.
-        /// </summary>
-        [HttpDelete("")]
-        [Authorize]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Delete([FromQuery] string id)
-        {
-            var res = await _SlotService.DeleteAsync(id);
-            return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"Slot with id '{id} not found.'" });
-        }
 
 
         /// <summary>
         /// Creates a Slot with repetition.
         /// </summary>
-        [HttpPost("WithRepetition")]
+        [HttpPost("[controller]/WithRepetition")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateWithRepetition([FromBody] CreateSlotWithRepetitionRequest request)
+        public async Task<IActionResult> CreateWithRepetition([FromRoute] string workspaceId, [FromBody] CreateSlotWithRepetitionRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _SlotService.CreateWithRepetitionAsync(request);
+            var res = await _SlotService.CreateWithRepetitionAsync(workspaceId, request);
             return CreatedAtAction(null, res);
         }
 
+
         /// <summary>
-        /// Add a Slot to a Room.
+        /// Deletes a Slot.
         /// </summary>
-        [HttpPost("Room")]
+        [HttpDelete("[controller]/{id}")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddSlotToRoom([FromQuery] string slotId, [FromQuery] string roomId)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Delete([FromRoute] string workspaceId, [FromRoute] string id)
         {
-            var res = await _SlotService.AddSlotToRoom(slotId, roomId);
-            return res ? NoContent() : BadRequest();
+            var res = await _SlotService.DeleteAsync(workspaceId, id);
+            return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"Slot with id '{id} not found.'" });
         }
+
+        // /// <summary>
+        // /// Add a Slot to a Room.
+        // /// </summary>
+        // [HttpPost("Room")]
+        // [Authorize]
+        // [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status400BadRequest)]
+        // public async Task<IActionResult> AddSlotToRoom([FromQuery] string slotId, [FromQuery] string roomId)
+        // {
+        //     var res = await _SlotService.AddSlotToRoom(slotId, roomId);
+        //     return res ? NoContent() : BadRequest();
+        // }
 
         // TODO faire le update d'un slot / super chiant a faire car faut check pour chaque salle du créneaux si cela pose probleme
         // /// <summary>

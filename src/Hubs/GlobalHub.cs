@@ -1,4 +1,5 @@
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
+using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
@@ -7,27 +8,24 @@ namespace BachelorTherasoftDotnetApi.src.Hubs;
 [Authorize]
 public class GlobalHub : Hub
 {
-    private readonly IUserService _userService;
-    public GlobalHub(IUserService userService)
+    private readonly IWorkspaceService _workspaceService;
+    public GlobalHub(IWorkspaceService workspaceService)
     {
-        _userService = userService;
+        _workspaceService = workspaceService;
     }
 
     public override async Task<Task> OnConnectedAsync()
     {
         var userId = Context.UserIdentifier;
-
         if (userId != null)
         {
-            var user = await _userService.GetUserJoinWorkspacesByIdAsync(userId);
-            if (user != null)
+            var workspaces = await _workspaceService.GetByUserIdAsync(userId);
+            foreach (var workspace in workspaces)
             {
-                foreach (var workspace in user.Workspaces)
-                {
-                    await Groups.AddToGroupAsync(Context.ConnectionId, workspace.Id);
-                }
+                await Groups.AddToGroupAsync(Context.ConnectionId, workspace.Id);
             }
         }
+
         return base.OnConnectedAsync();
     }
 
@@ -36,15 +34,13 @@ public class GlobalHub : Hub
         var userId = Context.UserIdentifier;
         if (userId != null)
         {
-            var user = await _userService.GetUserJoinWorkspacesByIdAsync(userId);
-            if (user != null)
+            var workspaces = await _workspaceService.GetByUserIdAsync(userId);
+            foreach (var workspace in workspaces)
             {
-                foreach (var workspace in user.Workspaces)
-                {
-                    await Groups.RemoveFromGroupAsync(Context.ConnectionId, workspace.Id);
-                }
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, workspace.Id);
             }
         }
+
         return base.OnDisconnectedAsync(exception);
     }
 

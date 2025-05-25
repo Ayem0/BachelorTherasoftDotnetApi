@@ -4,6 +4,7 @@ namespace BachelorTherasoftDotnetApi.src.Models;
 
 public class Room : BaseEntity, BaseAuthorizationModel
 {
+    public Room() { }
     public Room(Workspace workspace, Area area, string name, string? description)
     {
         Workspace = workspace;

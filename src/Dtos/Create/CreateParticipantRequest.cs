@@ -2,7 +2,6 @@ namespace BachelorTherasoftDotnetApi.src.Dtos.Create;
 
 public class CreateParticipantRequest
 {
-    public required string WorkspaceId { get; set; }
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
     public required string ParticipantCategoryId { get; set; }
