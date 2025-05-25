@@ -1,10 +1,13 @@
 ﻿using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class Event : BaseEntity, BaseAuthorizationModel
+public class Event : BaseEntity, IBaseEntity
 {
+    [Key]
+    public string Id { get; set; } = string.Empty;
     public Event() { }
     public Event(Workspace workspace, string? description, DateTime startDate, DateTime endDate, Room room, EventCategory eventCategory, List<Participant> participants, List<EventUser> users,
         List<Tag> tags, Interval? repetitionInterval, int? repetitionNumber, Event? mainEvent, DateOnly? repetitionEndDate)

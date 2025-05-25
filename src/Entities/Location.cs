@@ -1,9 +1,12 @@
 ﻿using BachelorTherasoftDotnetApi.src.Base;
+using System.ComponentModel.DataAnnotations;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class Location : BaseEntity, BaseAuthorizationModel
+public class Location : BaseEntity, IBaseEntity
 {
+    [Key]
+    public string Id { get; set; } = string.Empty;
     public Location() { }
     public Location(Workspace workspace, string name, string? description, string? address, string? city, string? country)
     {

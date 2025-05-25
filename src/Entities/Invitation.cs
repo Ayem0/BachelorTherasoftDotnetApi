@@ -1,10 +1,13 @@
 using BachelorTherasoftDotnetApi.src.Base;
 using BachelorTherasoftDotnetApi.src.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class Invitation : BaseEntity
+public class Invitation : BaseEntity, IBaseEntity
 {
+    [Key]
+    public string Id { get; set; } = string.Empty;
     public Invitation() { }
     public Invitation(Event @event, User sender, User receiver)
     {

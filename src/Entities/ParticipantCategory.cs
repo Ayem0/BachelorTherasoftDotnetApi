@@ -1,9 +1,12 @@
 using BachelorTherasoftDotnetApi.src.Base;
+using System.ComponentModel.DataAnnotations;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class ParticipantCategory : BaseEntity, BaseAuthorizationModel
+public class ParticipantCategory : BaseEntity, IBaseEntity
 {
+    [Key]
+    public string Id { get; set; } = string.Empty;
     public ParticipantCategory() { }
     public ParticipantCategory(Workspace workspace, string name, string? description, string color, string icon)
     {

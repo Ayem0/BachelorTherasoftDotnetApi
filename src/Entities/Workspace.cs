@@ -1,11 +1,14 @@
-using System.Text.Json.Serialization;
 using BachelorTherasoftDotnetApi.src.Base;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class Workspace : BaseEntity
+public class Workspace : BaseEntity, IBaseEntity
 {
-        public Workspace() { }
+    [Key]
+    public string Id { get; set; } = string.Empty;
+    public Workspace() { }
         public Workspace(string name, string? description, List<User> users)
         {
                 Name = name;

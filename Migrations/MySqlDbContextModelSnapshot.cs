@@ -500,11 +500,11 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime(6)");
 
-                    b.Property<TimeOnly>("EndTime")
-                        .HasColumnType("time");
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("time(6)");
 
                     b.Property<string>("MainSlotId")
                         .HasColumnType("varchar(255)");
@@ -522,11 +522,11 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<int?>("RepetitionNumber")
                         .HasColumnType("int");
 
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime(6)");
 
-                    b.Property<TimeOnly>("StartTime")
-                        .HasColumnType("time");
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("time(6)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");

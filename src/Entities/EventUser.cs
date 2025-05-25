@@ -1,4 +1,5 @@
 using BachelorTherasoftDotnetApi.src.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 

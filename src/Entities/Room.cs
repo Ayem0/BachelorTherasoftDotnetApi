@@ -1,9 +1,12 @@
 ﻿using BachelorTherasoftDotnetApi.src.Base;
+using System.ComponentModel.DataAnnotations;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class Room : BaseEntity, BaseAuthorizationModel
+public class Room : BaseEntity, IBaseEntity
 {
+    [Key]
+    public string Id { get; set; } = string.Empty;
     public Room() { }
     public Room(Workspace workspace, Area area, string name, string? description)
     {

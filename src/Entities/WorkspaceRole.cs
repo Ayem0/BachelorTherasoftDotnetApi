@@ -1,10 +1,13 @@
-using System;
 using BachelorTherasoftDotnetApi.src.Base;
+using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class WorkspaceRole : BaseEntity, BaseAuthorizationModel
+public class WorkspaceRole : BaseEntity, IBaseEntity
 {
+    [Key]
+    public string Id { get; set; } = string.Empty;
     public WorkspaceRole()
     {
     }

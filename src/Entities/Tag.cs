@@ -1,9 +1,12 @@
 ﻿using BachelorTherasoftDotnetApi.src.Base;
+using System.ComponentModel.DataAnnotations;
 
 namespace BachelorTherasoftDotnetApi.src.Models;
 
-public class Tag : BaseEntity, BaseAuthorizationModel
+public class Tag : BaseEntity, IBaseEntity
 {
+    [Key]
+    public string Id { get; set; } = string.Empty;
     public Tag() { }
     public Tag(Workspace workspace, string name, string icon, string color, string? description)
     {
