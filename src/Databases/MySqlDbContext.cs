@@ -46,21 +46,21 @@ public class MySqlDbContext : IdentityDbContext<User, Role, string>
         builder.Entity<Invitation>().HasQueryFilter(i => i.DeletedAt == null);
         builder.Entity<Notification>().HasQueryFilter(n => n.DeletedAt == null);
 
-        builder.Entity<Area>().HasKey(x => x.Id);
-        builder.Entity<Workspace>().HasKey(x => x.Id);
-        builder.Entity<Location>().HasKey(x => x.Id);
-        builder.Entity<Room>().HasKey(x => x.Id);
-        builder.Entity<Event>().HasKey(x => x.Id);
-        builder.Entity<Participant>().HasKey(x => x.Id);
-        builder.Entity<Tag>().HasKey(x => x.Id);
-        builder.Entity<Document>().HasKey(x => x.Id);
-        builder.Entity<DocumentCategory>().HasKey(x => x.Id);
-        builder.Entity<ParticipantCategory>().HasKey(x => x.Id);
-        builder.Entity<EventCategory>().HasKey(x => x.Id);
-        builder.Entity<Slot>().HasKey(x => x.Id);
-        builder.Entity<WorkspaceRole>().HasKey(x => x.Id);
-        builder.Entity<Invitation>().HasKey(x => x.Id);
-        builder.Entity<Notification>().HasKey(x => x.Id);
+        // builder.Entity<Area>().HasKey(x => x.Id);
+        // builder.Entity<Workspace>().HasKey(x => x.Id);
+        // builder.Entity<Location>().HasKey(x => x.Id);
+        // builder.Entity<Room>().HasKey(x => x.Id);
+        // builder.Entity<Event>().HasKey(x => x.Id);
+        // builder.Entity<Participant>().HasKey(x => x.Id);
+        // builder.Entity<Tag>().HasKey(x => x.Id);
+        // builder.Entity<Document>().HasKey(x => x.Id);
+        // builder.Entity<DocumentCategory>().HasKey(x => x.Id);
+        // builder.Entity<ParticipantCategory>().HasKey(x => x.Id);
+        // builder.Entity<EventCategory>().HasKey(x => x.Id);
+        // builder.Entity<Slot>().HasKey(x => x.Id);
+        // builder.Entity<WorkspaceRole>().HasKey(x => x.Id);
+        // builder.Entity<Invitation>().HasKey(x => x.Id);
+        // builder.Entity<Notification>().HasKey(x => x.Id);
 
         // Contacts
         builder.Entity<User>()

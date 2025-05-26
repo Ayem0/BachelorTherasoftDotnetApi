@@ -15,93 +15,57 @@ public class ParticipantCategoryService : IParticipantCategoryService
     private readonly IParticipantCategoryRepository _participantCategoryRepository;
     private readonly IWorkspaceRepository _workspaceRepository;
     private readonly IMapper _mapper;
-    private readonly IRedisService _cache;
     private readonly ISocketService _socket;
-    private static readonly TimeSpan ttl = TimeSpan.FromMinutes(10);
     public ParticipantCategoryService(
         IParticipantCategoryRepository participantCategoryRepository,
         IWorkspaceRepository workspaceRepository,
         IMapper mapper,
-        IRedisService cache,
         ISocketService socket
         )
     {
         _participantCategoryRepository = participantCategoryRepository;
         _workspaceRepository = workspaceRepository;
         _mapper = mapper;
-        _cache = cache;
         _socket = socket;
     }
 
-
-    public async Task<ParticipantCategoryDto> CreateAsync(string workspaceId, CreateParticipantCategoryRequest req)
+    public async Task<ParticipantCategoryDto> CreateAsync(CreateParticipantCategoryRequest req)
     {
-        var workspace = await _cache.GetOrSetAsync(
-            CacheKeys.Workspace(workspaceId),
-            () => _workspaceRepository.GetByIdAsync(workspaceId),
-            ttl
-        ) ?? throw new NotFoundException("Workspace", workspaceId);
-
-        var ParticipantCategory = new ParticipantCategory(workspace, req.Name, req.Description, req.Color, req.Icon) { Workspace = workspace };
-
-        var created = await _participantCategoryRepository.CreateAsync(ParticipantCategory);
-        var dto = _mapper.Map<ParticipantCategoryDto>(ParticipantCategory);
-
-        await _socket.NotififyGroup(workspaceId, "ParticipantCategoryCreated", dto);
-        await _cache.SetAsync(CacheKeys.ParticipantCategory(workspaceId, created.Id), created, ttl);
-        await _cache.DeleteAsync(CacheKeys.ParticipantCategories(workspaceId));
-
+        var workspace = await _workspaceRepository.GetByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
+        var pc = new ParticipantCategory(workspace, req.Name, req.Description, req.Color, req.Icon) { Workspace = workspace };
+        var created = await _participantCategoryRepository.CreateAsync(pc);
+        var dto = _mapper.Map<ParticipantCategoryDto>(created);
+        await _socket.NotififyGroup(req.WorkspaceId, "ParticipantCategoryCreated", dto);
         return dto;
     }
 
-    public async Task<ParticipantCategoryDto> UpdateAsync(string workspaceId, string id, UpdateParticipantCategoryRequest req)
+    public async Task<ParticipantCategoryDto> UpdateAsync(string id, UpdateParticipantCategoryRequest req)
     {
-        var key = CacheKeys.ParticipantCategory(workspaceId, id);
-        var ParticipantCategory = await _cache.GetOrSetAsync(key, () => _participantCategoryRepository.GetByIdAsync(id), ttl)
-            ?? throw new NotFoundException("ParticipantCategory", id);
+        var pc = await _participantCategoryRepository.GetByIdAsync(id) ?? throw new NotFoundException("ParticipantCategory", id);
 
-        ParticipantCategory.Name = req.Name ?? ParticipantCategory.Name;
-        ParticipantCategory.Description = req.Description ?? ParticipantCategory.Description;
+        pc.Name = req.Name ?? pc.Name;
+        pc.Description = req.Description ?? pc.Description;
 
-        var updated = await _participantCategoryRepository.UpdateAsync(ParticipantCategory);
+        var updated = await _participantCategoryRepository.UpdateAsync(pc);
         var dto = _mapper.Map<ParticipantCategoryDto>(updated);
-
-        await _cache.SetAsync(key, dto, TimeSpan.FromMinutes(10));
-        await _socket.NotififyGroup(workspaceId, "ParticipantCategoryUpdated", dto);
-        await _cache.DeleteAsync(CacheKeys.ParticipantCategories(workspaceId));
-
+        await _socket.NotififyGroup(updated.WorkspaceId, "ParticipantCategoryUpdated", dto);
         return dto;
     }
 
-    public async Task<bool> DeleteAsync(string workspaceId, string id)
+    public async Task<bool> DeleteAsync(string id)
     {
-        var key = CacheKeys.ParticipantCategory(workspaceId, id);
-        var ParticipantCategory = await _cache.GetOrSetAsync(key, () => _participantCategoryRepository.GetByIdAsync(id), ttl)
-            ?? throw new NotFoundException("ParticipantCategory", id);
-
-        var success = await _participantCategoryRepository.DeleteAsync(ParticipantCategory);
+        var pc = await _participantCategoryRepository.GetByIdAsync(id) ?? throw new NotFoundException("ParticipantCategory", id);
+        var success = await _participantCategoryRepository.DeleteAsync(pc);
         if (success)
         {
-            await _socket.NotififyGroup(ParticipantCategory.WorkspaceId, "ParticipantCategoryDeleted", id);
-            await _cache.DeleteAsync([
-                CacheKeys.ParticipantCategories(workspaceId),
-                CacheKeys.ParticipantCategory(workspaceId, id)
-            ]);
+            await _socket.NotififyGroup(pc.WorkspaceId, "ParticipantCategoryDeleted", id);
         }
         return success;
     }
 
-    public Task<ParticipantCategoryDto?> GetByIdAsync(string workspaceId, string id)
-    => _cache.GetOrSetAsync<ParticipantCategory?, ParticipantCategoryDto?>(
-        CacheKeys.ParticipantCategory(workspaceId, id),
-        () => _participantCategoryRepository.GetByIdAsync(id),
-        ttl
-    );
+    public async Task<ParticipantCategoryDto?> GetByIdAsync(string id)
+    => _mapper.Map<ParticipantCategoryDto?>(await _participantCategoryRepository.GetByIdAsync(id));
 
-    public Task<List<ParticipantCategoryDto>> GetByWorkspaceIdAsync(string workspaceId)
-    => _cache.GetOrSetAsync<List<ParticipantCategory>, List<ParticipantCategoryDto>>(
-        CacheKeys.ParticipantCategories(workspaceId),
-        () => _participantCategoryRepository.GetByWorkpaceIdAsync(workspaceId),
-        ttl
-    );
+    public async Task<List<ParticipantCategoryDto>> GetByWorkspaceIdAsync(string workspaceId)
+    => _mapper.Map<List<ParticipantCategoryDto>>(await _participantCategoryRepository.GetByWorkpaceIdAsync(workspaceId));
 }

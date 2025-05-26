@@ -1,12 +1,9 @@
 using System.Security.Claims;
 using BachelorTherasoftDotnetApi.src.Dtos.Create;
 using BachelorTherasoftDotnetApi.src.Dtos.Update;
-using BachelorTherasoftDotnetApi.src.Hubs;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using MongoDB.Driver;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
@@ -38,24 +35,26 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         }
 
 
+
         /// <summary>
-        /// Get user workspace.
+        /// Get user workspaces
         /// </summary>
-        [HttpGet("User")]
-        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByUser()
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Authorize]
+        [HttpGet("")]
+        public async Task<IActionResult> GetWorkspaces()
         {
-            string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return Unauthorized();
 
-            var res = await _workspaceService.GetByUserIdAsync(userId);
-            return Ok(res);
+            var workspaces = await _workspaceService.GetByUserIdAsync(userId);
+
+            return Ok(workspaces);
         }
 
         /// <summary>
-        /// Get user workspace.
+        /// Get workspace users.
         /// </summary>
         [HttpGet("{id}/Users")]
         [Authorize]
@@ -91,12 +90,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Deletes a workspace.
         /// </summary>
-        [HttpDelete("")]
+        [HttpDelete("{id}")]
         [Authorize]
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete([FromQuery] string id)
+        public async Task<IActionResult> Delete([FromRoute] string id)
         {
             var res = await _workspaceService.DeleteAsync(id);
 
@@ -106,18 +105,16 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Updates a workspace.
         /// </summary>
-        [HttpPut("")]
+        [HttpPut("{id}")]
         [Authorize]
 
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateWorkspaceRequest request)
+        public async Task<IActionResult> Update([FromRoute] string id, [FromBody] UpdateWorkspaceRequest request)
         {
             if (request.Name == null && request.Description == null) return BadRequest(new ProblemDetails() { Title = "At least one field is required." });
 
             var res = await _workspaceService.UpdateAsync(id, request);
-            // await _workspaceHub.NotifyWorkspaceGroup(res.workspaceId, $"WORKSPACE {res.Name} UPDATED");
-            // await _workspaceHub.Clients.Group(res.Id).SendAsync("WorkspaceUpdated", $"WORKSPACE {res.Name} UPDATED");
             return Ok(res);
         }
 

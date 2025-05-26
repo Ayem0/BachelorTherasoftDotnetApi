@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
-    [Route("Api/Workspace/{workspaceId}")]
+    [Route("Api")]
     [ApiController]
     public class TagController : ControllerBase
     {
@@ -25,9 +25,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetById([FromRoute] string workspaceId, [FromRoute] string id)
+        public async Task<IActionResult> GetById([FromRoute] string id)
         {
-            var tag = await _tagService.GetByIdAsync(workspaceId, id);
+            var tag = await _tagService.GetByIdAsync(id);
             return Ok(tag);
         }
 
@@ -38,9 +38,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create([FromRoute] string workspaceId, [FromBody] CreateTagRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateTagRequest request)
         {
-            var res = await _tagService.CreateAsync(workspaceId, request);
+            var res = await _tagService.CreateAsync(request);
             return CreatedAtAction("Create", res);
         }
 
@@ -51,9 +51,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete([FromRoute] string workspaceId, [FromRoute] string id)
+        public async Task<IActionResult> Delete([FromRoute] string id)
         {
-            var res = await _tagService.DeleteAsync(workspaceId, id);
+            var res = await _tagService.DeleteAsync(id);
             return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"Tag with id '{id} not found.'" });
         }
 
@@ -65,17 +65,17 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update([FromRoute] string workspaceId, [FromRoute] string id, [FromBody] UpdateTagRequest request)
+        public async Task<IActionResult> Update([FromRoute] string id, [FromBody] UpdateTagRequest request)
         {
             if (request.Name == null && request.Description == null && request.Color == null && request.Name == null) return BadRequest(new ProblemDetails() { Title = "At least one field is required." });
-            var tag = await _tagService.UpdateAsync(workspaceId, id, request);
+            var tag = await _tagService.UpdateAsync(id, request);
             return Ok(tag);
         }
 
         /// <summary>
         /// Get tags.
         /// </summary>
-        [HttpGet("Tags")]
+        [HttpGet("Workspace/{workspaceId}/Tags")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

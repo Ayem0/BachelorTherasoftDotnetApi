@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BachelorTherasoftDotnetApi.src.Controllers
 {
-    [Route("Api/Workspace/{workspaceId}")]
+    [Route("Api")]
     [ApiController]
     public class SlotController : ControllerBase
     {
@@ -22,16 +22,16 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [HttpGet("[controller]/{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById([FromRoute] string workspaceId, [FromRoute] string id)
+        public async Task<IActionResult> GetById([FromRoute] string id)
         {
-            var res = await _SlotService.GetByIdAsync(workspaceId, id);
+            var res = await _SlotService.GetByIdAsync(id);
             return Ok(res);
         }
 
         /// <summary>
         /// Get slots.
         /// </summary>
-        [HttpGet("Slots")]
+        [HttpGet("Workspace/{workspaceId}/Slots")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK / StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByWorkspaceId([FromRoute] string workspaceId)
@@ -46,11 +46,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [HttpPost("[controller]")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created / StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create([FromRoute] string workspaceId, [FromBody] CreateSlotRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateSlotRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _SlotService.CreateAsync(workspaceId, request);
+            var res = await _SlotService.CreateAsync(request);
             return CreatedAtAction(null, res);
         }
 
@@ -63,11 +63,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateWithRepetition([FromRoute] string workspaceId, [FromBody] CreateSlotWithRepetitionRequest request)
+        public async Task<IActionResult> CreateWithRepetition([FromBody] CreateSlotWithRepetitionRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
-            var res = await _SlotService.CreateWithRepetitionAsync(workspaceId, request);
+            var res = await _SlotService.CreateWithRepetitionAsync(request);
             return CreatedAtAction(null, res);
         }
 
@@ -79,9 +79,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Delete([FromRoute] string workspaceId, [FromRoute] string id)
+        public async Task<IActionResult> Delete([FromRoute] string id)
         {
-            var res = await _SlotService.DeleteAsync(workspaceId, id);
+            var res = await _SlotService.DeleteAsync(id);
             return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"Slot with id '{id} not found.'" });
         }
 

@@ -7,7 +7,6 @@ using BachelorTherasoftDotnetApi.src.Exceptions;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
-using BachelorTherasoftDotnetApi.src.Utils;
 using BachelorTherasoftDotnetApi.Utils;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
@@ -22,9 +21,7 @@ public class EventService : IEventService
     private readonly IWorkspaceRepository _workspaceRepository;
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
-    private readonly IRedisService _cache;
     private readonly ISocketService _socket;
-    private static readonly TimeSpan ttl = TimeSpan.FromMinutes(10);
 
     public EventService(
         IEventRepository eventRepository,
@@ -35,7 +32,6 @@ public class EventService : IEventService
         ITagRepository tagRepository,
         IWorkspaceRepository workspaceRepository,
         IUserRepository userRepository,
-        IRedisService cache,
         ISocketService socket
     )
     {
@@ -47,63 +43,34 @@ public class EventService : IEventService
         _workspaceRepository = workspaceRepository;
         _mapper = mapper;
         _userRepository = userRepository;
-        _cache = cache;
         _socket = socket;
     }
 
     public async Task<EventDto> CreateAsync(string userId, CreateEventRequest req)
     {
-        var workspace = await _cache.GetOrSetAsync(
-            CacheKeys.Workspace(req.WorkspaceId),
-            () => _workspaceRepository.GetByIdAsync(req.WorkspaceId),
-            ttl
-        ) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
-
-        var eventCategory = await _cache.GetOrSetAsync(
-            CacheKeys.EventCategory(req.WorkspaceId, req.EventCategoryId),
-            () => _eventCategoryRepository.GetByIdAsync(req.EventCategoryId),
-            ttl
-        ) ?? throw new NotFoundException("eventCategory", req.EventCategoryId);
-
-        var user = await _cache.GetOrSetAsync(CacheKeys.User(userId), () => _userRepository.GetByIdAsync(userId), ttl)
-            ?? throw new NotFoundException("User", userId);
-
-        var room = await _cache.GetOrSetAsync(
-            CacheKeys.RoomDetails(req.WorkspaceId, req.RoomId),
-            () => _roomRepository.GetJoinEventsSlotsByRangeAndIdAsync(req.RoomId, req.StartDate, req.EndDate),
-            ttl
-        ) ?? throw new NotFoundException("Room", req.RoomId);
+        var workspace = await _workspaceRepository.GetByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
+        var eventCategory = await _eventCategoryRepository.GetByIdAsync(req.EventCategoryId) ?? throw new NotFoundException("eventCategory", req.EventCategoryId);
+        var user = await _userRepository.GetByIdAsync(userId) ?? throw new NotFoundException("User", userId);
+        var room = await _roomRepository.GetJoinEventsSlotsByRangeAndIdAsync(req.RoomId, req.StartDate, req.EndDate) ?? throw new NotFoundException("Room", req.RoomId);
 
         List<Participant> participants = [];
         foreach (var pId in req.ParticipantIds)
         {
-            var participant = await _cache.GetOrSetAsync(
-                CacheKeys.Participant(req.WorkspaceId, pId),
-                () => _participantRepository.GetByIdAsync(pId),
-                ttl
-            ) ?? throw new NotFoundException("Participant", pId);
+            var participant = await _participantRepository.GetByIdAsync(pId) ?? throw new NotFoundException("Participant", pId);
             participants.Add(participant);
         }
 
         List<Tag> tags = [];
         foreach (var tagId in req.TagIds)
         {
-            var tag = await _cache.GetOrSetAsync(
-                CacheKeys.Tag(req.WorkspaceId, tagId),
-                () => _tagRepository.GetByIdAsync(tagId),
-                ttl
-            ) ?? throw new NotFoundException("Tag", tagId);
+            var tag = await _tagRepository.GetByIdAsync(tagId) ?? throw new NotFoundException("Tag", tagId);
             tags.Add(tag);
         }
 
         List<User> users = [user];
         foreach (var uId in req.UserIds)
         {
-            var User = await _cache.GetOrSetAsync(
-                CacheKeys.User(uId),
-                () => _userRepository.GetByIdAsync(uId),
-                ttl
-            ) ?? throw new NotFoundException("User", uId);
+            var User = await _userRepository.GetByIdAsync(uId) ?? throw new NotFoundException("User", uId);
             users.Add(User);
         }
 
@@ -125,64 +92,36 @@ public class EventService : IEventService
         })];
 
         var created = await _eventRepository.CreateAsync(@event);
-        var dto = _mapper.Map<EventDto>(@event);
+        var dto = _mapper.Map<EventDto>(created);
 
         return dto;
     }
 
     public async Task<List<EventDto>> CreateWithRepetitionAsync(string userId, CreateEventWithRepetitionRequest req)
     {
-        var workspace = await _cache.GetOrSetAsync(
-            CacheKeys.Workspace(req.WorkspaceId),
-            () => _workspaceRepository.GetByIdAsync(req.WorkspaceId),
-            ttl
-        ) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
-
-        var eventCategory = await _cache.GetOrSetAsync(
-            CacheKeys.EventCategory(req.WorkspaceId, req.EventCategoryId),
-            () => _eventCategoryRepository.GetByIdAsync(req.EventCategoryId),
-            ttl
-        ) ?? throw new NotFoundException("eventCategory", req.EventCategoryId);
-
-        var user = await _cache.GetOrSetAsync(CacheKeys.User(userId), () => _userRepository.GetByIdAsync(userId), ttl)
-            ?? throw new NotFoundException("User", userId);
-
-        var room = await _cache.GetOrSetAsync(
-            CacheKeys.RoomDetails(req.WorkspaceId, req.RoomId),
-            () => _roomRepository.GetJoinEventsSlotsByRangeAndIdAsync(req.RoomId, req.StartDate, req.EndDate),
-            ttl
-        ) ?? throw new NotFoundException("Room", req.RoomId);
+        var workspace = await _workspaceRepository.GetByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
+        var eventCategory = await _eventCategoryRepository.GetByIdAsync(req.EventCategoryId) ?? throw new NotFoundException("eventCategory", req.EventCategoryId);
+        var user = await _userRepository.GetByIdAsync(userId) ?? throw new NotFoundException("User", userId);
+        var room = await _roomRepository.GetJoinEventsSlotsByRangeAndIdAsync(req.RoomId, req.StartDate, req.EndDate) ?? throw new NotFoundException("Room", req.RoomId);
 
         List<Participant> participants = [];
         foreach (var pId in req.ParticipantIds)
         {
-            var participant = await _cache.GetOrSetAsync(
-                CacheKeys.Participant(req.WorkspaceId, pId),
-                () => _participantRepository.GetByIdAsync(pId),
-                ttl
-            ) ?? throw new NotFoundException("Participant", pId);
+            var participant = await _participantRepository.GetByIdAsync(pId) ?? throw new NotFoundException("Participant", pId);
             participants.Add(participant);
         }
 
         List<Tag> tags = [];
         foreach (var tagId in req.TagIds)
         {
-            var tag = await _cache.GetOrSetAsync(
-                CacheKeys.Tag(req.WorkspaceId, tagId),
-                () => _tagRepository.GetByIdAsync(tagId),
-                ttl
-            ) ?? throw new NotFoundException("Tag", tagId);
+            var tag = await _tagRepository.GetByIdAsync(tagId) ?? throw new NotFoundException("Tag", tagId);
             tags.Add(tag);
         }
 
         List<User> users = [user];
         foreach (var uId in req.UserIds)
         {
-            var User = await _cache.GetOrSetAsync(
-                CacheKeys.User(uId),
-                () => _userRepository.GetByIdAsync(uId),
-                ttl
-            ) ?? throw new NotFoundException("User", uId);
+            var User = await _userRepository.GetByIdAsync(uId) ?? throw new NotFoundException("User", uId);
             users.Add(User);
         }
 
@@ -229,22 +168,18 @@ public class EventService : IEventService
             repetitionEndDate = Repetition.IncrementDateTime(repetitionEndDate, req.RepetitionInterval, req.RepetitionNumber);
         }
         var created = await _eventRepository.CreateMultipleAsync(events);
-        var dto = _mapper.Map<List<EventDto>>(events);
+        var dto = _mapper.Map<List<EventDto>>(created);
 
         return dto;
     }
 
     public async Task<bool> DeleteAsync(string id)
     {
-        var key = CacheKeys.Event(id);
-        var @event = await _cache.GetOrSetAsync(key, () => _eventRepository.GetByIdAsync(id), ttl)
-            ?? throw new NotFoundException("Event", id);
+        var @event = await _eventRepository.GetByIdAsync(id) ?? throw new NotFoundException("Event", id);
         var success = await _eventRepository.DeleteAsync(@event);
         if (success)
         {
             await _socket.NotififyGroup(@event.Id, "EventDeleted", id);
-            // TODO remove other keys (related users, room ...)
-            await _cache.DeleteAsync(key);
         }
         return success;
     }
@@ -313,27 +248,14 @@ public class EventService : IEventService
         return _mapper.Map<EventDto>(eventToUpdate);
     }
 
-    public Task<EventDto?> GetByIdAsync(string id)
-     => _cache.GetOrSetAsync<Event?, EventDto?>(
-        CacheKeys.Event(id),
-        () => _eventRepository.GetByIdAsync(id),
-        ttl
-    );
+    public async Task<EventDto?> GetByIdAsync(string id)
+     => _mapper.Map<EventDto?>(await _eventRepository.GetByIdAsync(id));
 
+    public async Task<List<EventDto>> GetByRangeAndUserIdAsync(string id, DateTime start, DateTime end)
+    => _mapper.Map<List<EventDto>>(await _eventRepository.GetByRangeAndUserIdAsync(id, start, end));
 
-    public Task<List<EventDto>> GetByRangeAndUserIdAsync(string id, DateTime start, DateTime end)
-    => _cache.GetOrSetAsync<List<Event>, List<EventDto>>(
-        CacheKeys.UserEvents(id, start.ToString(), end.ToString()),
-        () => _eventRepository.GetByRangeAndUserIdAsync(id, start, end),
-        ttl
-    );
-
-    public Task<List<EventDto>> GetByRangeAndRoomIdAsync(string id, DateTime start, DateTime end)
-    => _cache.GetOrSetAsync<List<Event>, List<EventDto>>(
-        CacheKeys.RoomEvents(id, start.ToString(), end.ToString()),
-        () => _eventRepository.GetByRangeAndRoomIdAsync(id, start, end),
-        ttl
-    );
+    public async Task<List<EventDto>> GetByRangeAndRoomIdAsync(string id, DateTime start, DateTime end)
+    => _mapper.Map<List<EventDto>>(await _eventRepository.GetByRangeAndRoomIdAsync(id, start, end));
 
     public async Task<DialogEventDto> GetEventsByUserIdsAndRoomIdAsync(List<string> userIds, string roomId, DateTime start, DateTime end)
     {

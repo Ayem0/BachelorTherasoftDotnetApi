@@ -2,6 +2,7 @@ namespace BachelorTherasoftDotnetApi.src.Dtos.Create;
 
 public class CreateSlotWithRepetitionRequest : RepetitionRequest
 {
+    public required string WorkspaceId { get; set; }
     public required string Name { get; set; }
     public string? Description { get; set; }
     public required DateOnly StartDate { get; set; }

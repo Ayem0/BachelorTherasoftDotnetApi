@@ -23,6 +23,7 @@ public class InvitationRepository : BaseRepository<Invitation>, IInvitationRepos
             return await _dbSet
                 .Where(x => x.ReceiverId == userId && x.DeletedAt == null)
                 .Include(x => x.Sender)
+                .Include(x => x.Workspace)
                 .ToListAsync();
 
         }

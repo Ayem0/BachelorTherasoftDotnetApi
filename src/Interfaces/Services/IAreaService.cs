@@ -6,10 +6,10 @@ namespace BachelorTherasoftDotnetApi.src.Interfaces.Services;
 
 public interface IAreaService
 {
-    Task<AreaDto?> GetByIdAsync(string workspaceId, string id);
-    Task<AreaDto> CreateAsync(string workspaceId, CreateAreaRequest request);
-    Task<bool> DeleteAsync(string workspaceId, string id);
-    Task<AreaDto> UpdateAsync(string workspaceId, string id, UpdateAreaRequest request);
-    Task<List<AreaDto>> GetByLocationIdAsync(string workspaceId, string locationId);
+    Task<AreaDto?> GetByIdAsync(string id);
+    Task<AreaDto> CreateAsync(CreateAreaRequest request);
+    Task<bool> DeleteAsync(string id);
+    Task<AreaDto> UpdateAsync(string id, UpdateAreaRequest request);
+    Task<List<AreaDto>> GetByLocationIdAsync(string locationId);
     Task<List<AreaDto>> GetByWorkspaceIdAsync(string workspaceId);
 }

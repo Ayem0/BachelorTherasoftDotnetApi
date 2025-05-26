@@ -7,6 +7,7 @@ using BachelorTherasoftDotnetApi.src.Models;
 using BachelorTherasoftDotnetApi.src.Repositories;
 using BachelorTherasoftDotnetApi.src.Services;
 using BachelorTherasoftDotnetApi.src.Utils;
+using EFCoreSecondLevelCacheInterceptor;
 using Google.Apis.Auth.AspNetCore3;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,9 +22,25 @@ var builder = WebApplication.CreateBuilder(args);
 // Controllers
 builder.Services.AddControllers();
 
+// Redis service
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis")!;
+});
+
+// EFCore cache interceptor
+builder.Services.AddEFSecondLevelCache(options =>
+    options.UseStackExchangeRedisCacheProvider(builder.Configuration.GetConnectionString("Redis")!, timeout: TimeSpan.FromMinutes(10))
+        .ConfigureLogging(true)
+        .CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(10))
+);
+
 // MySQL service
-builder.Services.AddDbContext<MySqlDbContext>(
-    (sp, options) => options.UseMySQL(builder.Configuration.GetConnectionString("MySQL")!)
+builder.Services.AddDbContext<MySqlDbContext>((sp, options) =>
+    {
+        options.UseMySQL(builder.Configuration.GetConnectionString("MySQL")!);
+        options.AddInterceptors(sp.GetRequiredService<SecondLevelCacheInterceptor>());
+    }
 );
 
 // builder.Services.AddDbContext<MySqlDbContext>(
@@ -33,15 +50,6 @@ builder.Services.AddDbContext<MySqlDbContext>(
 //         options => options.EnableRetryOnFailure()
 //     ));
 
-// Redis service
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = builder.Configuration.GetConnectionString("Redis");
-});
-builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
-    ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")!)
-);
-builder.Services.AddSingleton<IRedisService, RedisService>();
 
 
 

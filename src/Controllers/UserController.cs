@@ -12,11 +12,9 @@ namespace BachelorTherasoftDotnetApi.src.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
-    private readonly IWorkspaceService _workspaceService;
-    public UserController(IUserService userService, IWorkspaceService workspaceService)
+    public UserController(IUserService userService)
     {
         _userService = userService;
-        _workspaceService = workspaceService;
     }
 
     /// <summary>
@@ -68,23 +66,6 @@ public class UserController : ControllerBase
         var contacts = await _userService.GetContactsByIdAsync(userId);
 
         return Ok(contacts);
-    }
-
-    /// <summary>
-    /// Get user workspaces
-    /// </summary>
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [Authorize]
-    [HttpGet("Workspaces")]
-    public async Task<IActionResult> GetWorkspaces()
-    {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (userId == null) return Unauthorized();
-
-        var workspaces = await _workspaceService.GetByUserIdAsync(userId);
-
-        return Ok(workspaces);
     }
 
     // /// <summary>

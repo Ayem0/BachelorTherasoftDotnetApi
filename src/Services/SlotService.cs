@@ -15,82 +15,50 @@ public class SlotService : ISlotService
     private readonly ISlotRepository _slotRepository;
     private readonly IWorkspaceRepository _workspaceRepository;
     private readonly IEventCategoryRepository _eventCategoryRepository;
-    private readonly IRoomRepository _roomRepository;
     private readonly IMapper _mapper;
-    private readonly IRedisService _cache;
     private readonly ISocketService _socket;
-    private static readonly TimeSpan ttl = TimeSpan.FromMinutes(10);
-
 
     public SlotService(
         ISlotRepository slotRepository,
         IWorkspaceRepository workspaceRepository,
-        IRoomRepository roomRepository,
         IEventCategoryRepository eventCategoryRepository,
         IMapper mapper,
-        IRedisService cache,
         ISocketService socket
     )
     {
         _slotRepository = slotRepository;
         _workspaceRepository = workspaceRepository;
-        _roomRepository = roomRepository;
         _eventCategoryRepository = eventCategoryRepository;
         _mapper = mapper;
-        _cache = cache;
         _socket = socket;
     }
 
-    public async Task<bool> DeleteAsync(string workspaceId, string id)
+    public async Task<bool> DeleteAsync(string id)
     {
-        var key = CacheKeys.Slot(workspaceId, id);
-        var slot = await _cache.GetOrSetAsync(key, () => _slotRepository.GetByIdAsync(id), ttl)
-            ?? throw new NotFoundException("Slot", id);
-
+        var slot = await _slotRepository.GetByIdAsync(id) ?? throw new NotFoundException("Slot", id);
         var success = await _slotRepository.DeleteAsync(slot);
         if (success)
         {
             await _socket.NotififyGroup(slot.WorkspaceId, "SlotDeleted", id);
-            await _cache.DeleteAsync([
-                CacheKeys.Slots(workspaceId),
-                CacheKeys.Slot(workspaceId, id)
-            ]);
         }
         return success;
     }
 
-    public Task<SlotDto?> GetByIdAsync(string workspaceId, string id)
-    => _cache.GetOrSetAsync<Slot?, SlotDto?>(
-        CacheKeys.Slot(workspaceId, id),
-        () => _slotRepository.GetByIdAsync(id),
-        ttl
-    );
+    public async Task<SlotDto?> GetByIdAsync(string id)
+    => _mapper.Map<SlotDto?>(await _slotRepository.GetByIdAsync(id));
 
-    public Task<List<SlotDto>> GetByWorkspaceIdAsync(string workspaceId)
-    => _cache.GetOrSetAsync<List<Slot>, List<SlotDto>>(
-        CacheKeys.Slots(workspaceId),
-        () => _slotRepository.GetByWorkpaceIdAsync(workspaceId),
-        ttl
-    );
+    public async Task<List<SlotDto>> GetByWorkspaceIdAsync(string workspaceId)
+    => _mapper.Map<List<SlotDto>>(await _slotRepository.GetByWorkpaceIdAsync(workspaceId));
 
-    public async Task<SlotDto> CreateAsync(string workspaceId, CreateSlotRequest req)
+    public async Task<SlotDto> CreateAsync(CreateSlotRequest req)
     {
-        var workspace = await _cache.GetOrSetAsync(
-            CacheKeys.Workspace(workspaceId),
-            () => _workspaceRepository.GetByIdAsync(workspaceId),
-            ttl
-        ) ?? throw new NotFoundException("Workspace", workspaceId);
-
+        var workspace = await _workspaceRepository.GetByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
         List<EventCategory> eventCategories = [];
         if (req.EventCategoryIds != null)
         {
             foreach (var eventCategoryId in req.EventCategoryIds)
             {
-                var eventCategory = await _cache.GetOrSetAsync(
-                   CacheKeys.EventCategory(workspaceId, eventCategoryId),
-                   () => _eventCategoryRepository.GetByIdAsync(eventCategoryId),
-                   ttl
-               ) ?? throw new NotFoundException("Event category", eventCategoryId);
+                var eventCategory = await _eventCategoryRepository.GetByIdAsync(eventCategoryId) ?? throw new NotFoundException("Event category", eventCategoryId);
                 eventCategories.Add(eventCategory);
             }
         }
@@ -100,10 +68,51 @@ public class SlotService : ISlotService
             Workspace = workspace
         };
         var created = await _slotRepository.CreateAsync(slot);
-        var dto = _mapper.Map<SlotDto>(slot);
+        var dto = _mapper.Map<SlotDto>(created);
 
-        await _socket.NotififyGroup(workspaceId, "SlotCreated", dto);
-        await _cache.DeleteAsync(CacheKeys.Slots(workspaceId));
+        await _socket.NotififyGroup(created.WorkspaceId, "SlotCreated", dto);
+
+        return dto;
+    }
+
+    public async Task<List<SlotDto>> CreateWithRepetitionAsync(CreateSlotWithRepetitionRequest req)
+    {
+        var workspace = await _workspaceRepository.GetByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
+        List<EventCategory> eventCategories = [];
+        if (req.EventCategoryIds != null)
+        {
+            foreach (var eventCategoryId in req.EventCategoryIds)
+            {
+                var eventCategory = await _eventCategoryRepository.GetByIdAsync(eventCategoryId) ?? throw new NotFoundException("Event category", eventCategoryId);
+                eventCategories.Add(eventCategory);
+            }
+        }
+
+        var mainSlot = new Slot(req.Name, req.Description, workspace, req.StartDate, req.EndDate, req.StartTime, req.EndTime, eventCategories,
+        req.RepetitionInterval, req.RepetitionNumber, null, req.RepetitionEndDate)
+        {
+            Workspace = workspace
+        };
+
+        List<Slot> slots = [mainSlot];
+        var repetitionStartDate = Repetition.IncrementDateOnly(req.StartDate, req.RepetitionInterval, req.RepetitionNumber);
+        var repetitionEndDate = Repetition.IncrementDateOnly(req.EndDate, req.RepetitionInterval, req.RepetitionNumber);
+
+        while (repetitionStartDate < req.RepetitionEndDate)
+        {
+            var slot = new Slot(req.Name, req.Description, workspace, repetitionStartDate, repetitionEndDate, req.StartTime, req.EndTime, eventCategories, null, null, mainSlot, null)
+            {
+                Workspace = workspace
+            };
+            slots.Add(slot);
+
+            repetitionStartDate = Repetition.IncrementDateOnly(req.StartDate, req.RepetitionInterval, req.RepetitionNumber);
+            repetitionEndDate = Repetition.IncrementDateOnly(req.EndDate, req.RepetitionInterval, req.RepetitionNumber);
+        }
+        var created = await _slotRepository.CreateMultipleAsync(slots);
+        var dto = _mapper.Map<List<SlotDto>>(created);
+
+        await _socket.NotififyGroup(req.WorkspaceId, "SlotsCreated", dto);
 
         return dto;
     }
@@ -166,56 +175,5 @@ public class SlotService : ISlotService
     //     return null;
     // }
 
-    public async Task<List<SlotDto>> CreateWithRepetitionAsync(string workspaceId, CreateSlotWithRepetitionRequest req)
-    {
-        var workspace = await _cache.GetOrSetAsync(
-            CacheKeys.Workspace(workspaceId),
-            () => _workspaceRepository.GetByIdAsync(workspaceId),
-            ttl
-        ) ?? throw new NotFoundException("Workspace", workspaceId);
 
-        List<EventCategory> eventCategories = [];
-        if (req.EventCategoryIds != null)
-        {
-
-            foreach (var eventCategoryId in req.EventCategoryIds)
-            {
-                var eventCategory = await _cache.GetOrSetAsync(
-                   CacheKeys.EventCategory(workspaceId, eventCategoryId),
-                   () => _eventCategoryRepository.GetByIdAsync(eventCategoryId),
-                   ttl
-               ) ?? throw new NotFoundException("Event category", eventCategoryId);
-                eventCategories.Add(eventCategory);
-            }
-        }
-
-        var mainSlot = new Slot(req.Name, req.Description, workspace, req.StartDate, req.EndDate, req.StartTime, req.EndTime, eventCategories,
-        req.RepetitionInterval, req.RepetitionNumber, null, req.RepetitionEndDate)
-        {
-            Workspace = workspace
-        };
-
-        List<Slot> slots = [mainSlot];
-        var repetitionStartDate = Repetition.IncrementDateOnly(req.StartDate, req.RepetitionInterval, req.RepetitionNumber);
-        var repetitionEndDate = Repetition.IncrementDateOnly(req.EndDate, req.RepetitionInterval, req.RepetitionNumber);
-
-        while (repetitionStartDate < req.RepetitionEndDate)
-        {
-            var slot = new Slot(req.Name, req.Description, workspace, repetitionStartDate, repetitionEndDate, req.StartTime, req.EndTime, eventCategories, null, null, mainSlot, null)
-            {
-                Workspace = workspace
-            };
-            slots.Add(slot);
-
-            repetitionStartDate = Repetition.IncrementDateOnly(req.StartDate, req.RepetitionInterval, req.RepetitionNumber);
-            repetitionEndDate = Repetition.IncrementDateOnly(req.EndDate, req.RepetitionInterval, req.RepetitionNumber);
-        }
-        var created = await _slotRepository.CreateMultipleAsync(slots);
-        var dto = _mapper.Map<List<SlotDto>>(slots);
-
-        await _socket.NotififyGroup(workspaceId, "SlotsCreated", dto);
-        await _cache.DeleteAsync(CacheKeys.Slots(workspaceId));
-
-        return dto;
-    }
 }

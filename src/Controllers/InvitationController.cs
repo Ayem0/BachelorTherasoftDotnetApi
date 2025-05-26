@@ -18,17 +18,6 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             _invitationService = invitationService;
         }
 
-
-
-
-
-
-
-
-
-
-
-
         [HttpPost("Workspace/Create")]
         [Authorize]
         public async Task<IActionResult> CreateWorkspaceInvitation([FromBody] CreateWorkspaceInvitationRequest req)

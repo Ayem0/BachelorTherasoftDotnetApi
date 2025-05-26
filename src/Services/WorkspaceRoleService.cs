@@ -17,95 +17,67 @@ public class WorkspaceRoleService : IWorkspaceRoleService
     private readonly IWorkspaceRoleRepository _workspaceRoleRepository;
     private readonly IWorkspaceRepository _workspaceRepository;
     private readonly IMapper _mapper;
-    private readonly IRedisService _cache;
     private readonly ISocketService _socket;
-    private static readonly TimeSpan ttl = TimeSpan.FromMinutes(10);
 
     public WorkspaceRoleService(
         IWorkspaceRoleRepository workspaceRoleRepository,
         IWorkspaceRepository workspaceRepository,
         IMapper mapper,
-        IRedisService cache,
         ISocketService socket)
     {
         _workspaceRoleRepository = workspaceRoleRepository;
         _workspaceRepository = workspaceRepository;
         _mapper = mapper;
-        _cache = cache;
         _socket = socket;
         _workspaceRepository = workspaceRepository;
     }
+    // var workspace = await _cache.GetOrSetAsync(
+    //     CacheKeys.Workspace(workspaceId),
+    //     () => _workspaceRepository.GetByIdAsync(workspaceId),
+    //     ttl
+    // ) ?? throw new NotFoundException("Workspace", workspaceId);
+    // await _cache.SetAsync(CacheKeys.WorkspaceRole(workspaceId, created.Id), created, ttl);
+    // await _cache.DeleteAsync(CacheKeys.WorkspaceRoles(workspaceId));
 
-    public async Task<WorkspaceRoleDto> CreateAsync(string workspaceId, CreateWorkspaceRoleRequest req)
+    public async Task<WorkspaceRoleDto> CreateAsync(CreateWorkspaceRoleRequest req)
     {
-        var workspace = await _cache.GetOrSetAsync(
-            CacheKeys.Workspace(workspaceId),
-            () => _workspaceRepository.GetByIdAsync(workspaceId),
-            ttl
-        ) ?? throw new NotFoundException("Workspace", workspaceId);
-
+        var workspace = await _workspaceRepository.GetByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
         var WorkspaceRole = new WorkspaceRole(workspace, req.Name, req.Description) { Workspace = workspace };
-
         var created = await _workspaceRoleRepository.CreateAsync(WorkspaceRole);
-        var dto = _mapper.Map<WorkspaceRoleDto>(WorkspaceRole);
-
-        await _socket.NotififyGroup(workspaceId, "WorkspaceRoleCreated", dto);
-        await _cache.SetAsync(CacheKeys.WorkspaceRole(workspaceId, created.Id), created, ttl);
-        await _cache.DeleteAsync(CacheKeys.WorkspaceRoles(workspaceId));
-
+        var dto = _mapper.Map<WorkspaceRoleDto>(created);
+        await _socket.NotififyGroup(req.WorkspaceId, "WorkspaceRoleCreated", dto);
         return dto;
     }
 
-    public async Task<WorkspaceRoleDto> UpdateAsync(string workspaceId, string id, UpdateWorkspaceRoleRequest req)
+    public async Task<WorkspaceRoleDto> UpdateAsync(string id, UpdateWorkspaceRoleRequest req)
     {
-        var key = CacheKeys.WorkspaceRole(workspaceId, id);
-        var WorkspaceRole = await _cache.GetOrSetAsync(key, () => _workspaceRoleRepository.GetByIdAsync(id), ttl)
-            ?? throw new NotFoundException("WorkspaceRole", id);
+        var workspaceRole = await _workspaceRoleRepository.GetByIdAsync(id) ?? throw new NotFoundException("WorkspaceRole", id);
 
-        WorkspaceRole.Name = req.Name ?? WorkspaceRole.Name;
-        WorkspaceRole.Description = req.Description ?? WorkspaceRole.Description;
+        workspaceRole.Name = req.Name ?? workspaceRole.Name;
+        workspaceRole.Description = req.Description ?? workspaceRole.Description;
 
-        var updated = await _workspaceRoleRepository.UpdateAsync(WorkspaceRole);
+        var updated = await _workspaceRoleRepository.UpdateAsync(workspaceRole);
         var dto = _mapper.Map<WorkspaceRoleDto>(updated);
-
-        await _cache.SetAsync(key, dto, TimeSpan.FromMinutes(10));
-        await _socket.NotififyGroup(workspaceId, "WorkspaceRoleUpdated", dto);
-        await _cache.DeleteAsync(CacheKeys.WorkspaceRoles(workspaceId));
-
+        await _socket.NotififyGroup(updated.WorkspaceId, "WorkspaceRoleUpdated", dto);
         return dto;
     }
 
-    public async Task<bool> DeleteAsync(string workspaceId, string id)
+    public async Task<bool> DeleteAsync(string id)
     {
-        var key = CacheKeys.WorkspaceRole(workspaceId, id);
-        var WorkspaceRole = await _cache.GetOrSetAsync(key, () => _workspaceRoleRepository.GetByIdAsync(id), ttl)
-            ?? throw new NotFoundException("WorkspaceRole", id);
-
-        var success = await _workspaceRoleRepository.DeleteAsync(WorkspaceRole);
+        var workspaceRole = await _workspaceRoleRepository.GetByIdAsync(id) ?? throw new NotFoundException("WorkspaceRole", id);
+        var success = await _workspaceRoleRepository.DeleteAsync(workspaceRole);
         if (success)
         {
-            await _socket.NotififyGroup(WorkspaceRole.WorkspaceId, "WorkspaceRoleDeleted", id);
-            await _cache.DeleteAsync([
-                CacheKeys.WorkspaceRoles(workspaceId),
-                CacheKeys.WorkspaceRole(workspaceId, id)
-            ]);
+            await _socket.NotififyGroup(workspaceRole.WorkspaceId, "WorkspaceRoleDeleted", id);
         }
         return success;
     }
 
-    public Task<WorkspaceRoleDto?> GetByIdAsync(string workspaceId, string id)
-    => _cache.GetOrSetAsync<WorkspaceRole?, WorkspaceRoleDto?>(
-        CacheKeys.WorkspaceRole(workspaceId, id),
-        () => _workspaceRoleRepository.GetByIdAsync(id),
-        ttl
-    );
+    public async Task<WorkspaceRoleDto?> GetByIdAsync(string id)
+    => _mapper.Map<WorkspaceRoleDto?>(await _workspaceRoleRepository.GetByIdAsync(id));
 
-    public Task<List<WorkspaceRoleDto>> GetByWorkspaceIdAsync(string workspaceId)
-    => _cache.GetOrSetAsync<List<WorkspaceRole>, List<WorkspaceRoleDto>>(
-        CacheKeys.WorkspaceRoles(workspaceId),
-        () => _workspaceRoleRepository.GetByWorkspaceIdAsync(workspaceId),
-        ttl
-    );
+    public async Task<List<WorkspaceRoleDto>> GetByWorkspaceIdAsync(string workspaceId)
+    => _mapper.Map<List<WorkspaceRoleDto>>(await _workspaceRoleRepository.GetByWorkspaceIdAsync(workspaceId));
 
     // public async Task<ActionResult> AddRoleToMemberAsync(string id, string userId)
     // {
