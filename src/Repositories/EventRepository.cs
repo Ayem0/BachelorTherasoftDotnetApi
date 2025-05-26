@@ -47,7 +47,7 @@ public class EventRepository : BaseRepository<Event>, IEventRepository
             .Include(x => x.EventCategory)
             .Include(x => x.Room)
             .Include(x => x.Workspace)
-            .Where(e => EventUtils.IsInRange(e, start, end) && e.Users.Select(x => x.UserId).Contains(id)).ToListAsync();
+            .Where(e => e.StartDate < end && start > e.EndDate && e.Users.Select(x => x.UserId).Contains(id)).ToListAsync();
     }
 
     public async Task<List<Event>> GetByRangeAndRoomIdAsync(string id, DateTime start, DateTime end)
