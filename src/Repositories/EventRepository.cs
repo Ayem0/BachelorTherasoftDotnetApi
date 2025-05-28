@@ -47,18 +47,18 @@ public class EventRepository : BaseRepository<Event>, IEventRepository
             .Include(x => x.EventCategory)
             .Include(x => x.Room)
             .Include(x => x.Workspace)
-            .Where(e => e.StartDate < end && start > e.EndDate && e.Users.Select(x => x.UserId).Contains(id)).ToListAsync();
+            .Where(e => e.StartDate <= end && start >= e.EndDate && e.Users.Any(x => x.UserId == id)).ToListAsync();
     }
 
     public async Task<List<Event>> GetByRangeAndRoomIdAsync(string id, DateTime start, DateTime end)
     {
-        return await _dbSet.Where(e => EventUtils.IsInRange(e, start, end) && e.RoomId == id).ToListAsync();
+        return await _dbSet.Where(e => e.StartDate < end && start > e.EndDate && e.RoomId == id).ToListAsync();
     }
 
     public Task<List<Event>> GetEventsByUserIdsAndRoomIdAsync(List<string> userIds, string roomId, DateTime start, DateTime end)
     {
         return _dbSet
              .Include(e => e.Users)
-             .Where(e => EventUtils.IsInRange(e, start, end) && (e.Users.Select(x => x.UserId).Any(id => userIds.Contains(id)) || e.RoomId == roomId)).ToListAsync();
+             .Where(e => e.StartDate < end && start > e.EndDate && (e.Users.Select(x => x.UserId).Any(id => userIds.Contains(id)) || e.RoomId == roomId)).ToListAsync();
     }
 }

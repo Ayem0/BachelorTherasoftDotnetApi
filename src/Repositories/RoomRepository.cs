@@ -67,8 +67,8 @@ public class RoomRepository : BaseRepository<Room>, IRoomRepository
         try
         {
             return await _dbSet
-                .Include(x => x.Events.Where(e => EventUtils.IsInRange(e, start, end)))
-                .Include(x => x.Slots.Where(s => EventUtils.IsInRange(s, start, end)))
+                .Include(x => x.Events.Where(e => e.StartDate < end && start > e.EndDate))
+                .Include(x => x.Slots.Where(s => s.StartDate < end && start > s.EndDate))
                 .Where(x => x.Id == id)
                 .FirstOrDefaultAsync();
         }

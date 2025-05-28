@@ -363,12 +363,10 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     WorkspaceId = table.Column<string>(type: "varchar(255)", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    StartTime = table.Column<TimeSpan>(type: "time(6)", nullable: false),
-                    EndTime = table.Column<TimeSpan>(type: "time(6)", nullable: false),
                     RepetitionInterval = table.Column<int>(type: "int", nullable: true),
                     RepetitionNumber = table.Column<int>(type: "int", nullable: true),
                     MainSlotId = table.Column<string>(type: "varchar(255)", nullable: true),
-                    RepetitionEndDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    RepetitionEndDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
@@ -622,7 +620,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     RepetitionInterval = table.Column<int>(type: "int", nullable: true),
                     RepetitionNumber = table.Column<int>(type: "int", nullable: true),
                     MainEventId = table.Column<string>(type: "varchar(255)", nullable: true),
-                    RepetitionEndDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    RepetitionEndDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     WorkspaceId = table.Column<string>(type: "varchar(255)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)

@@ -16,7 +16,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "9.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("BachelorTherasoftDotnetApi.src.Models.Area", b =>
@@ -133,8 +133,8 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<string>("MainEventId")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<DateOnly?>("RepetitionEndDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime?>("RepetitionEndDate")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("RepetitionInterval")
                         .HasColumnType("int");
@@ -503,9 +503,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("time(6)");
-
                     b.Property<string>("MainSlotId")
                         .HasColumnType("varchar(255)");
 
@@ -513,8 +510,8 @@ namespace BachelorTherasoftDotnetApi.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<DateOnly?>("RepetitionEndDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime?>("RepetitionEndDate")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("RepetitionInterval")
                         .HasColumnType("int");
@@ -524,9 +521,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("time(6)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");

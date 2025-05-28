@@ -10,7 +10,7 @@ public class Event : BaseEntity, IBaseEntity
     public string Id { get; set; } = string.Empty;
     public Event() { }
     public Event(Workspace workspace, string? description, DateTime startDate, DateTime endDate, Room room, EventCategory eventCategory, List<Participant> participants, List<EventUser> users,
-        List<Tag> tags, Interval? repetitionInterval, int? repetitionNumber, Event? mainEvent, DateOnly? repetitionEndDate)
+        List<Tag> tags, Interval? repetitionInterval, int? repetitionNumber, Event? mainEvent, DateTime? repetitionEndDate)
     {
         Workspace = workspace;
         WorkspaceId = workspace.Id;
@@ -31,7 +31,7 @@ public class Event : BaseEntity, IBaseEntity
         Users = users;
     }
     public Event(string workspaceId, string? description, DateTime startDate, DateTime endDate, string roomId, string eventCategoryId, Interval? repetitionInterval,
-    int? repetitionNumber, string? mainEventId, DateOnly? repetitionEndDate)
+    int? repetitionNumber, string? mainEventId, DateTime? repetitionEndDate)
     {
         WorkspaceId = workspaceId;
         Description = description;
@@ -56,7 +56,7 @@ public class Event : BaseEntity, IBaseEntity
     public int? RepetitionNumber { get; set; }
     public Event? MainEvent { get; set; }
     public string? MainEventId { get; set; }
-    public DateOnly? RepetitionEndDate { get; set; }
+    public DateTime? RepetitionEndDate { get; set; }
     public string WorkspaceId { get; set; }
     public required Workspace Workspace { get; set; }
 

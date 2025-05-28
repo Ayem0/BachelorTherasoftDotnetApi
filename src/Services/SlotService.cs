@@ -5,7 +5,6 @@ using BachelorTherasoftDotnetApi.src.Exceptions;
 using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using BachelorTherasoftDotnetApi.src.Models;
-using BachelorTherasoftDotnetApi.src.Utils;
 using BachelorTherasoftDotnetApi.Utils;
 
 namespace BachelorTherasoftDotnetApi.src.Services;
@@ -63,7 +62,7 @@ public class SlotService : ISlotService
             }
         }
 
-        var slot = new Slot(req.Name, req.Description, workspace, req.StartDate, req.EndDate, req.StartTime, req.EndTime, eventCategories, null, null, null, null)
+        var slot = new Slot(req.Name, req.Description, workspace, req.StartDate, req.EndDate, eventCategories, null, null, null, null)
         {
             Workspace = workspace
         };
@@ -88,26 +87,26 @@ public class SlotService : ISlotService
             }
         }
 
-        var mainSlot = new Slot(req.Name, req.Description, workspace, req.StartDate, req.EndDate, req.StartTime, req.EndTime, eventCategories,
+        var mainSlot = new Slot(req.Name, req.Description, workspace, req.StartDate, req.EndDate, eventCategories,
         req.RepetitionInterval, req.RepetitionNumber, null, req.RepetitionEndDate)
         {
             Workspace = workspace
         };
 
         List<Slot> slots = [mainSlot];
-        var repetitionStartDate = Repetition.IncrementDateOnly(req.StartDate, req.RepetitionInterval, req.RepetitionNumber);
-        var repetitionEndDate = Repetition.IncrementDateOnly(req.EndDate, req.RepetitionInterval, req.RepetitionNumber);
+        var repetitionStartDate = Repetition.IncrementDateTime(req.StartDate, req.RepetitionInterval, req.RepetitionNumber);
+        var repetitionEndDate = Repetition.IncrementDateTime(req.EndDate, req.RepetitionInterval, req.RepetitionNumber);
 
         while (repetitionStartDate < req.RepetitionEndDate)
         {
-            var slot = new Slot(req.Name, req.Description, workspace, repetitionStartDate, repetitionEndDate, req.StartTime, req.EndTime, eventCategories, null, null, mainSlot, null)
+            var slot = new Slot(req.Name, req.Description, workspace, repetitionStartDate, repetitionEndDate, eventCategories, null, null, mainSlot, null)
             {
                 Workspace = workspace
             };
             slots.Add(slot);
 
-            repetitionStartDate = Repetition.IncrementDateOnly(req.StartDate, req.RepetitionInterval, req.RepetitionNumber);
-            repetitionEndDate = Repetition.IncrementDateOnly(req.EndDate, req.RepetitionInterval, req.RepetitionNumber);
+            repetitionStartDate = Repetition.IncrementDateTime(req.StartDate, req.RepetitionInterval, req.RepetitionNumber);
+            repetitionEndDate = Repetition.IncrementDateTime(req.EndDate, req.RepetitionInterval, req.RepetitionNumber);
         }
         var created = await _slotRepository.CreateMultipleAsync(slots);
         var dto = _mapper.Map<List<SlotDto>>(created);

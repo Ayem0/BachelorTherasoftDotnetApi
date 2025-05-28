@@ -88,34 +88,34 @@ public class MySqlDbContext : IdentityDbContext<User, Role, string>
         // );
 
         // Configuration pour DateOnly
-        builder.Entity<Slot>()
-            .Property(s => s.StartDate)
-            .HasConversion(
-                d => d.ToDateTime(TimeOnly.MinValue), // Conversion de DateOnly vers DateTime
-                d => DateOnly.FromDateTime(d)        // Conversion de DateTime vers DateOnly
-            );
+        // builder.Entity<Slot>()
+        //     .Property(s => s.StartDate)
+        //     .HasConversion(
+        //         d => d.ToDateTime(TimeOnly.MinValue), // Conversion de DateOnly vers DateTime
+        //         d => DateOnly.FromDateTime(d)        // Conversion de DateTime vers DateOnly
+        //     );
 
-        builder.Entity<Slot>()
-            .Property(s => s.EndDate)
-            .HasConversion(
-                d => d.ToDateTime(TimeOnly.MinValue),
-                d => DateOnly.FromDateTime(d)
-            );
+        // builder.Entity<Slot>()
+        //     .Property(s => s.EndDate)
+        //     .HasConversion(
+        //         d => d.ToDateTime(TimeOnly.MinValue),
+        //         d => DateOnly.FromDateTime(d)
+        //     );
 
-        // // Configuration pour TimeOnly
-        builder.Entity<Slot>()
-            .Property(s => s.StartTime)
-            .HasConversion(
-                t => t.ToTimeSpan(),          // Conversion de TimeOnly vers TimeSpan
-                t => TimeOnly.FromTimeSpan(t)       // Conversion de TimeSpan vers TimeOnly
-            );
+        // // // Configuration pour TimeOnly
+        // builder.Entity<Slot>()
+        //     .Property(s => s.StartTime)
+        //     .HasConversion(
+        //         t => t.ToTimeSpan(),          // Conversion de TimeOnly vers TimeSpan
+        //         t => TimeOnly.FromTimeSpan(t)       // Conversion de TimeSpan vers TimeOnly
+        //     );
 
-        builder.Entity<Slot>()
-            .Property(s => s.EndTime)
-            .HasConversion(
-                t => t.ToTimeSpan(),
-                t => TimeOnly.FromTimeSpan(t)
-            );
+        // builder.Entity<Slot>()
+        //     .Property(s => s.EndTime)
+        //     .HasConversion(
+        //         t => t.ToTimeSpan(),
+        //         t => TimeOnly.FromTimeSpan(t)
+        //     );
 
 
 

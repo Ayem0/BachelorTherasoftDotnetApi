@@ -150,7 +150,7 @@ public class EventService : IEventService
         var repetitionStartDate = Repetition.IncrementDateTime(req.StartDate, req.RepetitionInterval, req.RepetitionNumber);
         var repetitionEndDate = Repetition.IncrementDateTime(req.EndDate, req.RepetitionInterval, req.RepetitionNumber);
 
-        while (DateOnly.FromDateTime(repetitionStartDate) < req.RepetitionEndDate)
+        while (repetitionStartDate < req.RepetitionEndDate)
         {
             var @event = new Event(room.Workspace, req.Description, repetitionStartDate, repetitionEndDate, room, eventCategory, participants, eventUsers, tags,
                 null, null, mainEvent, null)

@@ -9,8 +9,8 @@ public class Slot : BaseEntity, IBaseEntity
     [Key]
     public string Id { get; set; } = string.Empty;
     public Slot() { }
-    public Slot(string name, string? description, Workspace workspace, DateOnly startDate, DateOnly endDate, TimeOnly startTime, TimeOnly endTime, List<EventCategory> eventCategories, Interval? repetitionInterval,
-        int? repetitionNumber, Slot? mainSlot, DateOnly? repetitionEndDate)
+    public Slot(string name, string? description, Workspace workspace, DateTime startDate, DateTime endDate, List<EventCategory> eventCategories, Interval? repetitionInterval,
+        int? repetitionNumber, Slot? mainSlot, DateTime? repetitionEndDate)
     {
         Workspace = workspace;
         WorkspaceId = workspace.Id;
@@ -18,8 +18,6 @@ public class Slot : BaseEntity, IBaseEntity
         Description = description;
         StartDate = startDate;
         EndDate = endDate;
-        StartTime = startTime;
-        EndTime = endTime;
         EventCategories = eventCategories;
         RepetitionInterval = repetitionInterval;
         RepetitionNumber = repetitionNumber;
@@ -28,16 +26,14 @@ public class Slot : BaseEntity, IBaseEntity
         RepetitionEndDate = repetitionEndDate;
     }
 
-    public Slot(string name, string? description, string workspaceId, DateOnly startDate, DateOnly endDate, TimeOnly startTime, TimeOnly endTime, Interval? repetitionInterval,
-    int? repetitionNumber, string? mainSlotId, DateOnly? repetitionEndDate)
+    public Slot(string name, string? description, string workspaceId, DateTime startDate, DateTime endDate, Interval? repetitionInterval,
+    int? repetitionNumber, string? mainSlotId, DateTime? repetitionEndDate)
     {
         Name = name;
         Description = description;
         WorkspaceId = workspaceId;
         StartDate = startDate;
         EndDate = endDate;
-        StartTime = startTime;
-        EndTime = endTime;
         RepetitionInterval = repetitionInterval;
         RepetitionNumber = repetitionNumber;
         MainSlotId = mainSlotId;
@@ -48,14 +44,12 @@ public class Slot : BaseEntity, IBaseEntity
     public required Workspace Workspace { get; set; }
     public string WorkspaceId { get; set; }
     public List<Room> Rooms { get; set; } = [];
-    public DateOnly StartDate { get; set; }
-    public DateOnly EndDate { get; set; }
-    public TimeOnly StartTime { get; set; }
-    public TimeOnly EndTime { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
     public List<EventCategory> EventCategories { get; set; } = [];
     public Interval? RepetitionInterval { get; set; }
     public int? RepetitionNumber { get; set; }
     public Slot? MainSlot { get; set; }
     public string? MainSlotId { get; set; }
-    public DateOnly? RepetitionEndDate { get; set; }
+    public DateTime? RepetitionEndDate { get; set; }
 }

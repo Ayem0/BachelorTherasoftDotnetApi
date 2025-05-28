@@ -12,9 +12,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
     public class EventController : ControllerBase
     {
         private readonly IEventService _eventService;
-        public EventController(IEventService eventService)
+        private readonly ILogger<EventController> _logger;
+        public EventController(IEventService eventService, ILogger<EventController> logger)
         {
             _eventService = eventService;
+            _logger = logger;
         }
         /// <summary>
         /// Get a Event by id.
@@ -115,6 +117,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return Unauthorized();
+            _logger.LogDebug("DATE RECEIVED start: {start}, end: {end}", start, end);
 
             var res = await _eventService.GetByRangeAndUserIdAsync(userId, start, end);
             return Ok(res);
