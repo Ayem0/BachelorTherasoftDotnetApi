@@ -47,7 +47,26 @@ public class EventRepository : BaseRepository<Event>, IEventRepository
             .Include(x => x.EventCategory)
             .Include(x => x.Room)
             .Include(x => x.Workspace)
-            .Where(e => e.StartDate <= end && start >= e.EndDate && e.Users.Any(x => x.UserId == id)).ToListAsync();
+            .Where(e => ((e.StartDate <= end && e.EndDate >= end)
+            || (e.StartDate > start && e.EndDate < end)
+            || (e.StartDate < start && e.EndDate > start && e.EndDate < end)
+            || (e.StartDate > start && e.EndDate > end && e.StartDate < end))
+
+            //             // event with same date or starting before and ending after
+            // (event.startDate <= dateRange.start && event.endDate >= dateRange.end) ||
+            // // event starting after and ending before
+            // (event.startDate > dateRange.start && event.endDate < dateRange.end) ||
+            // // event starting before and ending before
+            // (event.startDate < dateRange.start &&
+            //   event.endDate > dateRange.start &&
+            //   event.endDate < dateRange.end) ||
+            // // event starting after and ending after
+            // (event.startDate > dateRange.start &&
+            //   event.endDate > dateRange.end &&
+            //   event.startDate < dateRange.end)
+
+
+            && e.Users.Any(x => x.UserId == id)).ToListAsync();
     }
 
     public async Task<List<Event>> GetByRangeAndRoomIdAsync(string id, DateTime start, DateTime end)

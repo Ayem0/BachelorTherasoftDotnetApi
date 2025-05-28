@@ -117,7 +117,7 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         {
             string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return Unauthorized();
-            _logger.LogDebug("DATE RECEIVED start: {start}, end: {end}", start, end);
+            _logger.LogDebug("DATE RECEIVED start: {start}, end: {end}, userID: {userID}", start, end, userId);
 
             var res = await _eventService.GetByRangeAndUserIdAsync(userId, start, end);
             return Ok(res);
