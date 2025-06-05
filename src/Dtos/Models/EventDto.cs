@@ -25,7 +25,7 @@ public class EventDto
     public List<ParticipantDto>? Participants { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public List<UserDto>? Members { get; set; }
+    public List<EventUserDto>? Users { get; set; } = null;
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<TagDto>? Tags { get; set; }

@@ -47,6 +47,8 @@ public class EventCategoryService : IEventCategoryService
 
         ec.Name = req.Name ?? ec.Name;
         ec.Description = req.Description ?? ec.Description;
+        ec.Color = req.Color ?? ec.Color;
+        ec.Icon = req.Icon ?? ec.Icon;
 
         var updated = await _eventCategoryRepository.UpdateAsync(ec);
         var dto = _mapper.Map<EventCategoryDto>(updated);

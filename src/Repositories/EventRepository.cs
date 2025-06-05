@@ -17,13 +17,13 @@ public class EventRepository : BaseRepository<Event>, IEventRepository
     public async Task<Event?> GetByIdJoinRelationsAsync(string id)
     {
         return await _dbSet
+            .Include(e => e.Workspace)
             .Include(e => e.Room)
             .Include(e => e.EventCategory)
             .Include(e => e.Users)
             .Include(e => e.Participants)
             .Include(e => e.Tags)
-            .Where(e => e.Id == id && e.DeletedAt == null && e.Room.DeletedAt == null && e.EventCategory.DeletedAt == null && e.Users.All(u => u.DeletedAt == null) &&
-                e.Participants.All(p => p.DeletedAt == null) && e.Tags.All(t => t.DeletedAt == null))
+            .Where(e => e.Id == id)
             .FirstOrDefaultAsync();
     }
 
@@ -42,6 +42,7 @@ public class EventRepository : BaseRepository<Event>, IEventRepository
     {
         return await _dbSet
             .Include(x => x.Users)
+                .ThenInclude(eu => eu.User)
             .Include(x => x.Participants)
             .Include(x => x.Tags)
             .Include(x => x.EventCategory)

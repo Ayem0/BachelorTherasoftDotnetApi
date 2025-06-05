@@ -21,11 +21,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Get a Event by id.
         /// </summary>
-        [HttpGet("")]
+        [HttpGet("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById([FromQuery] string id)
+        public async Task<IActionResult> GetById([FromRoute] string id)
         {
             var res = await _eventService.GetByIdAsync(id);
             return Ok(res);
