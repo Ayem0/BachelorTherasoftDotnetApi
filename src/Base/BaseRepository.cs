@@ -22,12 +22,25 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class, IBaseEntity
     {
         try
         {
-            return await _dbSet.FirstOrDefaultAsync(x => x.Id == id && x.DeletedAt == null);
+            return await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error getting {nameof(T)} with ID '{id}' : {ex.Message}");
             throw new DbException(DbAction.Read, nameof(T), id);
+        }
+    }
+
+    public async Task<List<T>> GetByIdsAsync(List<string> ids)
+    {
+        try
+        {
+            return await _dbSet.Where(x => ids.Contains(x.Id)).ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting {nameof(T)} with ID '{ids}' : {ex.Message}");
+            throw new DbException(DbAction.Read, nameof(T), "");
         }
     }
 

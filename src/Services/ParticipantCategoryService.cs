@@ -32,7 +32,7 @@ public class ParticipantCategoryService : IParticipantCategoryService
     public async Task<ParticipantCategoryDto> CreateAsync(CreateParticipantCategoryRequest req)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
-        var pc = new ParticipantCategory(workspace, req.Name, req.Description, req.Color, req.Icon) { Workspace = workspace };
+        var pc = new ParticipantCategory(workspace, req.Name, req.Description, req.Color) { Workspace = workspace };
         var created = await _participantCategoryRepository.CreateAsync(pc);
         var dto = _mapper.Map<ParticipantCategoryDto>(created);
         await _socket.NotififyGroup(req.WorkspaceId, "ParticipantCategoryCreated", dto);
@@ -43,6 +43,7 @@ public class ParticipantCategoryService : IParticipantCategoryService
     {
         var pc = await _participantCategoryRepository.GetByIdAsync(id) ?? throw new NotFoundException("ParticipantCategory", id);
 
+        pc.Color = req.Color ?? pc.Color;
         pc.Name = req.Name ?? pc.Name;
         pc.Description = req.Description ?? pc.Description;
 

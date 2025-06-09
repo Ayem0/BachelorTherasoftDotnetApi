@@ -83,6 +83,7 @@ namespace BachelorTherasoftDotnetApi.Migrations
                 {
                     Id = table.Column<string>(type: "varchar(255)", nullable: false),
                     Name = table.Column<string>(type: "longtext", nullable: false),
+                    Color = table.Column<string>(type: "longtext", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
@@ -284,7 +285,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     Id = table.Column<string>(type: "varchar(255)", nullable: false),
                     WorkspaceId = table.Column<string>(type: "varchar(255)", nullable: false),
                     Name = table.Column<string>(type: "longtext", nullable: false),
-                    Icon = table.Column<string>(type: "longtext", nullable: false),
                     Color = table.Column<string>(type: "longtext", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
@@ -337,7 +337,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     Name = table.Column<string>(type: "longtext", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: true),
                     Color = table.Column<string>(type: "longtext", nullable: false),
-                    Icon = table.Column<string>(type: "longtext", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
@@ -394,7 +393,6 @@ namespace BachelorTherasoftDotnetApi.Migrations
                     Id = table.Column<string>(type: "varchar(255)", nullable: false),
                     WorkspaceId = table.Column<string>(type: "varchar(255)", nullable: false),
                     Name = table.Column<string>(type: "longtext", nullable: false),
-                    Icon = table.Column<string>(type: "longtext", nullable: false),
                     Color = table.Column<string>(type: "longtext", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),

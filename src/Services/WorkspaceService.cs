@@ -32,7 +32,7 @@ public class WorkspaceService : IWorkspaceService
     public async Task<WorkspaceDto> CreateAsync(string userId, CreateWorkspaceRequest req)
     {
         var user = await _userRepository.GetByIdAsync(userId) ?? throw new NotFoundException("User", userId);
-        var workspace = new Workspace(req.Name, req.Description);
+        var workspace = new Workspace(req.Name, req.Color, req.Description);
         workspace.Users.Add(user);
         var created = await _workspaceRepository.CreateAsync(workspace);
         var dto = _mapper.Map<WorkspaceDto>(workspace);
@@ -46,6 +46,7 @@ public class WorkspaceService : IWorkspaceService
         var workspace = await _workspaceRepository.GetByIdAsync(id) ?? throw new NotFoundException("Workspace", id);
 
         workspace.Name = req.Name ?? workspace.Name;
+        workspace.Color = req.Color ?? workspace.Color;
         workspace.Description = req.Description ?? workspace.Description;
 
         var updated = await _workspaceRepository.UpdateAsync(workspace);

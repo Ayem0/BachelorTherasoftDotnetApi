@@ -51,11 +51,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Deletes a Event.
         /// </summary>
-        [HttpDelete("")]
+        [HttpDelete("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete([FromQuery] string id)
+        public async Task<IActionResult> Delete([FromRoute] string id)
         {
             var res = await _eventService.DeleteAsync(id);
             return res ? NoContent() : NotFound(new ProblemDetails() { Title = $"Event with id '{id} not found.'" });
@@ -64,12 +64,12 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
         /// <summary>
         /// Updates a Event.
         /// </summary>
-        [HttpPut("")]
+        [HttpPut("{id}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update([FromQuery] string id, [FromBody] UpdateEventRequest request)
+        public async Task<IActionResult> Update([FromRoute] string id, [FromBody] UpdateEventRequest request)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList());
 
@@ -91,19 +91,6 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
             if (userId == null) return Unauthorized();
             var res = await _eventService.CreateWithRepetitionAsync(userId, request);
             return CreatedAtAction(null, res);
-        }
-
-        /// <summary>
-        /// Get events by range and room id.
-        /// </summary>
-        [HttpGet("room")]
-        [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByRoomId([FromQuery] string id, [FromQuery] DateTime start, [FromQuery] DateTime end)
-        {
-            var res = await _eventService.GetByRangeAndRoomIdAsync(id, start, end);
-            return Ok(res);
         }
 
         /// <summary>

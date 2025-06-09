@@ -32,7 +32,7 @@ public class TagService : ITagService
     public async Task<TagDto> CreateAsync(CreateTagRequest req)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
-        var tag = new Tag(workspace, req.Name, req.Icon, req.Color, req.Description) { Workspace = workspace };
+        var tag = new Tag(workspace, req.Name, req.Color, req.Description) { Workspace = workspace };
         var created = await _tagRepository.CreateAsync(tag);
         var dto = _mapper.Map<TagDto>(created);
         await _socket.NotififyGroup(req.WorkspaceId, "TagCreated", dto);
@@ -46,7 +46,6 @@ public class TagService : ITagService
         tag.Name = req.Name ?? tag.Name;
         tag.Description = req.Description ?? tag.Description;
         tag.Color = req.Color ?? tag.Color;
-        tag.Icon = req.Icon ?? tag.Icon;
 
         var updated = await _tagRepository.UpdateAsync(tag);
         var dto = _mapper.Map<TagDto>(updated);

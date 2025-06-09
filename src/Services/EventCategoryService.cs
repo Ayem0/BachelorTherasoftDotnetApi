@@ -34,7 +34,7 @@ public class EventCategoryService : IEventCategoryService
     public async Task<EventCategoryDto> CreateAsync(CreateEventCategoryRequest req)
     {
         var workspace = await _workspaceRepository.GetByIdAsync(req.WorkspaceId) ?? throw new NotFoundException("Workspace", req.WorkspaceId);
-        var eventCategory = new EventCategory(workspace, req.Name, req.Icon, req.Color, req.Description) { Workspace = workspace };
+        var eventCategory = new EventCategory(workspace, req.Name, req.Color, req.Description) { Workspace = workspace };
         var created = await _eventCategoryRepository.CreateAsync(eventCategory);
         var dto = _mapper.Map<EventCategoryDto>(created);
         await _socket.NotififyGroup(req.WorkspaceId, "EventCategoryCreated", dto);
@@ -46,9 +46,8 @@ public class EventCategoryService : IEventCategoryService
         var ec = await _eventCategoryRepository.GetByIdAsync(id) ?? throw new NotFoundException("EventCategory", id);
 
         ec.Name = req.Name ?? ec.Name;
-        ec.Description = req.Description ?? ec.Description;
         ec.Color = req.Color ?? ec.Color;
-        ec.Icon = req.Icon ?? ec.Icon;
+        ec.Description = req.Description ?? ec.Description;
 
         var updated = await _eventCategoryRepository.UpdateAsync(ec);
         var dto = _mapper.Map<EventCategoryDto>(updated);

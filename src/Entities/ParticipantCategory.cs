@@ -8,20 +8,18 @@ public class ParticipantCategory : BaseEntity, IBaseEntity
     [Key]
     public string Id { get; set; } = string.Empty;
     public ParticipantCategory() { }
-    public ParticipantCategory(Workspace workspace, string name, string? description, string color, string icon)
+    public ParticipantCategory(Workspace workspace, string name, string? description, string color)
     {
         Workspace = workspace;
         WorkspaceId = workspace.Id;
         Name = name;
-        Icon = icon;
         Description = description;
         Color = color;
     }
-    public ParticipantCategory(string workspaceId, string name, string? description, string color, string icon)
+    public ParticipantCategory(string workspaceId, string name, string? description, string color)
     {
         WorkspaceId = workspaceId;
         Name = name;
-        Icon = icon;
         Description = description;
         Color = color;
     }
@@ -31,7 +29,6 @@ public class ParticipantCategory : BaseEntity, IBaseEntity
     public string Name { get; set; }
     public string? Description { get; set; }
     public string Color { get; set; }
-    public string Icon { get; set; }
 
     public List<Participant> Participants { get; set; } = [];
 }
