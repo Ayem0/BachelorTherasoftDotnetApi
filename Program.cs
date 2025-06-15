@@ -22,26 +22,28 @@ var builder = WebApplication.CreateBuilder(args);
 // Controllers
 builder.Services.AddControllers();
 
-// Redis service
+// Redis cache integration
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("Redis")!;
 });
 
-// EFCore cache interceptor
+// EFCore second level cache interceptor
 builder.Services.AddEFSecondLevelCache(options =>
+    // use Redis
     options.UseStackExchangeRedisCacheProvider(builder.Configuration.GetConnectionString("Redis")!, timeout: TimeSpan.FromMinutes(10))
         .ConfigureLogging(true)
-        .CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(10))
+        .CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(10)) // Default expiration time is 10 mins
 );
 
-// MySQL service
+// EFCore database context
 builder.Services.AddDbContext<MySqlDbContext>((sp, options) =>
-    {
-        options.UseMySQL(builder.Configuration.GetConnectionString("MySQL")!);
-        options.AddInterceptors(sp.GetRequiredService<SecondLevelCacheInterceptor>());
-    }
-);
+{
+    // use MySQL
+    options.UseMySQL(builder.Configuration.GetConnectionString("MySQL")!);
+    // add cache interceptor
+    options.AddInterceptors(sp.GetRequiredService<SecondLevelCacheInterceptor>());
+});
 
 // builder.Services.AddDbContext<MySqlDbContext>(
 //     options => options.UseMySql(

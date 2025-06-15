@@ -4,14 +4,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.src.Databases;
 
-public class MySqlDbContext : IdentityDbContext<User, Role, string>
+public class MySqlDbContext : IdentityDbContext<User, Role, string> 
 {
     public MySqlDbContext(DbContextOptions<MySqlDbContext> options) : base(options)
     {
     }
     public DbSet<Area> Area { get; set; }
-    public DbSet<Document> Document { get; set; }
-    public DbSet<DocumentCategory> DocumentCategory { get; set; }
     public DbSet<Event> Event { get; set; }
     public DbSet<EventCategory> EventCategory { get; set; }
     public DbSet<Tag> Tag { get; set; }
@@ -24,11 +22,9 @@ public class MySqlDbContext : IdentityDbContext<User, Role, string>
     public DbSet<EventUser> EventUser { get; set; }
     public DbSet<WorkspaceRole> WorkspaceRole { get; set; }
     public DbSet<Invitation> Invitatition { get; set; }
-    public DbSet<Notification> Notification { get; set; }
-
+    
     protected override void OnModelCreating(ModelBuilder builder)
     {
-
         base.OnModelCreating(builder);
         builder.Entity<Workspace>().HasQueryFilter(w => w.DeletedAt == null);
         builder.Entity<Area>().HasQueryFilter(a => a.DeletedAt == null);
@@ -44,7 +40,40 @@ public class MySqlDbContext : IdentityDbContext<User, Role, string>
         builder.Entity<Slot>().HasQueryFilter(s => s.DeletedAt == null);
         builder.Entity<WorkspaceRole>().HasQueryFilter(wr => wr.DeletedAt == null);
         builder.Entity<Invitation>().HasQueryFilter(i => i.DeletedAt == null);
+
         builder.Entity<Notification>().HasQueryFilter(n => n.DeletedAt == null);
+        // Contacts
+        builder.Entity<User>()
+            .HasMany(u => u.Contacts)
+            .WithMany()
+            .UsingEntity<Dictionary<string, object>>(
+            "UserContactUser",
+            u => u.HasOne<User>().WithMany().HasForeignKey("ContactId"),
+            u => u.HasOne<User>().WithMany().HasForeignKey("UserId")
+            );
+
+        builder.Entity<User>()
+            .HasMany(u => u.BlockedUsers)
+            .WithMany()
+            .UsingEntity<Dictionary<string, object>>(
+            "UserBlockedUser",
+            u => u.HasOne<User>().WithMany().HasForeignKey("BlockedUserId"),
+            u => u.HasOne<User>().WithMany().HasForeignKey("UserId")
+            ); ;
+
+        // EventUser
+        builder.Entity<EventUser>()
+            .HasKey(uw => new { uw.EventId, uw.UserId });
+
+        builder.Entity<EventUser>()
+            .HasOne(uw => uw.User)
+            .WithMany(u => u.Events)
+            .HasForeignKey(uw => uw.UserId);
+
+        builder.Entity<EventUser>()
+            .HasOne(uw => uw.Event)
+            .WithMany(u => u.Users)
+            .HasForeignKey(uw => uw.EventId);
 
         // builder.Entity<Area>().HasKey(x => x.Id);
         // builder.Entity<Workspace>().HasKey(x => x.Id);
@@ -61,25 +90,6 @@ public class MySqlDbContext : IdentityDbContext<User, Role, string>
         // builder.Entity<WorkspaceRole>().HasKey(x => x.Id);
         // builder.Entity<Invitation>().HasKey(x => x.Id);
         // builder.Entity<Notification>().HasKey(x => x.Id);
-
-        // Contacts
-        builder.Entity<User>()
-            .HasMany(u => u.Contacts)
-            .WithMany()
-            .UsingEntity<Dictionary<string, object>>(
-            "UserContactUser",
-            j => j.HasOne<User>().WithMany().HasForeignKey("ContactId"),
-            j => j.HasOne<User>().WithMany().HasForeignKey("UserId")
-            );
-
-        builder.Entity<User>()
-            .HasMany(u => u.BlockedUsers)
-            .WithMany()
-            .UsingEntity<Dictionary<string, object>>(
-            "UserBlockedUser",
-            j => j.HasOne<User>().WithMany().HasForeignKey("BlockedUserId"),
-            j => j.HasOne<User>().WithMany().HasForeignKey("UserId")
-            ); ;
 
         // var JsonSerializerOptions = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
         // var dayOfWeekConverter = new ValueConverter<List<DayOfWeek>?, string?>(
@@ -116,21 +126,5 @@ public class MySqlDbContext : IdentityDbContext<User, Role, string>
         //         t => t.ToTimeSpan(),
         //         t => TimeOnly.FromTimeSpan(t)
         //     );
-
-
-
-        // EventUser
-        builder.Entity<EventUser>()
-            .HasKey(uw => new { uw.EventId, uw.UserId });
-
-        builder.Entity<EventUser>()
-            .HasOne(uw => uw.User)
-            .WithMany(u => u.Events)
-            .HasForeignKey(uw => uw.UserId);
-
-        builder.Entity<EventUser>()
-            .HasOne(uw => uw.Event)
-            .WithMany(u => u.Users)
-            .HasForeignKey(uw => uw.EventId);
     }
 }

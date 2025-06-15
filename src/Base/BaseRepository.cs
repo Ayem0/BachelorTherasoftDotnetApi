@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BachelorTherasoftDotnetApi.src.Base;
 
-public class BaseRepository<T> : IBaseRepository<T> where T : class, IBaseEntity
+public abstract class BaseRepository<T> : IBaseRepository<T> where T : class, IBaseEntity
 {
     protected readonly MySqlDbContext _context;
     protected readonly DbSet<T> _dbSet;
@@ -22,25 +22,14 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class, IBaseEntity
     {
         try
         {
-            return await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
+            return await _dbSet
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error getting {nameof(T)} with ID '{id}' : {ex.Message}");
+            _logger.LogError("Error getting {name} with id '{id}' : {ex.Message}", nameof(T), id, ex.Message);
             throw new DbException(DbAction.Read, nameof(T), id);
-        }
-    }
-
-    public async Task<List<T>> GetByIdsAsync(List<string> ids)
-    {
-        try
-        {
-            return await _dbSet.Where(x => ids.Contains(x.Id)).ToListAsync();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error getting {nameof(T)} with ID '{ids}' : {ex.Message}");
-            throw new DbException(DbAction.Read, nameof(T), "");
         }
     }
 
@@ -56,7 +45,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class, IBaseEntity
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error creating {nameof(T)} : {ex.Message}");
+            _logger.LogError("Error creating {name} : {ex.Message}", nameof(T), ex.Message);
             throw new DbException(DbAction.Create, nameof(T));
         }
     }
@@ -72,7 +61,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class, IBaseEntity
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error updating {nameof(entity)} with ID '{entity.Id}' : {ex.Message}");
+            _logger.LogError("Error updating {name} with id '{id}' : {ex.Message}", nameof(T), entity.Id, ex.Message);
             throw new DbException(DbAction.Update, nameof(entity), entity.Id);
         }
     }
@@ -87,8 +76,26 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class, IBaseEntity
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error deleting {nameof(T)} with ID '{entity.Id}' : {ex.Message}");
+            _logger.LogError("Error deleting {name} with id '{id}' : {ex.Message}", nameof(T), entity.Id, ex.Message);
             throw new DbException(DbAction.Delete, nameof(T), entity.Id);
+        }
+    }
+
+    public async Task<bool> DeleteMultipleAsync(List<T> entities)
+    {
+        try
+        {
+            foreach (var entity in entities)
+            {
+                entity.DeletedAt = DateTime.UtcNow;
+            }
+            _dbSet.UpdateRange(entities);
+            return await _context.SaveChangesAsync() > 0;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Error deleting {name} with ids '{ids}' : {ex.Message}", nameof(T), entities.Select(e => e.Id), ex.Message);
+            throw new DbException(DbAction.Delete, nameof(T));
         }
     }
 
@@ -106,7 +113,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class, IBaseEntity
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error creating mutliple {nameof(T)} : {ex.Message}");
+            _logger.LogError("Error creating multiple {name} : {ex.Message}", nameof(T), ex.Message);
             throw new DbException(DbAction.Create, nameof(T));
         }
     }
@@ -121,9 +128,23 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class, IBaseEntity
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error updating mutliple {nameof(T)} : {ex.Message}");
+            _logger.LogError("Error updating multiple {name} with ids '{ids}' : {ex.Message}", nameof(T), entities.Select(e => e.Id), ex.Message);
             throw new DbException(DbAction.Update, nameof(T));
         }
     }
+
+    public async Task<List<T>> GetByIdsAsync(List<string> ids)
+    {
+        try
+        {
+            return await _dbSet.Where(x => ids.Contains(x.Id)).ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Error getting {name} with ids '{ids}' : {ex.Message}", nameof(T), ids, ex.Message);
+            throw new DbException(DbAction.Read, nameof(T));
+        }
+    }
+
 }
 

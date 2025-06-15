@@ -208,7 +208,7 @@ public class EventService : IEventService
      => _mapper.Map<EventDto?>(await _eventRepository.GetByIdJoinRelationsAsync(id));
 
     public async Task<List<EventDto>> GetByRangeAndUserIdAsync(string id, DateTime start, DateTime end)
-    => _mapper.Map<List<EventDto>>(await _eventRepository.GetByRangeAndUserIdAsync(id, start, end));
+    => _mapper.Map<List<EventDto>>(await _eventRepository.GetByRangeAndUserIdJoinRelationsAsync(id, start, end));
 
     public async Task<List<EventDto>> GetByRangeAndRoomIdAsync(string id, DateTime start, DateTime end)
     => _mapper.Map<List<EventDto>>(await _eventRepository.GetByRangeAndRoomIdAsync(id, start, end));
