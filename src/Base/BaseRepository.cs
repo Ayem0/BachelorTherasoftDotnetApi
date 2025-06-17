@@ -23,7 +23,6 @@ public abstract class BaseRepository<T> : IBaseRepository<T> where T : class, IB
         try
         {
             return await _dbSet
-                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
         catch (Exception ex)

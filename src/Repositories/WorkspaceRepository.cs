@@ -19,7 +19,6 @@ public class WorkspaceRepository : BaseRepository<Workspace>, IWorkspaceReposito
         try
         {
             return await _dbSet
-                .AsNoTracking()
                 .Where(w => w.Users.Any(x => x.Id == id))
                 .ToListAsync();
         }

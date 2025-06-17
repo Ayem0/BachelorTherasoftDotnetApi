@@ -17,19 +17,19 @@ public class SocketService : ISocketService
 
     public Task NotififyGroup(string groupId, string key, object value)
     {
-        _logger.LogInformation("Notififying group '{groupId}' with key '{key}' with value '{value}'", groupId, key, value);
+        _logger.LogDebug("Notififying group '{groupId}' with key '{key}' with value '{value}'", groupId, key, value);
         return _hub.Clients.Group(groupId).SendAsync(key, value);
     }
 
     public Task NotififyUser(string userId, string key, object value)
     {
-        _logger.LogInformation("Notififying user '{userId}' with key '{key}' with value '{value}'", userId, key, value);
+        _logger.LogDebug("Notififying user '{userId}' with key '{key}' with value '{value}'", userId, key, value);
         return _hub.Clients.User(userId).SendAsync(key, value);
     }
 
     public Task NotififyUsers(IEnumerable<string> userIds, string key, object value)
     {
-        _logger.LogInformation("Notififying users '{userIds}' with key '{key}' with value '{value}'", userIds, key, value);
+        _logger.LogDebug("Notififying users '{userIds}' with key '{key}' with value '{value}'", userIds, key, value);
         return _hub.Clients.Users(userIds).SendAsync(key, value);
     }
 }

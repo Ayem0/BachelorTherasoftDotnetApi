@@ -1,4 +1,3 @@
-using BachelorTherasoftDotnetApi.src.Interfaces.Repositories;
 using BachelorTherasoftDotnetApi.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -9,48 +8,52 @@ namespace BachelorTherasoftDotnetApi.src.Hubs;
 public class GlobalHub : Hub
 {
     private readonly IWorkspaceService _workspaceService;
-    public GlobalHub(IWorkspaceService workspaceService)
+    private readonly ILogger<GlobalHub> _logger;
+    public GlobalHub(IWorkspaceService workspaceService, ILogger<GlobalHub> logger)
     {
         _workspaceService = workspaceService;
+        _logger = logger;
     }
 
     public override async Task<Task> OnConnectedAsync()
     {
+        _logger.LogDebug("OnConnectedAsync : connectionId '{connectionId}', userId '{userId}'", Context.ConnectionId, Context.UserIdentifier);
         var userId = Context.UserIdentifier;
         if (userId != null)
         {
             var workspaces = await _workspaceService.GetByUserIdAsync(userId);
             foreach (var workspace in workspaces)
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, workspace.Id);
+                await AddToGroupAsync(workspace.Id);
             }
         }
-
         return base.OnConnectedAsync();
     }
 
     public override async Task<Task> OnDisconnectedAsync(Exception? exception)
     {
+        _logger.LogDebug("OnDisconnectedAsync : connectionId '{connectionId}', userId '{userId}'", Context.ConnectionId, Context.UserIdentifier);
         var userId = Context.UserIdentifier;
         if (userId != null)
         {
             var workspaces = await _workspaceService.GetByUserIdAsync(userId);
             foreach (var workspace in workspaces)
             {
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, workspace.Id);
+                await RemoveFromGroupAsync(workspace.Id);
             }
         }
-
         return base.OnDisconnectedAsync(exception);
     }
 
-    public async Task NotifyGroup(string groupId, string key, object value)
+    public Task AddToGroupAsync(string groupName)
     {
-        await Clients.Group(groupId).SendAsync(key, value);
+        _logger.LogDebug("AddToGroupAsync : connectionId '{connectionId}', groupName '{groupName}'", Context.ConnectionId, groupName);
+        return Groups.AddToGroupAsync(Context.ConnectionId, groupName);
     }
 
-    public async Task NotifyUser(string userId, string key, object value)
+    public Task RemoveFromGroupAsync(string groupName)
     {
-        await Clients.User(userId).SendAsync(key, value);
+        _logger.LogDebug("AddToGroupAsync : connectionId '{connectionId}', groupName '{groupName}'", Context.ConnectionId, groupName);
+        return Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
     }
 }

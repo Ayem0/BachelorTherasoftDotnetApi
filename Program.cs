@@ -84,14 +84,7 @@ builder.Services
         options.ClientSecret = googleSection["ClientSecret"]!;
         options.CallbackPath = "/signin-oidc";
         options.SignInScheme = IdentityConstants.ExternalScheme;
-        // options.NonceCookie.SameSite = SameSiteMode.None;
-        // options.NonceCookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         options.ProtocolValidator.RequireNonce = false;
-        // options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "sub");
-        // options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
-        // options.ClaimActions.MapJsonKey(ClaimTypes.GivenName, "firstName");
-        // options.ClaimActions.MapJsonKey(ClaimTypes.Surname, "lastName");
-        // options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
         options.Scope.Add("openid");
         options.Scope.Add("profile");
         options.Scope.Add("email");
@@ -103,7 +96,6 @@ builder.Services.AddIdentityApiEndpoints<User>(options =>
 {
     // options.SignIn.RequireConfirmedEmail = true;
     options.User.RequireUniqueEmail = true;
-    // options.User.AllowedUserNameCharacters = "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN0123456789";
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 10;
     options.Password.RequireDigit = true;
@@ -111,6 +103,8 @@ builder.Services.AddIdentityApiEndpoints<User>(options =>
     options.Password.RequireUppercase = true;
     options.Lockout.MaxFailedAccessAttempts = 5;
 }).AddEntityFrameworkStores<MySqlDbContext>();
+
+
 // Rate Limiting middleware
 builder.Services.AddRateLimiter(options =>
 {

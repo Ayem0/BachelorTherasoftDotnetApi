@@ -15,19 +15,28 @@ public class WorkspaceService : IWorkspaceService
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
     private readonly ISocketService _socket;
+    private readonly ILogger<WorkspaceService> _logger;
 
     public WorkspaceService(
         IWorkspaceRepository workspaceRepository,
         IUserRepository userRepository,
         IMapper mapper,
-        ISocketService socket
+        ISocketService socket,
+        ILogger<WorkspaceService> logger
     )
     {
         _workspaceRepository = workspaceRepository;
         _userRepository = userRepository;
         _mapper = mapper;
         _socket = socket;
+        _logger = logger;
     }
+
+    public async Task<WorkspaceDto?> GetByIdAsync(string id)
+    => _mapper.Map<WorkspaceDto?>(await _workspaceRepository.GetByIdAsync(id));
+
+    public async Task<List<WorkspaceDto>> GetByUserIdAsync(string userId)
+    => _mapper.Map<List<WorkspaceDto>>(await _workspaceRepository.GetByUserIdAsync(userId));
 
     public async Task<WorkspaceDto> CreateAsync(string userId, CreateWorkspaceRequest req)
     {
@@ -35,9 +44,9 @@ public class WorkspaceService : IWorkspaceService
         var workspace = new Workspace(req.Name, req.Color, req.Description);
         workspace.Users.Add(user);
         var created = await _workspaceRepository.CreateAsync(workspace);
-        var dto = _mapper.Map<WorkspaceDto>(workspace);
+        var dto = _mapper.Map<WorkspaceDto>(created);
 
-        await _socket.NotififyGroup(created.Id, "WorkspaceCreated", dto);
+        await _socket.NotififyUser(user.Id, "WorkspaceAdded", dto);
         return dto;
     }
 
@@ -65,45 +74,5 @@ public class WorkspaceService : IWorkspaceService
         }
         return success;
     }
-
-    public async Task<WorkspaceDto?> GetByIdAsync(string id)
-    => _mapper.Map<WorkspaceDto?>(await _workspaceRepository.GetByIdAsync(id));
-
-    public async Task<List<WorkspaceDto>> GetByUserIdAsync(string userId)
-    => _mapper.Map<List<WorkspaceDto>>(await _workspaceRepository.GetByUserIdAsync(userId));
-
-    // TODO do this in the user service, and user controller
-    // public async Task<List<MemberDto>> GetMembersByIdAsync(string workspaceId)
-    // {
-    //     var setKey = $"workspace:{workspaceId}:users";
-    //     var cachedKeys = await _cache.GetSetAsync(setKey);
-    //     if (cachedKeys.Any())
-    //     {
-    //         var cachedUsers = await _cache.GetHashesAsync<MemberDto>(cachedKeys);
-    //         return cachedUsers;
-    //     }
-    //     var workspace = await _workspaceRepository.GetJoinUsersByIdAsync(workspaceId) ?? throw new NotFoundException("Workspace", workspaceId);
-    //     var membersDto = _mapper.Map<List<MemberDto>>(workspace.Users);
-    //     await _cache.SetHashesAsync(membersDto.Select(m => $"user:{m.Id}"), membersDto, TimeSpan.FromMinutes(10));
-    //     await _cache.AddSetAsync(setKey, membersDto.Select(m => $"user:{m.Id}"), TimeSpan.FromMinutes(5));
-    //     return membersDto;
-    // }
-
-    // public async Task<ActionResult> RemoveMemberAsync(string id, string userId)
-    // {
-    //     var workspace = await _workspaceRepository.GetByIdAsync(id);
-    //     if (workspace == null) return Response.NotFound(id, "Workspace");
-
-    //     var workspaceUser = workspace.Users.Where(x => x.UserId == userId).First();
-    //     if (workspaceUser == null) return Response.NotFound(userId, "User");
-
-    //     workspaceUser.DeletedAt = DateTime.UtcNow;
-
-    //     var res2 = await _workspaceRepository.UpdateAsync(workspace);
-
-    //     return Response.Ok("Successfully removed member.");
-    // }
-
-
 
 }

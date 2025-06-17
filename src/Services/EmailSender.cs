@@ -9,14 +9,12 @@ namespace BachelorTherasoftDotnetApi.src.Services;
 public class EmailSender : IEmailSender
 {
     private readonly ILogger<EmailSender> _logger;
-
+    public AuthMessageSenderOptions Options { get; }
     public EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor, ILogger<EmailSender> logger)
     {
         Options = optionsAccessor.Value;
         _logger = logger;
     }
-    // 
-    public AuthMessageSenderOptions Options { get; }
 
     public async Task SendEmailAsync(string toEmail, string subject, string message)
     {
@@ -32,19 +30,19 @@ public class EmailSender : IEmailSender
         var client = new SendGridClient(apiKey);
         var msg = new SendGridMessage()
         {
-            From = new EmailAddress("chess.legends.sendgrid@gmail.com", "Chess Legends"),
+            From = new EmailAddress(Options.FromEmail, Options.FromName),
             Subject = subject,
             PlainTextContent = message,
             HtmlContent = message
         };
         msg.AddTo(new EmailAddress(toEmail));
-
-        // Disable click tracking. test
         // See https://sendgrid.com/docs/User_Guide/Settings/tracking.html
         msg.SetClickTracking(false, false);
         var response = await client.SendEmailAsync(msg);
-        _logger.LogInformation(response.IsSuccessStatusCode
-                               ? $"Email to {toEmail} queued successfully!"
-                               : $"Failure Email to {toEmail}");
+        _logger.LogInformation(
+            response.IsSuccessStatusCode
+            ? $"Email to {toEmail} queued successfully!"
+            : $"Failure Email to {toEmail}"
+        );
     }
 }

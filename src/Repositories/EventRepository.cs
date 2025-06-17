@@ -21,7 +21,6 @@ public class EventRepository : BaseRepository<Event>, IEventRepository
         try
         {
             return await _dbSet
-               .AsNoTracking()
                .Include(e => e.Workspace)
                .Include(e => e.Room)
                .Include(e => e.EventCategory)
