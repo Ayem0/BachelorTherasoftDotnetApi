@@ -1,3 +1,4 @@
+using System.Text.Json;
 using BachelorTherasoftDotnetApi.src.Models;
 using Google.Apis.Auth.AspNetCore3;
 using Microsoft.AspNetCore.Authentication;
@@ -13,9 +14,11 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
     {
 
         private readonly SignInManager<User> _signInManager;
-        public AuthController(SignInManager<User> signInManager)
+        private readonly UserManager<User> _userManager;
+        public AuthController(SignInManager<User> signInManager, UserManager<User> userManager)
         {
             _signInManager = signInManager;
+            _userManager = userManager;
         }
         /// <summary>
         /// Logout.
@@ -60,13 +63,24 @@ namespace BachelorTherasoftDotnetApi.src.Controllers
                 Console.WriteLine("------------------- ------------------- ERROR FROM GOOGLE :", result.Failure?.Message);
                 return Unauthorized();
             }
+            var principal = result.Principal;
+            var email = principal.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
+                ?? principal.FindFirst("email")?.Value;
+            var name = (principal.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value
+                ?? principal.FindFirst("name")?.Value)?.Split(' ');
+            var firstName = name?[0] ?? null;
+            var lastName = name?[1] ?? null;
+            if (email == null)
+                return Unauthorized();
+            User? user;
+            user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                user = new() { UserName = email, Email = email, FirstName = firstName, LastName = lastName };
+                await _userManager.CreateAsync(user);
+            }
 
-            Console.WriteLine("------------------- ------------------- WOWOWO SUCESS -------------------------------------- ");
-
-            var payload = result.Principal;
-
-            Console.WriteLine("IT WORKED I GUESS NOW DO STUFF TO SEE IF USER IS ALRIGHT LOGGED IN....");
-
+            await _signInManager.SignInAsync(user, true);
             return Redirect("http://localhost:4200/");
         }
     }

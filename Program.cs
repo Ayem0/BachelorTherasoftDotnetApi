@@ -61,7 +61,7 @@ builder.Services.AddDbContext<MySqlDbContext>((sp, options) =>
 
 // Cors client
 builder.Services.AddCors(options => options.AddPolicy("Client",
-    policy => policy.WithOrigins("http://localhost:4200", "http://localhost:4444")
+    policy => policy.WithOrigins("http://localhost:4200", "https://localhost")
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials()
@@ -71,11 +71,9 @@ builder.Services.AddCors(options => options.AddPolicy("Client",
 
 // Authentication service
 var authSection = builder.Configuration.GetSection("Auth");
-builder.Services
-    .AddAuthentication(options =>
+builder.Services.AddAuthentication(options =>
     {
         options.DefaultScheme = IdentityConstants.ApplicationScheme;
-        options.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
     })
     .AddGoogleOpenIdConnect(options =>
     {
