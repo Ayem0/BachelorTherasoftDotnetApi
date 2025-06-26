@@ -8,6 +8,7 @@ public class Workspace : BaseEntity, IBaseEntity
 {
     [Key]
     public string Id { get; set; } = string.Empty;
+    // Empty ctor for deserialization
     public Workspace() { }
     public Workspace(string name, string color, string? description, List<User> users)
     {
@@ -15,12 +16,6 @@ public class Workspace : BaseEntity, IBaseEntity
         Color = color;
         Description = description;
         Users = users;
-    }
-    public Workspace(string name, string color, string? description)
-    {
-        Name = name;
-        Color = color;
-        Description = description;
     }
     public string Name { get; set; }
     public string Color { get; set; }

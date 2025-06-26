@@ -41,8 +41,7 @@ public class WorkspaceService : IWorkspaceService
     public async Task<WorkspaceDto> CreateAsync(string userId, CreateWorkspaceRequest req)
     {
         var user = await _userRepository.GetByIdAsync(userId) ?? throw new NotFoundException("User", userId);
-        var workspace = new Workspace(req.Name, req.Color, req.Description);
-        workspace.Users.Add(user);
+        var workspace = new Workspace(req.Name, req.Color, req.Description, [user]);
         var created = await _workspaceRepository.CreateAsync(workspace);
         var dto = _mapper.Map<WorkspaceDto>(created);
 
